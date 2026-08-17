@@ -1,0 +1,1643 @@
+{
+  "schema_version": 1,
+  "reframe_version": "0.1.0",
+  "config_hash": "sha256:b955cf0f80c1d98bb9af55c9e2421b9a1c29e0066f3856ea3983664d35d5e0c2",
+  "video": {
+    "slug": "demo-01",
+    "source_path": "/private/tmp/claude-501/-Users-vimalkumaryadav-epic-reframe/2aef8729-d3c4-4279-9954-ebdd5c0e2f64/scratchpad/fake_app.mp4",
+    "sha256": "0d9f0f9db62c24b1982a485e1ec3eed69e0ce7e1494de8e2fc053a08c1830018",
+    "duration_s": 30.0,
+    "width": 1920,
+    "height": 1080,
+    "fps": 30.0,
+    "rotation": 0,
+    "codec": "mpeg4"
+  },
+  "stages_completed": [
+    "00",
+    "01",
+    "02",
+    "03",
+    "04",
+    "05",
+    "06",
+    "07",
+    "08"
+  ],
+  "stage_inputs": {
+    "00": {},
+    "01": {
+      "sample": "a4e24f180b949d2a"
+    },
+    "02": {
+      "sample": "a4e24f180b949d2a",
+      "rectify": "04b400b357f9579b"
+    },
+    "03": {
+      "rectify": "04b400b357f9579b",
+      "clean": "c89cce023ad4413f"
+    },
+    "04": {
+      "rectify": "04b400b357f9579b",
+      "clean": "c89cce023ad4413f",
+      "dedupe": "de450809d0561cef"
+    },
+    "05": {
+      "rectify": "04b400b357f9579b",
+      "dedupe": "de450809d0561cef",
+      "ocr": "7e3a388036f01b77"
+    },
+    "06": {
+      "dedupe": "de450809d0561cef",
+      "ocr": "7e3a388036f01b77",
+      "identify": "d5ac4c1852c9e98f",
+      "confidence": "55614587d11b7677"
+    },
+    "07": {
+      "classify": "30874d86fdb07669",
+      "confidence": "55614587d11b7677"
+    },
+    "08": {
+      "classify": "30874d86fdb07669",
+      "confidence": "55614587d11b7677"
+    }
+  },
+  "warnings": [],
+  "review_spans": [
+    {
+      "t_ms_start": 0,
+      "t_ms_end": 2000,
+      "reason": "06:low-confidence",
+      "detail": "'Dashboard' — confidence 0.57 is below confidence.accept_threshold 0.75",
+      "frame_ids": [
+        "f_000000"
+      ]
+    },
+    {
+      "t_ms_start": 0,
+      "t_ms_end": 2000,
+      "reason": "07:confirm-partial",
+      "detail": "'Dashboard' is built at /dashboard; the footage shows tabs [Summary, Activity, Alerts]. If the component is missing any of them, add 'Dashboard' to classify.partial_labels to move it into the build queue",
+      "frame_ids": [
+        "f_000000"
+      ]
+    },
+    {
+      "t_ms_start": 12000,
+      "t_ms_end": 17000,
+      "reason": "07:confirm-partial",
+      "detail": "'Work Queue' is built at /work-queue; the footage shows tabs [Open, Assigned, Closed]. If the component is missing any of them, add 'Work Queue' to classify.partial_labels to move it into the build queue",
+      "frame_ids": [
+        "f_000012"
+      ]
+    }
+  ],
+  "inventory": {
+    "project": "demoapp",
+    "commit": "41b6eb3f",
+    "path": "/private/tmp/claude-501/-Users-vimalkumaryadav-epic-reframe/2aef8729-d3c4-4279-9954-ebdd5c0e2f64/scratchpad/fake-app/inventory.json",
+    "entry_count": 5
+  },
+  "frames": [
+    {
+      "id": "f_000000",
+      "t_ms": 0,
+      "path": "frames/raw/f_000000__t00m00s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.99,
+            96.32
+          ],
+          [
+            1711.88,
+            136.78
+          ],
+          [
+            1684.54,
+            973.43
+          ],
+          [
+            250.71,
+            933.64
+          ]
+        ],
+        "quad_confidence": 0.7167,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006000000002d8000008c019860c0000031020000009200000020022180",
+        "distance_from_last_kept": null,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000001",
+      "t_ms": 1000,
+      "path": "frames/raw/f_000001__t00m01s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.19,
+            96.31
+          ],
+          [
+            1712.21,
+            136.78
+          ],
+          [
+            1684.84,
+            972.99
+          ],
+          [
+            251.02,
+            932.55
+          ]
+        ],
+        "quad_confidence": 0.717,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006000000002d800000cc01986080000020000000009200000030022180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000002",
+      "t_ms": 2000,
+      "path": "frames/raw/f_000002__t00m02s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.38,
+            96.3
+          ],
+          [
+            1711.88,
+            136.77
+          ],
+          [
+            1685.15,
+            973.43
+          ],
+          [
+            251.34,
+            933.64
+          ]
+        ],
+        "quad_confidence": 0.717,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006000000002d8000008c019860c0000020000000009200000020022180",
+        "distance_from_last_kept": 1.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000003",
+      "t_ms": 3000,
+      "path": "frames/raw/f_000003__t00m03s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.19,
+            96.1
+          ],
+          [
+            1711.87,
+            136.78
+          ],
+          [
+            1684.84,
+            972.99
+          ],
+          [
+            251.12,
+            933.54
+          ]
+        ],
+        "quad_confidence": 0.7165,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006d00000002d800000cc01986080000028200000009200000030022180",
+        "distance_from_last_kept": 4.2,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000004",
+      "t_ms": 4000,
+      "path": "frames/raw/f_000004__t00m04s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.38,
+            95.9
+          ],
+          [
+            1711.86,
+            136.78
+          ],
+          [
+            1685.15,
+            972.55
+          ],
+          [
+            251.34,
+            933.64
+          ]
+        ],
+        "quad_confidence": 0.7172,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006900000002d800000cc01986080000028200000009200000030022180",
+        "distance_from_last_kept": 1.2,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000005",
+      "t_ms": 5000,
+      "path": "frames/raw/f_000005__t00m05s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.38,
+            95.22
+          ],
+          [
+            1711.86,
+            136.99
+          ],
+          [
+            1685.27,
+            972.55
+          ],
+          [
+            250.9,
+            933.43
+          ]
+        ],
+        "quad_confidence": 0.7167,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:38000006980000002d800000cc01986080000028000000009200000030022180",
+        "distance_from_last_kept": 1.9,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000006",
+      "t_ms": 6000,
+      "path": "frames/raw/f_000006__t00m06s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.5,
+            94.83
+          ],
+          [
+            1711.86,
+            136.99
+          ],
+          [
+            1685.27,
+            971.79
+          ],
+          [
+            251.34,
+            933.64
+          ]
+        ],
+        "quad_confidence": 0.7107,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006880000006d6000008c01986080000021100000019280000120022181",
+        "distance_from_last_kept": 7.1,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000007",
+      "t_ms": 7000,
+      "path": "frames/raw/f_000007__t00m07s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.65,
+            94.83
+          ],
+          [
+            1712.54,
+            136.99
+          ],
+          [
+            1685.27,
+            971.79
+          ],
+          [
+            251.61,
+            933.64
+          ]
+        ],
+        "quad_confidence": 0.7105,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006000000006d6000008c019860a0000021100000019280000120222181",
+        "distance_from_last_kept": 2.2,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000008",
+      "t_ms": 8000,
+      "path": "frames/raw/f_000008__t00m08s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.65,
+            94.83
+          ],
+          [
+            1711.57,
+            137.23
+          ],
+          [
+            1685.27,
+            971.55
+          ],
+          [
+            251.61,
+            933.66
+          ]
+        ],
+        "quad_confidence": 0.7109,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006080000006d6000008c019860a0000021100000019280000120222181",
+        "distance_from_last_kept": 2.5,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000009",
+      "t_ms": 9000,
+      "path": "frames/raw/f_000009__t00m09s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.5,
+            93.98
+          ],
+          [
+            1711.57,
+            136.99
+          ],
+          [
+            1685.27,
+            971.55
+          ],
+          [
+            251.61,
+            933.66
+          ]
+        ],
+        "quad_confidence": 0.7107,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006000000006d6000008c019860a0000021000000019280000120022181",
+        "distance_from_last_kept": 1.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000010",
+      "t_ms": 10000,
+      "path": "frames/raw/f_000010__t00m10s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.71,
+            93.98
+          ],
+          [
+            1711.57,
+            137.23
+          ],
+          [
+            1684.53,
+            971.79
+          ],
+          [
+            251.74,
+            934.46
+          ]
+        ],
+        "quad_confidence": 0.7109,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006880000006d6000008c019860a0000020000000009280000020222180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000011",
+      "t_ms": 11000,
+      "path": "frames/raw/f_000011__t00m11s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.53,
+            94.83
+          ],
+          [
+            1711.57,
+            137.23
+          ],
+          [
+            1684.34,
+            971.49
+          ],
+          [
+            252.54,
+            934.46
+          ]
+        ],
+        "quad_confidence": 0.7117,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:58000006880000006d6000008c019860a0000020120000009280000020222180",
+        "distance_from_last_kept": 2.0,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000012",
+      "t_ms": 12000,
+      "path": "frames/raw/f_000012__t00m12s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.71,
+            94.95
+          ],
+          [
+            1711.89,
+            137.23
+          ],
+          [
+            1684.53,
+            971.49
+          ],
+          [
+            252.54,
+            934.46
+          ]
+        ],
+        "quad_confidence": 0.7143,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800000608000000490000008c019860a000002181000001b600000120022181",
+        "distance_from_last_kept": 4.5,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000013",
+      "t_ms": 13000,
+      "path": "frames/raw/f_000013__t00m13s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.71,
+            95.03
+          ],
+          [
+            1712.62,
+            137.3
+          ],
+          [
+            1684.53,
+            971.79
+          ],
+          [
+            252.65,
+            934.17
+          ]
+        ],
+        "quad_confidence": 0.7147,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800008618000000490000008c019860a0000020a0000000b600000020022180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000014",
+      "t_ms": 14000,
+      "path": "frames/raw/f_000014__t00m14s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.9,
+            95.48
+          ],
+          [
+            1713.58,
+            137.3
+          ],
+          [
+            1684.53,
+            972.01
+          ],
+          [
+            253.16,
+            934.17
+          ]
+        ],
+        "quad_confidence": 0.7146,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800000600000000490000008c019860a000002000000000b600000020022180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000015",
+      "t_ms": 15000,
+      "path": "frames/raw/f_000015__t00m15s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.89,
+            95.48
+          ],
+          [
+            1713.58,
+            138.04
+          ],
+          [
+            1684.53,
+            972.53
+          ],
+          [
+            253.44,
+            933.49
+          ]
+        ],
+        "quad_confidence": 0.7139,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800000618000000490000008c019860a0000021a1000001b600000121022181",
+        "distance_from_last_kept": 1.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000016",
+      "t_ms": 16000,
+      "path": "frames/raw/f_000016__t00m16s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.89,
+            95.48
+          ],
+          [
+            1713.51,
+            138.34
+          ],
+          [
+            1684.34,
+            972.53
+          ],
+          [
+            253.44,
+            933.49
+          ]
+        ],
+        "quad_confidence": 0.7141,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800000618000000490000008c019860a000002020000000b600000020022180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000017",
+      "t_ms": 17000,
+      "path": "frames/raw/f_000017__t00m17s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.9,
+            95.03
+          ],
+          [
+            1713.51,
+            138.34
+          ],
+          [
+            1684.21,
+            972.53
+          ],
+          [
+            252.65,
+            933.49
+          ]
+        ],
+        "quad_confidence": 0.7147,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:5800000618000000490000008c019860a000002020000000b600000020022180",
+        "distance_from_last_kept": 2.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000018",
+      "t_ms": 18000,
+      "path": "frames/raw/f_000018__t00m18s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.07,
+            95.48
+          ],
+          [
+            1713.58,
+            138.34
+          ],
+          [
+            1684.21,
+            972.53
+          ],
+          [
+            252.65,
+            933.49
+          ]
+        ],
+        "quad_confidence": 0.7182,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000668000000660000008c01986082000020820000009000000020022180",
+        "distance_from_last_kept": 6.5,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000019",
+      "t_ms": 19000,
+      "path": "frames/raw/f_000019__t00m19s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.55,
+            95.49
+          ],
+          [
+            1713.51,
+            137.47
+          ],
+          [
+            1684.21,
+            972.53
+          ],
+          [
+            252.56,
+            933.41
+          ]
+        ],
+        "quad_confidence": 0.7176,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000640000000660000008c019860a0000021800000019000000120022181",
+        "distance_from_last_kept": 3.5,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000020",
+      "t_ms": 20000,
+      "path": "frames/raw/f_000020__t00m20s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.04,
+            95.49
+          ],
+          [
+            1713.51,
+            138.35
+          ],
+          [
+            1685.48,
+            972.53
+          ],
+          [
+            252.37,
+            932.72
+          ]
+        ],
+        "quad_confidence": 0.7184,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000640000000660000008c019860a0000021800000019100000120022181",
+        "distance_from_last_kept": 3.2,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000021",
+      "t_ms": 21000,
+      "path": "frames/raw/f_000021__t00m21s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.04,
+            95.49
+          ],
+          [
+            1712.75,
+            137.47
+          ],
+          [
+            1683.34,
+            972.63
+          ],
+          [
+            252.56,
+            932.72
+          ]
+        ],
+        "quad_confidence": 0.7178,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000640000000660000008c01986080000021800000019000000120022181",
+        "distance_from_last_kept": 3.5,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000022",
+      "t_ms": 22000,
+      "path": "frames/raw/f_000022__t00m22s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.04,
+            95.49
+          ],
+          [
+            1712.75,
+            137.47
+          ],
+          [
+            1683.34,
+            972.63
+          ],
+          [
+            252.37,
+            933.41
+          ]
+        ],
+        "quad_confidence": 0.7182,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000668000000660000008c01986080000020800000009000000020222180",
+        "distance_from_last_kept": 1.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000023",
+      "t_ms": 23000,
+      "path": "frames/raw/f_000023__t00m23s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.04,
+            95.49
+          ],
+          [
+            1712.56,
+            137.47
+          ],
+          [
+            1683.34,
+            972.55
+          ],
+          [
+            251.03,
+            933.4
+          ]
+        ],
+        "quad_confidence": 0.7173,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:4c00000660000000660000008c01986090000021800000019800000120022181",
+        "distance_from_last_kept": 3.2,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000024",
+      "t_ms": 24000,
+      "path": "frames/raw/f_000024__t00m24s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.54,
+            95.76
+          ],
+          [
+            1712.56,
+            137.47
+          ],
+          [
+            1683.34,
+            972.55
+          ],
+          [
+            251.0,
+            933.41
+          ]
+        ],
+        "quad_confidence": 0.7142,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:70000006a000000069980000cc01986082000028400000009660000030022180",
+        "distance_from_last_kept": 9.0,
+        "kept": true
+      }
+    },
+    {
+      "id": "f_000025",
+      "t_ms": 25000,
+      "path": "frames/raw/f_000025__t00m25s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.54,
+            95.87
+          ],
+          [
+            1711.95,
+            137.47
+          ],
+          [
+            1683.48,
+            972.51
+          ],
+          [
+            250.81,
+            933.41
+          ]
+        ],
+        "quad_confidence": 0.7138,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:700000023000000069980000cc01986080000020400000009660000031022180",
+        "distance_from_last_kept": 3.2,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000026",
+      "t_ms": 26000,
+      "path": "frames/raw/f_000026__t00m26s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.83,
+            96.17
+          ],
+          [
+            1712.26,
+            137.16
+          ],
+          [
+            1684.4,
+            972.51
+          ],
+          [
+            250.47,
+            933.41
+          ]
+        ],
+        "quad_confidence": 0.7139,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:7000000620000000699800008c01986080000020400000009660000020022180",
+        "distance_from_last_kept": 1.9,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000027",
+      "t_ms": 27000,
+      "path": "frames/raw/f_000027__t00m27s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            228.54,
+            95.87
+          ],
+          [
+            1711.95,
+            137.51
+          ],
+          [
+            1683.48,
+            972.47
+          ],
+          [
+            250.13,
+            933.4
+          ]
+        ],
+        "quad_confidence": 0.7137,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:70000006a000000069980000cc01986080000020400000009660000030022180",
+        "distance_from_last_kept": 0.6,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000028",
+      "t_ms": 28000,
+      "path": "frames/raw/f_000028__t00m28s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            227.59,
+            96.37
+          ],
+          [
+            1711.9,
+            137.97
+          ],
+          [
+            1684.4,
+            972.46
+          ],
+          [
+            250.47,
+            933.42
+          ]
+        ],
+        "quad_confidence": 0.7146,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:70000006a0000000a9980000cc01986080000020420000001660000030222180",
+        "distance_from_last_kept": 2.9,
+        "kept": false
+      }
+    },
+    {
+      "id": "f_000029",
+      "t_ms": 29000,
+      "path": "frames/raw/f_000029__t00m29s.jpg",
+      "rectify": {
+        "method": "auto",
+        "corners": [
+          [
+            226.63,
+            96.99
+          ],
+          [
+            1711.23,
+            137.51
+          ],
+          [
+            1683.48,
+            972.47
+          ],
+          [
+            250.13,
+            933.44
+          ]
+        ],
+        "quad_confidence": 0.7136,
+        "framing": "full"
+      },
+      "dedupe": {
+        "band_hash": "32x4:30000006a0000000699800008c01986082000028400000009660000020022180",
+        "distance_from_last_kept": 1.6,
+        "kept": false
+      }
+    }
+  ],
+  "screens": [
+    {
+      "id": "s_000",
+      "representative_frame": "f_000000",
+      "frame_ids": [
+        "f_000000",
+        "f_000001",
+        "f_000002"
+      ],
+      "t_ms_start": 0,
+      "t_ms_end": 2000,
+      "ocr": {
+        "title_raw": "7",
+        "title_confidence": 0.48,
+        "tabs_raw": [
+          "Summary _ Activity",
+          "Alerts"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "Dashboard",
+            "confidence": 0.13
+          },
+          {
+            "region": "title",
+            "text": "7",
+            "confidence": 0.48
+          },
+          {
+            "region": "tabs",
+            "text": "Summary",
+            "confidence": 0.84
+          },
+          {
+            "region": "tabs",
+            "text": "_",
+            "confidence": 0.74
+          },
+          {
+            "region": "tabs",
+            "text": "Activity",
+            "confidence": 0.87
+          },
+          {
+            "region": "tabs",
+            "text": "Alerts",
+            "confidence": 0.95
+          }
+        ]
+      },
+      "identity": {
+        "name": "Dashboard",
+        "module": null,
+        "tabs": [
+          "Summary",
+          "Activity",
+          "Alerts"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 0.5714,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 1.0,
+          "ocr_agreement": 0.0
+        },
+        "verdict": "review"
+      },
+      "classification": {
+        "bucket": "built",
+        "matched_label": "Dashboard",
+        "route": "/dashboard",
+        "module": "Core",
+        "match_kind": "exact",
+        "match_score": 1.0,
+        "evidence": "built · ROUTES",
+        "possible_match": null,
+        "component_paths": [],
+        "note": null
+      }
+    },
+    {
+      "id": "s_001",
+      "representative_frame": "f_000003",
+      "frame_ids": [
+        "f_000003",
+        "f_000004",
+        "f_000005"
+      ],
+      "t_ms_start": 3000,
+      "t_ms_end": 5000,
+      "ocr": {
+        "title_raw": "| Dashboard",
+        "title_confidence": 0.855,
+        "tabs_raw": [
+          "|",
+          "Summary",
+          "Alerts"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "|",
+            "confidence": 0.75
+          },
+          {
+            "region": "title",
+            "text": "Dashboard",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "|",
+            "confidence": 0.77
+          },
+          {
+            "region": "tabs",
+            "text": "Summary",
+            "confidence": 0.87
+          },
+          {
+            "region": "tabs",
+            "text": "Activity",
+            "confidence": 0.38
+          },
+          {
+            "region": "tabs",
+            "text": "Alerts",
+            "confidence": 0.96
+          }
+        ]
+      },
+      "identity": {
+        "name": "Dashboard",
+        "module": null,
+        "tabs": [
+          "Summary",
+          "Activity",
+          "Alerts"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 0.9839,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 0.9436,
+          "ocr_agreement": 1.0
+        },
+        "verdict": "accepted"
+      },
+      "classification": {
+        "bucket": "built",
+        "matched_label": "Dashboard",
+        "route": "/dashboard",
+        "module": "Core",
+        "match_kind": "exact",
+        "match_score": 1.0,
+        "evidence": "built · ROUTES",
+        "possible_match": null,
+        "component_paths": [],
+        "note": null
+      }
+    },
+    {
+      "id": "s_002",
+      "representative_frame": "f_000006",
+      "frame_ids": [
+        "f_000006",
+        "f_000007",
+        "f_000008",
+        "f_000009",
+        "f_000010",
+        "f_000011"
+      ],
+      "t_ms_start": 6000,
+      "t_ms_end": 11000,
+      "ocr": {
+        "title_raw": "| Order Entry",
+        "title_confidence": 0.95,
+        "tabs_raw": [
+          "|",
+          "Details",
+          "History",
+          "Notes",
+          "Audit"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "|",
+            "confidence": 0.93
+          },
+          {
+            "region": "title",
+            "text": "Order",
+            "confidence": 0.96
+          },
+          {
+            "region": "title",
+            "text": "Entry",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "|",
+            "confidence": 0.92
+          },
+          {
+            "region": "tabs",
+            "text": "Details",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "History",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Notes",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Audit",
+            "confidence": 0.96
+          }
+        ]
+      },
+      "identity": {
+        "name": "Order Entry",
+        "module": null,
+        "tabs": [
+          "Details",
+          "History",
+          "Notes",
+          "Audit"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 1.0,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 1.0,
+          "ocr_agreement": 1.0
+        },
+        "verdict": "accepted"
+      },
+      "classification": {
+        "bucket": "partial",
+        "matched_label": "Order Entry",
+        "route": "/orders",
+        "module": "Core",
+        "match_kind": "exact",
+        "match_score": 1.0,
+        "evidence": "built · ROUTES",
+        "possible_match": null,
+        "component_paths": [
+          "src/components/Core/OrderEntry/"
+        ],
+        "note": null
+      }
+    },
+    {
+      "id": "s_003",
+      "representative_frame": "f_000012",
+      "frame_ids": [
+        "f_000012",
+        "f_000013",
+        "f_000014",
+        "f_000015",
+        "f_000016",
+        "f_000017"
+      ],
+      "t_ms_start": 12000,
+      "t_ms_end": 17000,
+      "ocr": {
+        "title_raw": "Work Queue",
+        "title_confidence": 0.96,
+        "tabs_raw": [
+          "Open",
+          "Closed"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "Work",
+            "confidence": 0.96
+          },
+          {
+            "region": "title",
+            "text": "Queue",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Open",
+            "confidence": 0.8
+          },
+          {
+            "region": "tabs",
+            "text": "Assigned",
+            "confidence": 0.0
+          },
+          {
+            "region": "tabs",
+            "text": "Closed",
+            "confidence": 0.96
+          }
+        ]
+      },
+      "identity": {
+        "name": "Work Queue",
+        "module": null,
+        "tabs": [
+          "Open",
+          "Assigned",
+          "Closed"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 1.0,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 1.0,
+          "ocr_agreement": 1.0
+        },
+        "verdict": "accepted"
+      },
+      "classification": {
+        "bucket": "built",
+        "matched_label": "Work Queue",
+        "route": "/work-queue",
+        "module": "Core",
+        "match_kind": "exact",
+        "match_score": 1.0,
+        "evidence": "built · ROUTES",
+        "possible_match": null,
+        "component_paths": [],
+        "note": null
+      }
+    },
+    {
+      "id": "s_004",
+      "representative_frame": "f_000018",
+      "frame_ids": [
+        "f_000018",
+        "f_000019",
+        "f_000020",
+        "f_000021",
+        "f_000022",
+        "f_000023"
+      ],
+      "t_ms_start": 18000,
+      "t_ms_end": 23000,
+      "ocr": {
+        "title_raw": "Report Viewer",
+        "title_confidence": 0.96,
+        "tabs_raw": [
+          "|",
+          "Preview",
+          "Parameters"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "Report",
+            "confidence": 0.96
+          },
+          {
+            "region": "title",
+            "text": "Viewer",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "|",
+            "confidence": 0.92
+          },
+          {
+            "region": "tabs",
+            "text": "Preview",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Parameters",
+            "confidence": 0.96
+          }
+        ]
+      },
+      "identity": {
+        "name": "Report Viewer",
+        "module": null,
+        "tabs": [
+          "Preview",
+          "Parameters"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 1.0,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 1.0,
+          "ocr_agreement": 1.0
+        },
+        "verdict": "accepted"
+      },
+      "classification": {
+        "bucket": "new",
+        "matched_label": "Report Viewr",
+        "route": "/activity/report-viewr",
+        "module": "Reporting",
+        "match_kind": "fuzzy",
+        "match_score": 0.96,
+        "evidence": "stub · MENU",
+        "possible_match": null,
+        "component_paths": [],
+        "note": "reachable but falls through to a placeholder page"
+      }
+    },
+    {
+      "id": "s_005",
+      "representative_frame": "f_000024",
+      "frame_ids": [
+        "f_000024",
+        "f_000025",
+        "f_000026",
+        "f_000027",
+        "f_000028",
+        "f_000029"
+      ],
+      "t_ms_start": 24000,
+      "t_ms_end": 29000,
+      "ocr": {
+        "title_raw": "| Settings",
+        "title_confidence": 0.95,
+        "tabs_raw": [
+          "|",
+          "General",
+          "Users",
+          "Integrations",
+          "Advanced",
+          "|"
+        ],
+        "activity_raw": null,
+        "words": [
+          {
+            "region": "title",
+            "text": "|",
+            "confidence": 0.94
+          },
+          {
+            "region": "title",
+            "text": "Settings",
+            "confidence": 0.96
+          },
+          {
+            "region": "title",
+            "text": "ee",
+            "confidence": 0.23
+          },
+          {
+            "region": "tabs",
+            "text": "|",
+            "confidence": 0.93
+          },
+          {
+            "region": "tabs",
+            "text": "General",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Users",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "Integrations",
+            "confidence": 0.94
+          },
+          {
+            "region": "tabs",
+            "text": "Advanced",
+            "confidence": 0.96
+          },
+          {
+            "region": "tabs",
+            "text": "|",
+            "confidence": 0.44
+          }
+        ]
+      },
+      "identity": {
+        "name": "Settings",
+        "module": null,
+        "tabs": [
+          "General",
+          "Users",
+          "Integrations",
+          "Advanced"
+        ],
+        "dialog": null,
+        "description": "Title bar over a tab strip, with a five-column grid below."
+      },
+      "confidence": {
+        "score": 1.0,
+        "signals": {
+          "framing": 1.0,
+          "legibility": 1.0,
+          "ocr_agreement": 1.0
+        },
+        "verdict": "accepted"
+      },
+      "classification": {
+        "bucket": "new",
+        "matched_label": null,
+        "route": null,
+        "module": null,
+        "match_kind": "none",
+        "match_score": 0.3,
+        "evidence": null,
+        "possible_match": {
+          "label": "Report Viewr",
+          "score": 0.3,
+          "route": "/activity/report-viewr",
+          "module": "Reporting"
+        },
+        "component_paths": [],
+        "note": "closest inventory entry is 'Report Viewr' at 0.30, below classify.fuzzy_threshold — treated as new, but check the alias table before building it"
+      }
+    }
+  ]
+}

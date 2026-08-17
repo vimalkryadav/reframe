@@ -80,8 +80,30 @@ dedupe:
 
 ocr:
   engine: tesseract
-  # Chrome bands only. Data grids are never OCR'd (DEC-011).
-  regions: [title, tabs, activity]
+  # Which bands to read. Chrome only — data grids are never OCR'd (DEC-011).
+  # Drop a region from this list if it reads as noise on a particular video; its
+  # rectangle below stays, so re-enabling it needs no re-measuring.
+  #
+  # `activity` is deliberately NOT enabled by default. It sits below the tab strip,
+  # which on a grid-heavy screen is where the column headers or the first data row
+  # begin — and a default that quietly OCR'd a data row would break DEC-011 by
+  # accident. Measure it against a real rectified frame, then add it here.
+  regions: [title, tabs]
+  # Where those bands are, as [x, y, w, h] in CANONICAL coordinates — the same
+  # coordinate space as dedupe.band_rect, so all of these must be re-measured
+  # together whenever rectify.canonical_size changes.
+  #
+  # These are starting guesses for a desktop application with a title bar above a
+  # workspace tab strip. Measure them once per application from a frame in
+  # frames/rect/. Generous vertical padding costs nothing (tesseract is handed a
+  # single line to read); a rectangle that clips the text costs the whole read.
+  region_rects:
+    # Left portion only. A title is left-aligned, while the right end of the bar
+    # usually holds the logged-in user, environment or clock — none of which
+    # identifies a screen and all of which adds words to the cross-check.
+    title: [0, 0, 720, 72]
+    tabs: [0, 72, 1600, 64]        # the workspace tab strip beneath the title
+    activity: [0, 136, 1600, 56]   # sub-header between the tabs and the content
   # Words below this confidence are recorded but not used as a matching signal.
   min_word_confidence: 0.4
   # Tesseract page segmentation mode. 7 = "single text line", correct for bands.
@@ -102,16 +124,37 @@ confidence:
   # it to make the review list shorter.
   accept_threshold: 0.75
   # Signals are independent measurements, not the model's self-report (DEC-009).
+  # A signal with no weight here takes no part at all — which is how
+  # `inventory_match` stays opt-in: it is the only one that describes the
+  # consuming project rather than the footage. Add `inventory_match: 0.2` to let
+  # stage 07 feed it back.
+  #
+  # A signal that cannot be measured is dropped and the remaining weights are
+  # renormalised, never scored zero (DEC-022). `cross_frame` is unmeasurable
+  # unless a screen was seen twice with identical pixels, so expect coverage to
+  # rest on three signals in practice.
   weights:
     ocr_agreement: 0.3    # model's name vs the OCR'd title string
     cross_frame: 0.3      # do repeat sightings get the same name
     framing: 0.2          # did stage 02 flag this span
-    legibility: 0.2       # contrast, blur, glare over the title band
+    legibility: 0.2       # ink separation and blur over the title band. NOT glare:
+                          # a saturated-pixel count cannot tell a blown-out
+                          # highlight from a light UI theme (DEC-022). These two
+                          # constants are fitted to synthetic footage — re-check
+                          # them on the first real video.
 
 classify:
   # Normalised similarity required for a fuzzy inventory match. Below this the
   # screen is `new` WITH a possible_match note — never silently unbuilt.
   fuzzy_threshold: 0.82
+  # How close to fuzzy_threshold a rejected match must come before a human is
+  # asked to look at it. The closest candidate is ALWAYS recorded in the manifest
+  # and in BUILD_QUEUE.md; this only governs what reaches NEEDS_REVIEW.md.
+  # Raise it to see more possible collisions; lower it if the review list fills
+  # with unrelated names. At 0 every new screen drags its most-similar entry into
+  # the list, which is how a review list becomes something people skim.
+  near_miss_margin: 0.15
+
   # Per-VIDEO name corrections, applied before fuzzy matching. This is where a
   # validation round lands when THIS video's footage quality causes a consistent
   # misread. Corrections that are properties of the app rather than the footage

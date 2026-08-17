@@ -28,9 +28,15 @@ SCAN_PATHS=(src configs tests)
 
 fail=0
 
+# Source only. Compiled artifacts embed the absolute build path, so a checkout
+# living under a directory whose name happens to match would fail the guard for
+# a reason that has nothing to do with the code.
+GREP_FLAGS=(-rniE -I --exclude-dir=__pycache__ --exclude-dir=.mypy_cache
+  --exclude-dir=.pytest_cache --exclude-dir=.ruff_cache --exclude=*.pyc)
+
 for path in "${SCAN_PATHS[@]}"; do
   [[ -d "$path" ]] || continue
-  if hits=$(grep -rniE "$BANNED" "$path" 2>/dev/null); then
+  if hits=$(grep "${GREP_FLAGS[@]}" "$BANNED" "$path" 2>/dev/null); then
     echo "✗ project-specific reference found in $path/" >&2
     echo "$hits" | sed 's/^/    /' >&2
     fail=1

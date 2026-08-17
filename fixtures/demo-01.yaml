@@ -1,0 +1,51 @@
+# Ground truth for demo-01, recorded from a validated run.
+#
+# Two kinds of fact live here and verify treats them differently (DEC-019):
+#
+#   name, module, and the presence of a screen at a timestamp are STABLE.
+#     They are properties of the footage and are true forever. If a later run
+#     disagrees, that is a REGRESSION and `reframe verify` fails.
+#
+#   bucket is TIME-VARYING. It is a property of the consuming project at the
+#     commit recorded below. new -> built after you build something is DRIFT,
+#     which is reported and expected, not a failure.
+#
+# Edit freely: correct a name the model misread, delete a screen that is not
+# really there, and add a missed_spans entry for anything the run walked past.
+# A missed span is not a failure — it is a gap you can prove you closed later.
+
+slug: demo-01
+inventory_commit: ab2ea550
+
+screens:
+  - t: "00:00"
+    name: "Dashboard"
+    module: "Core"
+    bucket: built
+    note: "identified at 0.57 — verify this name"
+  - t: "00:03"
+    name: "Dashboard"
+    module: "Core"
+    bucket: built
+  - t: "00:06"
+    name: "Order Entry"
+    module: "Core"
+    bucket: partial
+  - t: "00:12"
+    name: "Work Queue"
+    module: "Core"
+    bucket: new
+  - t: "00:18"
+    name: "Report Viewer"
+    module: "Reporting"
+    bucket: new
+  - t: "00:24"
+    name: "Settings"
+    bucket: new
+    note: "resembles 'Report Viewr' (0.30)"
+
+# Spans this run failed to catalogue. Add one per stretch of footage that
+# shows a screen the catalogue above does not contain, e.g.:
+#   - {from: "31:10", to: "33:40", note: "scroll through the order list"}
+missed_spans:
+  - {from: "00:27", to: "00:29", note: "tail of the video was never catalogued"}

@@ -10,7 +10,6 @@ dependencies = [
     "opencv-python>=4.10.0",  # corner detection, warping, alignment
     "numpy>=2.1.0",
     "pillow>=11.0.0",         # montage composition, burnt-in labels
-    "imagehash>=4.3.1",       # perceptual hashing for dedupe
     "pytesseract>=0.3.13",    # OCR of chrome bands (needs system tesseract)
     "anthropic>=0.40.0",      # stage 06 only
     "rapidfuzz>=3.10.0",      # inventory matching
@@ -41,7 +40,7 @@ strict = true
 warn_unreachable = true
 # opencv and pytesseract ship no usable stubs
 [[tool.mypy.overrides]]
-module = ["cv2.*", "pytesseract.*", "imagehash.*"]
+module = ["cv2.*", "pytesseract.*"]
 ignore_missing_imports = true
 
 [tool.ruff]
@@ -50,6 +49,9 @@ src = ["src"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
+# The prose in this repo (docs and docstrings alike) uses typographic dashes and
+# quotes. RUF001-003 would flag every one of them.
+allowed-confusables = ["–", "—", "’", "×", "→"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
