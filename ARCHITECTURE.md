@@ -158,7 +158,10 @@ those numbers.
 Rotation matters and is easy to get wrong: phone video routinely carries a
 rotation flag in metadata rather than baked into the pixels. Reading it wrong
 gives you a sideways screen that corner-detection will still happily "find".
-The probe records the flag explicitly and stage 01 applies it.
+The probe records the flag explicitly; stage 01 leaves the rotation to ffmpeg's
+own autorotate and then **verifies** the result against the probed display size,
+because applying it a second time is what actually produces the sideways screen
+(see [DEC-020](DECISIONS.md#dec-020--rotation-is-applied-by-ffmpeg-and-then-verified-not-re-applied)).
 
 The generated config is the point of this stage. **Every threshold, crop,
 corner override and alias in the entire pipeline lives in that file** — never as
@@ -320,7 +323,7 @@ phone-of-monitor reads with `(?)` for exactly this reason.
 
 **Data grids are never OCR'd.** See [Out of scope](#out-of-scope).
 
-**Config:** `ocr.regions[]`, `ocr.engine`, `ocr.min_word_confidence`, `ocr.psm`
+**Config:** `ocr.regions[]`, `ocr.region_rects{}`, `ocr.engine`, `ocr.min_word_confidence`, `ocr.psm`
 
 ---
 
@@ -399,7 +402,7 @@ the score recorded. A fuzzy match below threshold produces `new` **with a
 
 See [`CONTRACT.md`](CONTRACT.md) for the inventory schema and matching rules.
 
-**Config:** `classify.fuzzy_threshold`, `classify.aliases{}`, `classify.modules_in_scope[]`
+**Config:** `classify.fuzzy_threshold`, `classify.near_miss_margin`, `classify.aliases{}`, `classify.modules_in_scope[]`, `classify.partial_labels[]` (see [DEC-023](DECISIONS.md#dec-023--partial-is-a-humans-answer-recorded-in-the-project-profile))
 
 ---
 
@@ -436,14 +439,49 @@ data. Corrections go into `fixtures/<slug>.yaml`, not into the Markdown.
     "duration_s": 903.4,
     "width": 1920, "height": 1080,
     "fps": 30.0,
-    "rotation": 90
+    "rotation": 90,
+    "codec": "hevc"
   },
-  "warnings": ["max_frames cap hit at 900"],
+
+  // Which stages have run, and the per-config-section hashes each one consumed.
+  // Together they make stale output detectable per stage: editing
+  // `dedupe.hash_distance` marks 04 onwards stale and leaves 01–03 alone.
+  "stages_completed": ["00", "01", "02", "03", "04", "05", "06", "07", "08"],
+  "stage_inputs": {
+    "04": {"rectify": "04b400b357f9579b", "clean": "c89cce023ad4413f", "dedupe": "de450809d0561cef"}
+  },
+
+  // Structured, and owned by the stage that raised it, so a re-running stage can
+  // replace its own warnings without duplicating them or erasing another's.
+  "warnings": [
+    {"stage": "01", "message": "sample.max_frames cap of 900 hit …", "t_ms_start": 900000, "t_ms_end": 903400}
+  ],
+
+  // The escalation list stage 08 renders into NEEDS_REVIEW.md. `reason` is
+  // namespaced by stage so a re-run can withdraw its own escalations.
+  "review_spans": [
+    {
+      "t_ms_start": 838000, "t_ms_end": 851000,
+      "reason": "06:low-confidence",
+      "detail": "'Bed Control' — confidence 0.62 is below confidence.accept_threshold 0.75",
+      "frame_ids": ["f_000842"]
+    }
+  ],
+
+  // Which snapshot of the consuming project the buckets were true against.
+  "inventory": {
+    "project": "example-app",
+    "commit": "9a0a4ad9",
+    "path": "/…/inventory.json",
+    "entry_count": 146
+  },
 
   "frames": [
     {
       "id": "f_000842",
       "t_ms": 842000,
+      // The raw sample. The rectified, cleaned and kept copies share this
+      // basename and are derived, not stored, so four paths cannot disagree.
       "path": "frames/raw/f_000842__t14m02s.jpg",
       "rectify": {
         "method": "auto",              // auto | interpolated | manual | failed
@@ -452,8 +490,13 @@ data. Corrections go into `fixtures/<slug>.yaml`, not into the Markdown.
         "framing": "full"              // full | partial | lost
       },
       "dedupe": {
-        "band_hash": "…",
-        "distance_from_last_kept": 14,
+        // "<cols>x<rows>:<hex>" — the grid is part of the hash, because two
+        // hashes taken at different shapes are not comparable (DEC-021).
+        "band_hash": "32x4:…",
+        // The combined score: band distance plus the full-frame distance weighted
+        // by dedupe.full_frame_weight. Fractional because the weight is, and
+        // rounding would hide why a frame sat just under threshold.
+        "distance_from_last_kept": 14.2,
         "kept": true
       }
     }
@@ -463,6 +506,9 @@ data. Corrections go into `fixtures/<slug>.yaml`, not into the Markdown.
     {
       "id": "s_014",
       "representative_frame": "f_000842",
+      // Every comparable frame folded into this screen. Membership has to survive
+      // into the manifest because cross-frame agreement is computed from it.
+      "frame_ids": ["f_000842", "f_000843", "f_000844"],
       "t_ms_start": 838000,
       "t_ms_end": 851000,
       "ocr": {
@@ -553,7 +599,16 @@ dedupe:
 
 ocr:
   engine: tesseract
-  regions: [title, tabs, activity]
+  # Which bands to read. `activity` is off by default: it sits where a grid header
+  # or first data row often begins, and a default that OCR'd a data row would
+  # break DEC-011 by accident.
+  regions: [title, tabs]
+  # Where those bands are, in CANONICAL coordinates — the same space as
+  # dedupe.band_rect, so all of them move together when canonical_size changes.
+  region_rects:
+    title: [0, 0, 720, 72]
+    tabs: [0, 72, 1600, 64]
+    activity: [0, 136, 1600, 56]
   min_word_confidence: 0.4
   psm: 7
 
@@ -568,12 +623,30 @@ confidence:
 
 classify:
   fuzzy_threshold: 0.82
+  # How close a rejected match must come to the threshold to reach
+  # NEEDS_REVIEW.md. The candidate is recorded in the manifest either way.
+  near_miss_margin: 0.15
   aliases: {}                  # per-video corrections only
 ```
 
 Layer 2 (`projects/<name>.yaml`) adds the project-scoped keys — `inventory`,
-`classify.modules_in_scope`, project-wide `classify.aliases` and `publish_to`.
-They are absent from layers 1 and 3 by design.
+`inventory_cmd`, `project_root`, `classify.modules_in_scope`,
+`classify.partial_labels`, project-wide `classify.aliases` and `publish_to`. They
+are absent from layers 1 and 3 by design.
+
+### Deliberately not configurable
+
+Two values are constants in code rather than tunables, and the distinction is
+worth keeping: a tunable is something a validation round would move.
+
+| Value | Where | Why not config |
+| --- | --- | --- |
+| Derived-frame JPEG quality | `vision.DERIVED_JPEG_QUALITY` | Frames in `rect/`, `clean/` and `kept/` feed OCR and a model. Nobody tuning this pipeline ever wants them *worse*, and every set except `kept/` is regenerable. |
+| The band-hash dead zone | `vision.hashing._FLAT_EPSILON` | A noise floor in grey levels, not a quality bar. Cell averaging puts sensor noise far below it and real text far above (DEC-021). |
+
+Also note what `confidence.weights` can and cannot reach: a signal with no weight
+takes no part at all. That is how `inventory_match` stays opt-in — it is the only
+signal that describes the consuming project rather than the footage.
 
 ---
 

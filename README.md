@@ -8,7 +8,39 @@ Built for the `rl_epic` workflow: 8 phone-of-monitor recordings of Epic
 Hyperspace (~15 min each, ~2 h total) need to become a list of screens to
 clone, with the screens that are *already built* filtered out automatically.
 
-**Status:** design complete, implementation not started.
+**Status:** implemented, and exercised end to end against synthetic footage. Not
+yet run on a real recording — the corpus this exists for is phone-of-monitor video,
+and several defaults are explicitly provisional until the first one goes through.
+See [what is and is not verified](#what-is-verified) below.
+
+---
+
+## What is verified
+
+The pipeline runs start to finish and its outputs are checked, but be clear about
+against what:
+
+| Verified | How |
+| --- | --- |
+| All nine stages run end to end | A synthetic 30 s recording: five app screens, perspective-projected onto a dark room with per-frame shake and sensor noise |
+| Determinism (DEC-013) | Two full runs produce a **byte-identical** `manifest.json`; frame ids and filenames are stable |
+| Rectification | 30/30 frames detected and warped automatically on that footage |
+| Dedupe | Finds every real screen boundary; the tuning trade-off is measured and recorded in [DEC-021](DECISIONS.md#dec-021--the-band-hash-needs-an-aspect-matched-grid-and-a-dead-zone) |
+| OCR | Reads all five screen titles and their tab strips |
+| Confidence | Accepts the five screens where signals agree and escalates the one where OCR contradicts the model |
+| Classification | `built` / `partial` / `new` / `other`, exact + alias + fuzzy matching, near-miss reporting, and the staleness abort — against a throwaway git project with a real exporter |
+| Verify | Regression fails with exit 1; bucket drift reports and exits 0 |
+
+| Not verified | Why |
+| --- | --- |
+| **Real handheld footage** | None exists in the repo yet. This is the big one: corner detection, glare, moiré and OCR quality are all guesses until then. |
+| **A live model call** | Stage 06 was exercised through its response cache, which covers montage building, parsing, mis-attribution handling and scoring — but not the request itself. |
+| **Tesseract on a real screen photo** | The synthetic frames are far cleaner than a photograph of a monitor. |
+| **Automated tests** | There are none. Verification so far is the end-to-end runs above plus `mypy --strict`; `CLAUDE.md` still asks for unit tests against fixture frames, and that debt is unpaid. |
+
+Provisional defaults to re-check on the first real video: `confidence.weights` and
+the two legibility constants ([DEC-022](DECISIONS.md#dec-022--a-signal-that-cannot-be-measured-is-reported-unmeasurable)),
+`dedupe.hash_distance`, and every rectangle in `ocr.region_rects`.
 
 ---
 
@@ -62,6 +94,9 @@ hand-edited, so a re-run cannot drift from the data.
 | [`CONTRACT.md`](CONTRACT.md) | The `inventory.json` interface with `rl_epic` — schema, exporter requirements, matching rules |
 | [`CLAUDE.md`](CLAUDE.md) | Working rules for anyone (human or agent) writing code in this repo |
 
+Requires `ffmpeg` (stages 00–01), `tesseract` (stage 05), and an Anthropic
+credential for stage 06 — `ANTHROPIC_API_KEY`, or a profile from `ant auth login`.
+
 Read `DECISIONS.md` first if you're wondering *why* something is built a
 particular way. Most of the non-obvious choices are forced by the footage being
 handheld, and the reasoning is recorded there rather than repeated in comments.
@@ -69,8 +104,6 @@ handheld, and the reasoning is recorded there rather than repeated in comments.
 ---
 
 ## Quickstart
-
-> Not yet implemented — this is the intended interface.
 
 ```bash
 uv sync

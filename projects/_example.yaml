@@ -39,6 +39,16 @@ classify:
   # Empty list = everything is in scope.
   modules_in_scope: []
 
+  # Screens that exist but are incomplete — the `partial` bucket. This cannot be
+  # derived from the inventory: it means the video shows tabs, columns or dialogs
+  # that the built component does not have, and knowing that means comparing the
+  # two. Stage 07 escalates likely candidates to NEEDS_REVIEW.md; once you have
+  # confirmed one, add its inventory label here and it moves from `built` to
+  # `partial`, which is where the cheapest wins in the build queue live.
+  #
+  #   partial_labels: ["Bed Board"]
+  partial_labels: []
+
   # Project-wide name corrections, applied before fuzzy matching. Use this layer
   # when a misread is a property of the APP (its chrome font, its abbreviations)
   # rather than of one video's footage quality — per-video misreads belong in

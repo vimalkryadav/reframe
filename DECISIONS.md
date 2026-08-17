@@ -197,9 +197,13 @@ stage does not degrade — it produces the exact opposite of its purpose.
    below threshold.
 
 **Consequences.** A screen whose chrome is identical but whose body differs
-(same screen, different patient) may collapse into one entry. That is usually
+(same screen, different record) may collapse into one entry. That is usually
 correct for a build queue, and the full-frame weight is the knob that adjusts it
 per video.
+
+**Amended during implementation** — see [DEC-021](#dec-021--the-band-hash-needs-an-aspect-matched-grid-and-a-dead-zone),
+which records what a stock perceptual hash actually did to a title band, and the
+measured relationship between `hash_distance` and drift.
 
 ---
 
@@ -597,6 +601,143 @@ screens:
   is visible precisely because drift is reported rather than suppressed.
 - Fixtures record which inventory commit their buckets were true against, so
   drift can always be explained.
+
+---
+
+## DEC-020 — Rotation is applied by ffmpeg and then verified, not re-applied
+
+**Status:** accepted · refines [DEC-004](#dec-004--source-timestamps-live-in-frame-filenames)
+
+**Context.** [Stage 00](ARCHITECTURE.md#stage-00--probe) records the source's
+rotation flag and `ARCHITECTURE.md` said stage 01 applies it. In practice ffmpeg
+already applies the display matrix by default. Doing it a second time rotates the
+frame *away* from upright — and a sideways screen is the one kind of broken input
+corner detection will still happily accept, because a rotated rectangle is a
+perfectly good bright quadrilateral. The result would be a whole video of
+confidently rectified, unusable frames.
+
+**Decision.** Sampling relies on ffmpeg's own autorotate. Stage 01 then
+**cross-checks** the emitted frame size against the probed display size and
+escalates a mismatch — a swap of width and height means the rotation was applied
+twice or not at all.
+
+**Consequences.**
+- One less place for the two rotations to disagree.
+- The check is the only thing between a mis-rotated source and a wasted run, so it
+  escalates the whole video rather than logging a note.
+- Deliberately no `-noautorotate`: the pixels a player would show are the pixels
+  the pipeline reads, which is also what a reviewer sees when they open the file.
+
+---
+
+## DEC-021 — The band hash needs an aspect-matched grid and a dead zone
+
+**Status:** accepted · amends [DEC-007](#dec-007--dedupe-on-the-title-band-against-the-last-kept-frame-handheld)
+
+**Context.** DEC-007 chose "perceptual hash of the title band" without saying
+*which* hash. A stock 8×8 dHash was tried first and measured on static footage:
+two frames of the **same** screen came out 8–13 bits apart, while two **different**
+screens sat 10–18 apart. No threshold separates those distributions, so the
+primary dedupe signal carried no information at all.
+
+Two causes, both measured:
+
+1. **The grid ignored the region's shape.** A 1600×190 band squashed into 9×8
+   cells averages the title text away entirely.
+2. **Flat cells were coin flips.** A title bar is mostly uniform; where adjacent
+   cells differ by less than the sensor noise, a `left > right` test returns noise.
+
+**Decision.** Hash with a grid matched to the region's aspect ratio, average with
+`INTER_AREA` so per-pixel noise falls with cell size, and give each cell pair *two*
+bits — brighter and darker — so a pair flatter than a fixed grey-level dead zone
+sets neither and reads as flat on every frame. Distances are reported on a fixed
+64-bit scale whatever grid was used, so `dedupe.hash_distance` keeps one meaning.
+
+After the change, on the same footage: same-screen 1–2, real screen changes 5.5–9.7.
+
+**`imagehash` was dropped as a dependency.** It cannot express a non-square grid,
+and the replacement is about fifteen lines of numpy. That also drops `scipy` and
+`pywavelets`.
+
+**Consequences.**
+- **`hash_distance` must sit above the drift floor, not just below the change
+  size.** Distance is measured against the *last kept* frame (DEC-007), so noise
+  accumulates across a long static screen and a threshold tuned only against
+  adjacent frames will split one screen in two.
+- Measured on the synthetic fixture: 4 → six screens for five real ones (one
+  duplicate row); 6 → four screens (one screen lost silently). **Tune low.** A
+  duplicate row is visible in the catalogue; a missing screen is not.
+- The stage escalates any frame that only `min_gap_frames` held back, so the other
+  way of losing a short-lived screen is at least visible.
+
+---
+
+## DEC-022 — A signal that cannot be measured is reported unmeasurable
+
+**Status:** accepted · refines [DEC-009](#dec-009--confidence-is-signal-agreement-not-model-self-report)
+
+**Context.** DEC-009 defines confidence as agreement between independent signals.
+Implementing them turned up two that cannot be measured as described, and in both
+cases the plausible implementation produced a *wrong* number rather than a missing
+one.
+
+**Cross-frame agreement.** "Do repeat sightings of the same screen get the same
+name?" needs the repeat sightings grouped. Grouping by band-hash distance does not
+work: measured on footage whose screens share a chrome layout, two sightings of the
+same screen sat 3 bits apart and two different screens also sat 3 bits apart. Any
+threshold wide enough to catch the repeat merges unrelated screens — and then the
+signal *penalises a correct reading* for disagreeing with a screen it has nothing
+to do with. Observed: every screen scored 0.54 on a fixture where five of six
+readings were correct.
+
+**Glare.** A saturated-pixel count cannot distinguish a blown-out highlight from a
+light UI theme. On a white-background application it condemns every frame; and
+whiting out half a test band *raised* the contrast measure, because pure white
+lifts the paper mean.
+
+**Decision.** Both are measured only where they are real, and reported as
+unmeasurable otherwise. Cross-frame agreement requires **identical** band hashes.
+There is **no glare term** at all. `confidence.py` renormalises the weights over
+the signals that exist and tracks coverage, so a screen scored from too little
+evidence goes to review even when the score is high.
+
+**Consequences.**
+- Cross-frame agreement will rarely be measurable on real handheld footage, so
+  coverage usually rests on three signals. That is the honest position, and the
+  coverage floor is what stops one signal masquerading as agreement.
+- Glare that destroys text is left to the human reading `NEEDS_REVIEW.md`. Stage
+  02's framing signal already catches the framing half of the problem.
+- **`legibility`'s two scaling constants are fitted to synthetic footage** and are
+  the first thing to re-check against the first real video.
+
+---
+
+## DEC-023 — `partial` is a human's answer, recorded in the project profile
+
+**Status:** accepted · implements the v1 note in [`CONTRACT.md`](CONTRACT.md#the-partial-bucket)
+
+**Context.** `partial` cannot be derived from the inventory: it means the footage
+shows tabs, columns or dialogs the built component lacks, and establishing that
+means comparing the video against the component. Automating it would mean parsing
+the consuming project, which reintroduces exactly the coupling
+[DEC-001](#dec-001--standalone-repo-not-part-of-rl_epic) removed.
+
+**Decision.** Stage 07 **asks** and the profile **answers**. Any screen that
+matched a `built` entry while the footage shows tabs or a dialog is escalated to
+`NEEDS_REVIEW.md` with the inventory label to add; listing that label in
+`classify.partial_labels` in `projects/<name>.yaml` moves it to `partial`.
+
+The question is asked once per inventory label, not once per sighting. A screen
+visited five times would otherwise produce five identical review rows, and a review
+list people skim is the failure mode `verify` is also designed around.
+
+**Consequences.**
+- `partial` never appears without a human having confirmed it, which is the point:
+  it drives build work.
+- The answer lives in layer 2, so every video inherits it — a component's
+  incompleteness is a fact about the project, not about one recording.
+- If nobody ever answers, the bucket stays empty and the build queue is still
+  correct, just less specific.
 
 ---
 
