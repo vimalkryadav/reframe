@@ -1,0 +1,35 @@
+# Source videos — never committed. Registered by path + hash in videos/<slug>/source.txt
+*.mov
+*.MOV
+*.mp4
+*.MP4
+*.mkv
+*.avi
+
+# Regenerable frame sets. Only out/*/frames/kept/ is committed — see DEC-013.
+out/*/frames/raw/
+out/*/frames/rect/
+out/*/frames/clean/
+out/*/montages/
+
+# Model response cache
+.cache/
+
+# Imported from rl_epic — regenerate with its export-inventory script
+inventory.json
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

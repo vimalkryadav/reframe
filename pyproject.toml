@@ -1,0 +1,55 @@
+[project]
+name = "reframe"
+version = "0.1.0"
+description = "Turns handheld recordings of a desktop application into a screen catalogue and a build queue"
+requires-python = ">=3.13"
+dependencies = [
+    "typer>=0.15.0",          # CLI
+    "pydantic>=2.9.0",        # manifest + config schemas
+    "pyyaml>=6.0.2",          # config files
+    "opencv-python>=4.10.0",  # corner detection, warping, alignment
+    "numpy>=2.1.0",
+    "pillow>=11.0.0",         # montage composition, burnt-in labels
+    "imagehash>=4.3.1",       # perceptual hashing for dedupe
+    "pytesseract>=0.3.13",    # OCR of chrome bands (needs system tesseract)
+    "anthropic>=0.40.0",      # stage 06 only
+    "rapidfuzz>=3.10.0",      # inventory matching
+    "rich>=13.9.0",           # progress + readable stage output
+]
+
+[project.scripts]
+reframe = "reframe.cli:app"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.13.0",
+    "pytest>=8.3.0",
+    "ruff>=0.8.0",
+    "types-pyyaml>=6.0.12",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/reframe"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+# opencv and pytesseract ship no usable stubs
+[[tool.mypy.overrides]]
+module = ["cv2.*", "pytesseract.*", "imagehash.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

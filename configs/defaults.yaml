@@ -1,0 +1,111 @@
+# Baseline configuration, layered under every video's own config.yaml.
+#
+# Every tunable in the pipeline lives here or in videos/<slug>/config.yaml —
+# never as a literal in Python (DEC-014). Each key documents what moving it
+# trades away, because this file is the tuning surface for someone who did not
+# write the code.
+#
+# Defaults are starting points chosen for phone-of-monitor footage of a laptop
+# screen. Expect per-video divergence; that is the design working.
+
+sample:
+  # Frames per second. Scene detection is deliberately not offered — handheld
+  # footage has constant micro-motion so hard cuts barely register (DEC-003).
+  # Raise for videos with fast navigation; costs linear time and disk.
+  fps: 1.0
+  # JPEG quality, 1 (best) to 31. Below ~5 starts eating small label detail.
+  quality: 3
+  # Time ranges to skip entirely: [["0:00", "0:12"]]. Use for intros, desk
+  # shots, and any span where the screen is not visible at all.
+  skip_ranges: []
+  # Safety cap. If hit, a warning is written to the manifest and surfaced —
+  # never a silent truncation.
+  max_frames: 2000
+
+rectify:
+  # Output size for the warped screen. Fixed so that band_rect and ocr regions
+  # below can be expressed in stable pixel coordinates.
+  canonical_size: [1600, 1000]
+  # Median window (frames) for smoothing detected corners. Higher = steadier but
+  # slower to follow genuine reframing. Must be odd.
+  smooth_window: 9
+  # Below this, detection is treated as weak and interpolated from neighbours
+  # rather than trusted. Lower it only if `interpolated` dominates the manifest.
+  min_quad_confidence: 0.55
+  # Plausible width/height ratio for the screen. Rejects contours that are
+  # clearly not a laptop display (a window, a desk edge, a reflection).
+  aspect_bounds: [1.3, 1.9]
+  # Manual override for spans where detection fails. Corners are clockwise from
+  # top-left, in source-frame pixels:
+  #   - {from: "4:10", to: "6:30", corners: [[210,88],[1720,120],[1700,980],[190,940]]}
+  manual_corners: []
+
+clean:
+  # Sub-pixel alignment against the previous frame. Cancels jitter that survived
+  # rectification.
+  align: true
+  # Local contrast normalisation. Screen brightness is uneven when photographed
+  # at an angle, so global normalisation makes one side worse.
+  clahe: {enabled: true, clip: 2.0, grid: 8}
+  # Glare suppression, bounded. A blown-out highlight has no recoverable detail;
+  # max_correction keeps the stage from inventing pixels where there are none.
+  deglare: {enabled: true, max_correction: 0.3}
+  # Moiré reduction. Off by default — it costs fine detail. Enable per video
+  # only if the interference pattern is measurably harming OCR.
+  moire: {enabled: false, sigma: 0.6}
+
+dedupe:
+  # The title + tab band in canonical coordinates: [x, y, w, h]. This region is
+  # what identifies a screen, and is the primary dedupe signal (DEC-007).
+  # Re-measure per video if the app chrome sits at a different height.
+  band_rect: [0, 0, 1600, 190]
+  # Perceptual hash distance above which a frame counts as a new screen.
+  # Lower = more screens kept. Tune this first when the screen count is wrong.
+  hash_distance: 12
+  # Weight of the full-frame comparison as a secondary signal. Catches dialogs
+  # opening and scroll position changing within one screen. Raise it if distinct
+  # states are collapsing; lower it if one screen fragments into many.
+  full_frame_weight: 0.3
+  # Minimum frames between two keeps. Suppresses flicker during transitions.
+  min_gap_frames: 2
+
+ocr:
+  engine: tesseract
+  # Chrome bands only. Data grids are never OCR'd (DEC-011).
+  regions: [title, tabs, activity]
+  # Words below this confidence are recorded but not used as a matching signal.
+  min_word_confidence: 0.4
+  # Tesseract page segmentation mode. 7 = "single text line", correct for bands.
+  psm: 7
+
+identify:
+  # Title-band strips per montage sheet. Higher = fewer model calls but smaller
+  # strips; if the model starts misreading, lower this before blaming the prompt.
+  montage_rows: 20
+  model: claude-opus-5
+  # Bump whenever the prompt in model/prompts.py changes, or the response cache
+  # will silently serve stale results and make a tuning round meaningless.
+  prompt_version: 1
+
+confidence:
+  # Below this, a screen is escalated to NEEDS_REVIEW.md rather than accepted.
+  # Expect to lower it as the pipeline earns trust across videos — never raise
+  # it to make the review list shorter.
+  accept_threshold: 0.75
+  # Signals are independent measurements, not the model's self-report (DEC-009).
+  weights:
+    ocr_agreement: 0.3    # model's name vs the OCR'd title string
+    cross_frame: 0.3      # do repeat sightings get the same name
+    framing: 0.2          # did stage 02 flag this span
+    legibility: 0.2       # contrast, blur, glare over the title band
+
+classify:
+  # Normalised similarity required for a fuzzy inventory match. Below this the
+  # screen is `new` WITH a possible_match note — never silently unbuilt.
+  fuzzy_threshold: 0.82
+  # Modules to build from. Everything else is catalogued as `other`.
+  modules_in_scope: []
+  # Per-video corrections, applied before fuzzy matching. This is where a
+  # validation round lands when the model consistently misreads a screen name:
+  #   "Bed Ctrl": "Bed Board"
+  aliases: {}

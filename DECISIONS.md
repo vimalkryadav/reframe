@@ -1,0 +1,441 @@
+# Decisions
+
+An architecture decision log. Each entry records the context, the options
+considered, what was chosen, and what it costs — so a future reader can tell a
+*deliberate* choice from an accident, and can reopen a decision knowing what it
+was originally weighed against.
+
+**Status key:** `accepted` · `superseded` · `reopened`
+
+Several of these are forced by the footage being handheld rather than a native
+screen capture. Those are marked **[handheld]** — if the corpus ever changes,
+they are the ones to revisit first.
+
+---
+
+## DEC-001 — Standalone repo, not part of `rl_epic`
+
+**Status:** accepted
+
+**Context.** The workflow this automates already exists inside `rl_epic` as a
+mix of `scripts/extract_frames.sh`, the RL_EPIC loop in `CLAUDE.md`, and hand-
+maintained notes in `docs/reference/`. It has been exercised across at least
+three separate video batches.
+
+**Options.**
+1. Extend `rl_epic/scripts/` — closest to the status quo.
+2. A standalone tool.
+3. Put it in `rl_components` — the existing shared library.
+
+**Decision.** Standalone repo at `~/epic/reframe/`.
+
+Option 3 was rejected quickly: `rl_components` is a UI component/hook library,
+and this is an ffmpeg/CV/CLI tool. Wrong kind of artifact.
+
+Option 1 was rejected because in-repo scripts inevitably absorb project-specific
+assumptions. The two worst offenders were already visible: a hardcoded
+`÷ 1.345` scale factor specific to one recording's window size, and colour
+handling entangled with Epic's theme. A tool that cannot see `rl_epic` cannot
+absorb them.
+
+**Consequences.**
+- The built/partial/new classifier can no longer read `nav.ts` directly. That
+  coupling has to be inverted — see [DEC-012](#dec-012--the-inventory-contract-is-owned-by-rl_epic).
+- Any future RL environment can use the tool by writing a short exporter.
+- The *outputs* still belong in `rl_epic/docs/reference/` — the tool is
+  separate, its evidence is not.
+
+---
+
+## DEC-002 — Python + uv
+
+**Status:** accepted
+
+**Context.** The work is video decoding, computer vision, OCR and a model call.
+
+**Decision.** Python, managed with `uv`.
+
+The CV and OCR ecosystem is decisively Python. `uv` matches the toolchain
+`rl_epic`'s backend already uses, so there is nothing new to learn operationally.
+A Node implementation would shell out to ffmpeg and Python for the image work
+anyway; a pure-bash implementation cannot carry a manifest, fixtures or real
+data structures, which caps what the tool can become.
+
+---
+
+## DEC-003 — Fixed-rate sampling, not scene detection **[handheld]**
+
+**Status:** accepted
+
+**Context.** Scene detection is the obvious way to extract "one frame per
+screen" and it is what `rl_epic`'s existing `extract_frames.sh` defaults to
+(`--mode scene`, threshold 0.12).
+
+**The problem is already documented in that script's own header:**
+
+> *"handheld video of a screen has constant micro-motion/blur, so hard scene
+> cuts are rare and the default threshold yields too few frames. For that
+> footage use a low threshold (`--scene 0.04`) or fixed sampling."*
+
+**Decision.** Sample at a fixed rate, default 1 fps. Scene detection is not
+offered at all in v1.
+
+**Consequences.**
+- ~900 frames per 15-minute video, ~7,200 across the corpus. Entirely tractable
+  at this scale — the corpus being small is what makes brute force acceptable.
+- All the reduction burden moves to stage 04, which is where it can be done
+  properly on rectified frames anyway.
+- If the corpus ever grows an order of magnitude, revisit.
+
+---
+
+## DEC-004 — Source timestamps live in frame filenames
+
+**Status:** accepted
+
+**Context.** `rl_epic`'s `extract_frames.sh` documents an output file:
+
+> `_frames.txt` (index: frame file -> source timestamp)
+
+The implementation writes three `#` comment lines and no per-frame rows. Combined
+with `-frame_pts 0` and sequential `frame-%04d.png` numbering, this means **in
+scene mode the source timestamp is unrecoverable** — which silently breaks the
+documented workflow in `SCREEN_CATALOG.md`:
+
+> *"Re-extract any screen full-res: `ffmpeg -ss <sec> -i <video> -frames:v 1 out.png`"*
+
+**Decision.** Encode the timestamp in the filename: `f_000842__t14m02s.jpg`, and
+carry `t_ms` in the manifest as the machine-readable form.
+
+**Consequences.** The failure mode becomes impossible rather than merely
+avoided. Timestamps are the join key between frames, notes, fixtures and the
+video itself; losing them costs far more than the redundancy costs.
+
+---
+
+## DEC-005 — Rectification is a mandatory stage **[handheld]**
+
+**Status:** accepted
+
+**Context.** Handheld footage of a screen gives you a moving, keystoned,
+partially-glared quadrilateral floating in a picture of a room. Every downstream
+algorithm — differencing, hashing, OCR, model reading — assumes a flat, stable,
+consistently-framed image.
+
+**Options.**
+1. Work on raw frames and make every downstream stage shake-tolerant.
+2. Detect the screen, warp it flat once, and let everything downstream stay
+   simple.
+
+**Decision.** Option 2, as a mandatory stage 02.
+
+Option 1 spreads the same problem across five stages, each solving it partially
+and differently. It is also the path where the project quietly fails: each stage
+looks *nearly* right, and the compounding error only shows up as a mysteriously
+bad catalogue.
+
+**Consequences.**
+- Stage 02 is the highest-risk component and the correct place to concentrate
+  effort and testing.
+- It needs a fallback chain, not just an algorithm — see [DEC-006](#dec-006--rectification-degrades-in-steps-and-never-fakes-success).
+- Everything after it can assume canonical-size input, which makes fixed
+  pixel coordinates in config (band rectangles, OCR regions) meaningful at all.
+
+---
+
+## DEC-006 — Rectification degrades in steps and never fakes success
+
+**Status:** accepted
+
+**Context.** Whether the laptop screen stays fully inside the phone's frame for
+the whole recording is **unknown, and may vary per video**. A detector that
+always returns four corners will happily return four corners for a screen whose
+right edge is out of shot.
+
+**Decision.** Four explicit outcomes, recorded per frame as `rectify.method`:
+
+| Outcome | Behaviour |
+| --- | --- |
+| `auto` | Confident detection; use it. |
+| `interpolated` | Weak detection; interpolate from neighbours within the smoothing window. |
+| `manual` | Detection failed across a span; use corners from `config.yaml` for that time range. |
+| `failed` | Screen genuinely out of frame; mark `framing: partial`/`lost` and escalate the span. |
+
+**Consequences.**
+- A human may need to click four corners once per stable segment. Acceptable —
+  it is bounded, and it is the difference between a usable video and a discarded
+  one.
+- **A cut-off screen is never silently cropped into a confident-looking frame.**
+  That would produce a plausible frame missing a column, which is precisely the
+  class of error this tool exists to prevent.
+
+---
+
+## DEC-007 — Dedupe on the title band, against the last kept frame **[handheld]**
+
+**Status:** accepted · supersedes the method in `rl_epic/CLAUDE.md` for this footage
+
+**Context.** The inherited method: greyscale, crop the taskbar, resize to ~320px,
+`GaussianBlur(1.2)`, keep a frame when >5.5% of pixels differ from the last kept
+one. Correct for a native screen recording.
+
+**On handheld footage it inverts.** Hand shake alone displaces the image by more
+than 5.5%, so nothing registers as a duplicate and all ~900 frames survive. The
+stage does not degrade — it produces the exact opposite of its purpose.
+
+**Decision.** Two changes, plus one rule preserved.
+
+1. Rectification (stage 02) removes most of the false movement *before* this
+   stage runs. This is the larger half of the fix.
+2. Compare a perceptual hash of the **title + tab band** as the primary signal —
+   that band is what identifies a screen. Full-frame comparison stays as a
+   weighted secondary signal to catch dialogs and scroll changes within one
+   screen.
+3. **Preserved unchanged:** compare against the *last kept* frame, not the
+   previous frame. `rl_epic`'s loop records why — comparing against the previous
+   frame collapses slow scrolls to nothing, because each step is individually
+   below threshold.
+
+**Consequences.** A screen whose chrome is identical but whose body differs
+(same screen, different patient) may collapse into one entry. That is usually
+correct for a build queue, and the full-frame weight is the knob that adjusts it
+per video.
+
+---
+
+## DEC-008 — A model identifies screens, with confidence-based escalation
+
+**Status:** accepted
+
+**Context.** Something must turn pixels into *"this is the Ancillary Orders
+screen."* Three arrangements were considered, discussed at length before this
+log existed:
+
+| | Approach | Verdict |
+| --- | --- | --- |
+| A | No model in the tool. It emits montages + OCR; a human/agent session reads them and writes the catalogue. | Viable, less to build |
+| B | Model identifies everything; output is a finished catalogue. | **Rejected** |
+| C | Model identifies, scores confidence, escalates the uncertain. | **Chosen** |
+
+**Decision.** C.
+
+**B is rejected on evidence, not taste.** The exact failure is on record in
+`rl_epic/docs/reference/full_dfs/SCREEN_INDEX.md`: an automated pass concluded a
+video held "only one claim screen," and the last three minutes turned out to
+contain the most valuable footage in the entire corpus. It produced a confident,
+complete-looking catalogue with a hole in it. **You cannot review a gap you were
+never told about.**
+
+**A became untenable when the footage was confirmed handheld.** A depended on
+OCR being reliable enough to carry most of the naming. On phone-of-monitor
+footage OCR is exactly what degrades — `rl_epic`'s own catalogue marks such
+reads `(?)`. Without reliable OCR, A degenerates into a human reading every
+montage manually, which is the cost the tool was built to remove.
+
+**Consequences.**
+- The tool needs an API key and a versioned prompt.
+- `NEEDS_REVIEW.md` will be long on video 1. That is the design working.
+- A → C would have been additive; C → A is always available by ignoring the
+  model stage.
+
+---
+
+## DEC-009 — Confidence is signal agreement, not model self-report
+
+**Status:** accepted
+
+**Context.** The obvious implementation of "how sure are you" is to ask the
+model. That is not a measurement — it is another generated value with the same
+failure modes as the answer it is meant to qualify, and it correlates with
+fluency rather than correctness.
+
+**Decision.** Compute confidence in `confidence.py` from independent signals:
+OCR agreement with the model's name, cross-frame consistency of repeat sightings,
+framing quality flags from stage 02, band legibility metrics, and whether the
+name resolves against the inventory.
+
+**Consequences.**
+- Confidence is explainable — the manifest records each signal separately, so a
+  bad score can be diagnosed rather than merely distrusted.
+- The weights are config, and tuning them is expected to be a main activity of
+  the validation rounds.
+- Cross-frame consistency only works because dedupe keeps repeat sightings as
+  separate screens when they are separated in time. Do not "optimise" that away.
+
+---
+
+## DEC-010 — Geometry measurement is out of scope **[handheld]**
+
+**Status:** accepted
+
+**Context.** Step 5 of the RL_EPIC loop is *"measure, don't eyeball"* —
+`source px ÷ 1.345 = CSS px`, measure with Pillow, target ≤2px against the DOM.
+It is the step that catches defects reading cannot, and losing it is a real cost.
+
+**Decision.** Out of scope. The videos will not yield reliable geometry.
+
+Perspective correction recovers *shape* but not absolute *scale*: there is no
+known-size reference in frame, the camera distance varies, and residual keystone
+error after warping propagates into every measurement. A number that is wrong by
+3% looks exactly like a number that is right, which is worse than no number.
+
+**Consequences.**
+- Column widths, row heights and spacing come from screens already built in
+  `rl_epic` — which is what its "Reference-This-Repo-First" rule already says to
+  do for chrome and layout.
+- The videos remain authoritative for structure, labels, column sets, column
+  order, control types, states and workflow. That is most of the value.
+- **If a future recording is a native screen capture, reopen this.**
+
+---
+
+## DEC-011 — No colour extraction, no data-grid OCR
+
+**Status:** accepted
+
+**Context.** Both are things the tool could easily attempt and would get wrong
+in ways that are hard to detect downstream.
+
+**Decision.** Neither is implemented, at any confidence level.
+
+**Colour.** The reference is a *green* Epic build; the target is the *purple
+HyperDrive* theme, which `rl_epic/CLAUDE.md` locks explicitly. A colour read off
+a frame is actively misleading before you even account for the phone's white
+balance and the monitor's colour profile.
+
+**Data-grid values.** `rl_epic`'s rule: *"Never invent data to fill a column."*
+An OCR error and a fabrication are indistinguishable once written into a
+catalogue — and on blurry footage, digits are exactly where OCR fails. Cell
+contents get read by a human off a full-res frame.
+
+**Consequences.** Descriptions in the catalogue name *structure* — "four
+sub-tabs, right-hand action rail, six-column grid" — and never values.
+
+---
+
+## DEC-012 — The inventory contract is owned by `rl_epic`
+
+**Status:** accepted
+
+**Context.** The classifier needs to know what is already built. That knowledge
+lives in `rl_epic`'s TypeScript: `ACTIVITY_OVERRIDES` in `lib/nav.ts` (85
+entries), `modalActivities.ts` (34), `menuConfig.ts` `disabled: true` markers
+(27), and 150 `page.tsx` routes. But [DEC-001](#dec-001--standalone-repo-not-part-of-rl_epic)
+says Reframe must not know about Epic.
+
+**Options.**
+1. Reframe parses `rl_epic`'s TypeScript.
+2. `rl_epic` exports a generic `inventory.json`; Reframe consumes it.
+
+**Decision.** Option 2. The exporter lives in `rl_epic/scripts/`.
+
+Option 1 couples Reframe permanently to one project's file layout and defeats
+the separation entirely.
+
+**Consequences.**
+- Every Epic-specific fact stays where it is already maintained and already
+  changes alongside the code.
+- Reframe's matching logic is generic string/alias/fuzzy matching over a list.
+- Any other project writes a short exporter and inherits the classifier.
+- See [`CONTRACT.md`](CONTRACT.md) for the schema.
+
+---
+
+## DEC-013 — Determinism, and only the deduped frames are committed
+
+**Status:** accepted
+
+**Context.** `rl_epic`'s `SCREEN_INDEX.md` records that full-res frames were not
+stored (2.9 GB) and are re-extracted on demand. That is the right call at this
+corpus size too — but it only works if re-extraction reproduces the same frames.
+
+**Decision.** Stages 00–05, 07 and 08 are fully deterministic: no wall-clock, no
+randomness, no `generated_at` in the manifest. The resolved config and the source
+video are both hashed into the manifest. Stage 06 is the sole non-deterministic
+stage and caches model responses keyed by `(montage_hash, prompt_version, model)`.
+
+**Consequences.**
+- A note saying "see `f_000842`" resolves correctly forever.
+- Changing a tunable changes `config_hash`, which makes stale output detectable
+  instead of confusing.
+- The same input never costs a second model call.
+
+---
+
+## DEC-014 — Tunables live in config; code holds no thresholds
+
+**Status:** accepted
+
+**Context.** The stated workflow is *process → build → validate → tune → next
+video*, across 8 videos. Accuracy is expected to be mediocre initially and to
+improve each round.
+
+**Decision.** Every threshold, crop rectangle, corner override, weight and alias
+lives in `videos/<slug>/config.yaml`, layered over `configs/defaults.yaml`. No
+tunable value appears as a literal in Python.
+
+**Consequences.**
+- A validation round is a YAML edit, not a refactor. This is the difference
+  between feedback that compounds and feedback that thrashes.
+- Per-video configs are expected to diverge — different videos will have
+  different framing, glare and legibility. That is a feature.
+- It forces a clean split: `stages/` orchestrates, `vision/` and `model/`
+  compute, config parameterises.
+
+---
+
+## DEC-015 — Fixtures and regression verification ship in v1
+
+**Status:** accepted
+
+**Context.** The improvement loop only compounds if corrections survive. Fix
+video 1's misses without recording them and you regress at video 4 without
+noticing — which is the same silent-gap failure as [DEC-008](#dec-008--a-model-identifies-screens-with-confidence-based-escalation),
+arriving by a different route.
+
+**Decision.** `reframe fixture <slug>` records validated ground truth;
+`reframe verify` re-runs **every video that has a fixture** and reports
+regressions, changed classifications, and newly-found screens.
+
+**Consequences.**
+- Roughly a hundred lines now; genuinely painful to retrofit once three videos
+  of undocumented corrections exist.
+- Verification gates tuning changes, which is what makes the process a ratchet
+  rather than a treadmill.
+
+---
+
+## DEC-016 — Flow / transition detection deferred to v2
+
+**Status:** accepted
+
+**Context.** Inferring *"clicking here opens this dialog"* would be the most
+valuable single output — it captures workflow, not just inventory.
+
+**Decision.** Not in v1. Kept out of the stage graph entirely rather than
+stubbed, so it cannot influence the design of stages that work.
+
+It is the hardest stage and the one most likely to be rewritten once real
+footage shows how transitions actually look on this corpus — and it depends on
+stages 02 and 04 being well-tuned, which will not be true until several videos
+have been processed.
+
+**Consequences.** Workflow information still reaches the build queue, via the
+model's description of each screen and the human review pass. It is just not
+extracted as a graph.
+
+---
+
+## Open questions
+
+Not yet decided. None block starting.
+
+- **Tool name.** *Reframe* is a working title — it is literally what stage 02
+  does, and what the tool does to the footage.
+- **Where outputs land.** Writing into `rl_epic/docs/reference/<module>/` keeps
+  them beside the evidence folders already there. Leaning yes.
+- **OCR engine.** Tesseract is the default assumption; the choice should be
+  re-made after seeing how one real frame actually renders.
+- **Capture resolution.** If the laptop ran at a high resolution, text will be
+  physically small in frame and OCR will struggle more. May push `sample.fps` or
+  the montage crop. Checkable on the first frame.
