@@ -431,13 +431,17 @@ extracted as a graph.
 **Status:** accepted
 
 **Context.** Videos are processed one at a time: process → build → validate →
-tune → next. The proposal was to **clone the repo fresh for each video**, so that
-no project details could be hardcoded and each run started clean.
+tune → next. Two questions came up while scoping that loop: whether project
+details were leaking into the tool, and whether a fresh start per video was
+needed.
 
-The instinct behind it is correct — nothing project-specific should be baked
-into the tool. The mechanism is not.
+The leak was real and is fixed here. Refreshing the *consuming project's* state
+per video is a separate and correct requirement, handled in
+[DEC-018](#dec-018--the-inventory-is-regenerated-per-run-and-staleness-is-a-hard-error).
+This entry covers only Reframe's own repo.
 
-**Why cloning fails.** Everything that makes the loop compound is shared state:
+**Why cloning Reframe per video would fail.** Everything that makes the loop
+compound is shared state:
 
 | Lost per clone | Consequence |
 | --- | --- |
@@ -466,9 +470,8 @@ videos/<slug>/config.yaml  WHICH video: framing, glare, thresholds. Generated fr
 
 Resolved via `reframe run <slug> --project <name>`.
 
-This extracts the legitimate half of the original proposal: project knowledge is
-genuinely disposable and genuinely absent from the committed tool, while the
-learning stays shared.
+Project knowledge is genuinely disposable and genuinely absent from the
+committed tool, while Reframe's own learning stays shared.
 
 **Enforcement.** The isolation is a discipline, and disciplines decay across
 eight rounds of tuning — so it is checked mechanically.
@@ -498,6 +501,102 @@ into the per-video layer. That signal does not exist across clones.
   `reframe verify` proves videos 1–3 still pass.
 - Adding a new consuming project means adding a line to the banned-name list in
   `check_isolation.sh` — treat that as part of onboarding.
+
+---
+
+## DEC-018 — The inventory is regenerated per run, and staleness is a hard error
+
+**Status:** accepted
+
+**Context.** The loop is: process video *N* → **build those screens into the
+consuming project** → validate → process video *N+1*. So by the time video *N+1*
+runs, the consuming project contains screens that did not exist when video *N*
+was processed.
+
+If the classifier reads a stale `inventory.json`, it will report screens as
+`new` that were built last week — sending you to rebuild work you just finished.
+That is the same class of failure as a silent gap: confident, plausible, wrong.
+
+**Decision.** The inventory is **derived state, refreshed on every run** — never
+a committed snapshot.
+
+1. `inventory.json` stays gitignored. It is a build artifact of the consuming
+   project, not data.
+2. The project profile carries an `inventory_cmd` — the command that regenerates
+   it. `reframe run` executes it before stage 07 unless `--no-refresh` is passed.
+3. **Staleness is a hard error, not a warning.** `generated_from.commit` in the
+   inventory is compared against the consuming project's current `HEAD`. A
+   mismatch aborts the run with the refresh command in the message.
+4. The commit the inventory was built from is recorded in the manifest, so any
+   catalogue can be traced to the exact state of the app it was classified
+   against.
+
+Whether the user refreshes by `git pull` or by re-cloning the consuming project
+is their business — Reframe only requires that the inventory match `HEAD`.
+
+**Consequences.**
+- The classifier's answers are only ever as fresh as the last build, which is
+  the correct semantics.
+- Re-running an old video after building yields *different and more correct*
+  classifications. See [DEC-019](#dec-019--fixtures-separate-stable-observations-from-time-varying-classifications).
+- The consuming project must expose a working exporter command, which
+  [`CONTRACT.md`](CONTRACT.md) already requires.
+
+---
+
+## DEC-019 — Fixtures separate stable observations from time-varying classifications
+
+**Status:** accepted · refines [DEC-015](#dec-015--fixtures-and-regression-verification-ship-in-v1)
+
+**Context.** [DEC-018](#dec-018--the-inventory-is-regenerated-per-run-and-staleness-is-a-hard-error)
+exposes a problem in the fixture design. Consider video 1:
+
+| When | What the run says |
+| --- | --- |
+| First pass | `Study Images` → `bucket: new` |
+| After you build it | `Study Images` → `bucket: built` |
+
+Under the original design that reads as a **regression** — the fixture said `new`
+and the run says `built`. It is the opposite: the run is now more correct, and
+the fixture has aged out. Left unfixed, `reframe verify` would cry wolf on every
+video after the first build, and would get muted, which destroys the ratchet it
+exists to protect.
+
+**Decision.** Fixtures record two kinds of fact, checked differently.
+
+**Stable observations** — properties of the *footage*, true forever:
+screen present at a timestamp, its name, its module, spans the run missed
+entirely. A change here is a **regression** and fails `verify`.
+
+**Time-varying classifications** — properties of the *consuming project* at a
+point in time: the bucket, the matched route. A change here is **informational**
+and is reported as drift, not failure.
+
+```yaml
+slug: video-01
+inventory_commit: 9a0a4ad9        # what the buckets below were true against
+
+screens:
+  - t: "22:41"
+    name: "Study Images"          # stable — regression if this changes
+    module: "Radiology"           # stable
+    bucket: new                   # time-varying — drift if this changes
+```
+
+`reframe verify` reports the two separately:
+
+```
+✗ REGRESSION  video-01 @ 14:02  screen no longer detected
+~ drift       video-01 @ 22:41  bucket new → built (inventory 9a0a4ad9 → 4f2b117)
+```
+
+**Consequences.**
+- Drift is the *expected* signal that building is working. Seeing it is
+  reassuring, not alarming.
+- A drift in the wrong direction — `built` → `new` — is worth investigating, and
+  is visible precisely because drift is reported rather than suppressed.
+- Fixtures record which inventory commit their buckets were true against, so
+  drift can always be explained.
 
 ---
 

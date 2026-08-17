@@ -371,9 +371,17 @@ Expect this list to be long on video 1. That is the tool working, not failing.
 
 **Reads:** identity records, `inventory.json` · **Writes:** classification records
 
-Matches each identified screen against the inventory exported by `rl_epic` and
-sorts it into one of four buckets. This is the stage that turns a catalogue into
-a work plan.
+Matches each identified screen against the inventory exported by the consuming
+project and sorts it into one of four buckets. This is the stage that turns a
+catalogue into a work plan.
+
+**The inventory is refreshed before this stage runs, every time.** Because the
+loop is *process video N → build those screens → process video N+1*, a stale
+inventory would report screens as `new` that were finished last week. Reframe
+runs the project's `inventory_cmd`, compares `generated_from.commit` against the
+project's `HEAD`, and **aborts on a mismatch** rather than classifying against an
+old snapshot ([DEC-018](DECISIONS.md#dec-018--the-inventory-is-regenerated-per-run-and-staleness-is-a-hard-error)).
+The commit used is recorded in the manifest.
 
 | Bucket | Meaning | Action |
 | --- | --- | --- |
@@ -596,29 +604,53 @@ Therefore:
 The improvement loop only compounds if corrections survive. Fix video 1's misses
 without recording them and you will silently regress at video 4.
 
-After validating a video, `reframe fixture <slug>` records ground truth:
+After validating a video, `reframe fixture <slug>` records ground truth.
+
+Fixtures hold **two kinds of fact**, and conflating them breaks verification
+([DEC-019](DECISIONS.md#dec-019--fixtures-separate-stable-observations-from-time-varying-classifications)):
+
+| Kind | Examples | Property of | Change means |
+| --- | --- | --- | --- |
+| **Stable observation** | screen present at a timestamp, its name, its module, a span the run missed | the *footage* — true forever | **regression**, fails `verify` |
+| **Time-varying classification** | bucket, matched route | the *consuming project* at one commit | **drift**, informational |
+
+The distinction is forced by the loop itself. Video 1 first reports
+`Study Images → new`; after you build it, the same video correctly reports
+`built`. Treating that as a regression would make `verify` cry wolf on every
+video after the first build — and a verification step people learn to ignore is
+worse than none, because it destroys the ratchet it exists to protect.
 
 ```yaml
-slug: radiant-01
+slug: video-01
+inventory_commit: 9a0a4ad9        # what the buckets below were true against
+
 screens:
   - t: "14:02"
-    name: "Bed Control"
-    module: "Grand Central"
-    bucket: built
+    name: "Bed Control"           # stable
+    module: "Grand Central"       # stable
+    bucket: built                 # time-varying
   - t: "22:41"
-    name: "Study Images"
-    bucket: new
-    note: "missed entirely on run 1 — dedupe collapsed it into the previous screen"
+    name: "Study Images"          # stable
+    bucket: new                   # time-varying
+    note: "missed on run 1 — dedupe collapsed it into the previous screen"
+
 missed_spans:
   - {from: "31:10", to: "33:40", note: "scroll through order list — no screen emitted"}
 ```
 
-`reframe verify` re-runs **every video that has a fixture** and reports:
+`reframe verify` re-runs **every video that has a fixture** and separates the two:
 
-- screens in the fixture that the run no longer finds (**regressions**)
-- screens whose name or bucket changed
-- new screens the run found that the fixture doesn't mention (candidates for
-  review, not necessarily errors)
+```
+✗ REGRESSION  video-01 @ 14:02  screen no longer detected
+✗ REGRESSION  video-03 @ 08:15  name changed: "Bed Control" → "Bed Coetrol"
+~ drift       video-01 @ 22:41  bucket new → built (inventory 9a0a4ad9 → 4f2b117)
+? unfixtured  video-02 @ 41:03  new screen found, not in fixture
+```
+
+Only regressions fail. Drift in the direction `new → built` is the expected
+signal that building is working; drift the other way, `built → new`, is worth
+investigating — and is visible precisely because drift is reported rather than
+suppressed.
 
 Verification runs before any tuning change is accepted. This is what turns
 *process → validate → next* into a ratchet rather than a treadmill.

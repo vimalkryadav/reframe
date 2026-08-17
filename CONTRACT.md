@@ -102,6 +102,33 @@ Requirements:
 4. **Emit deterministically.** Sorted by label, stable formatting. The file gets
    committed and diffed; churn makes it useless for spotting real changes.
 5. **Record the commit** in `generated_from`, so a stale inventory is detectable.
+6. **Be runnable as a single command** from the project root, with no arguments.
+   Reframe executes it before every run (see below).
+
+---
+
+## Freshness is enforced, not assumed
+
+The workflow is: process video *N* → **build those screens** → process video
+*N+1*. So the inventory is out of date the moment you finish building, and a
+stale one would report screens as `new` that were completed last week.
+
+Reframe treats the inventory as **derived state, refreshed per run**
+([DEC-018](DECISIONS.md#dec-018--the-inventory-is-regenerated-per-run-and-staleness-is-a-hard-error)):
+
+1. `inventory.json` is gitignored — it is a build artifact, not data.
+2. The project profile names `project_root` and `inventory_cmd`. Reframe runs
+   that command before stage 07 unless `--no-refresh` is passed.
+3. `generated_from.commit` is compared against the project's current `HEAD`.
+   **A mismatch aborts the run** with the refresh command in the error — it is
+   never a warning, because a warning about a stale classification is
+   indistinguishable from a correct classification once it is in a Markdown file.
+4. The inventory's commit is recorded in the manifest, so any catalogue can be
+   traced to the exact state of the app it was classified against.
+
+How the project itself gets refreshed — `git pull`, or a fresh clone before each
+video — is outside Reframe's concern. It only requires that the inventory match
+`HEAD`.
 
 ---
 

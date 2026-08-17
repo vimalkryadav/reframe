@@ -14,10 +14,24 @@
 # Human-readable name. Appears in generated Markdown headers only.
 project: example-app
 
+# Root of the consuming project's checkout. Used to read HEAD for the staleness
+# check — the inventory must have been generated from the current commit.
+project_root: ../example-app
+
 # Path to the inventory exported by the consuming project. See CONTRACT.md for
 # the schema and what that project's exporter has to do.
 # Relative paths resolve from the reframe repo root.
 inventory: ../example-app/inventory.json
+
+# Command that regenerates the inventory. Run from project_root before stage 07
+# on every run, unless --no-refresh is passed.
+#
+# This exists because the loop is: process video N -> BUILD those screens ->
+# process video N+1. A stale inventory would report screens as `new` that you
+# finished building last week (DEC-018). Refresh what the project itself is —
+# git pull, or a fresh clone — outside this tool; Reframe only requires that the
+# inventory match HEAD, and aborts the run if it does not.
+inventory_cmd: node scripts/export-inventory.mjs
 
 classify:
   # Modules to treat as in-scope for the build queue. Screens belonging to any
