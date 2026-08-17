@@ -1,0 +1,40 @@
+# Project profile — the middle config layer.
+#
+#   configs/defaults.yaml     tool defaults. Generic. Committed.
+#   projects/<name>.yaml      THIS FILE. Which project we're building for.
+#                             Gitignored — the tool ships knowing no projects.
+#   videos/<slug>/config.yaml which video. Generated fresh by stage 00.
+#
+# Used as:  reframe run <slug> --project <name>
+#
+# Copy this file to projects/<yourproject>.yaml and fill it in. Everything here
+# is knowledge about a consuming project, which is why it never lives in the
+# tool's own defaults and never appears in src/ (see DEC-017).
+
+# Human-readable name. Appears in generated Markdown headers only.
+project: example-app
+
+# Path to the inventory exported by the consuming project. See CONTRACT.md for
+# the schema and what that project's exporter has to do.
+# Relative paths resolve from the reframe repo root.
+inventory: ../example-app/inventory.json
+
+classify:
+  # Modules to treat as in-scope for the build queue. Screens belonging to any
+  # other module are catalogued as `other` rather than queued for building.
+  # Empty list = everything is in scope.
+  modules_in_scope: []
+
+  # Project-wide name corrections, applied before fuzzy matching. Use this layer
+  # when a misread is a property of the APP (its chrome font, its abbreviations)
+  # rather than of one video's footage quality — per-video misreads belong in
+  # videos/<slug>/config.yaml instead.
+  #
+  #   "Bed Ctrl": "Bed Board"
+  aliases: {}
+
+# Where generated Markdown should be copied after a successful run, if anywhere.
+# The tool always writes to out/<slug>/ first; this is an additional destination
+# so catalogues can live beside the consuming project's own evidence folders.
+# Leave null to skip.
+publish_to: null

@@ -48,7 +48,8 @@ whole point of the tool.
 | **Never OCR data-grid cells.** | An OCR error and a fabrication are indistinguishable downstream. Chrome bands only. |
 | **Never emit geometry or measurements.** | Handheld footage cannot support them. See [DEC-010](DECISIONS.md#dec-010--geometry-measurement-is-out-of-scope). |
 | **Never hardcode a tunable.** | Thresholds, crops, weights and aliases live in `videos/<slug>/config.yaml`. See [DEC-014](DECISIONS.md#dec-014--tunables-live-in-config-code-holds-no-thresholds). |
-| **Never reference the consuming project by name in `src/`.** | Reframe knows nothing about Epic. Project knowledge arrives as `inventory.json`. See [`CONTRACT.md`](CONTRACT.md). |
+| **Never name a consuming project in `src/`, `configs/` or `tests/`.** | Reframe knows nothing about the apps it processes. Project knowledge lives in `projects/<name>.yaml` (gitignored) and arrives as `inventory.json`. Enforced by `scripts/check_isolation.sh` — a hit fails the build. See [DEC-017](DECISIONS.md#dec-017--one-repo-three-config-layers-never-cloned-per-video) and [`CONTRACT.md`](CONTRACT.md). |
+| **Never clone the repo per video.** | Fixtures, tuned defaults, the alias table and the model cache are shared state — they are what makes accuracy compound. See [DEC-017](DECISIONS.md#dec-017--one-repo-three-config-layers-never-cloned-per-video). |
 | **Never use wall-clock time or randomness in stages 00–05, 07, 08.** | Determinism is what makes re-extraction safe. See [DEC-013](DECISIONS.md#dec-013--determinism-and-only-the-deduped-frames-are-committed). |
 | **Never silently truncate.** | Caps (`max_frames`, montage limits, model batch sizes) record a warning in the manifest when hit. |
 
@@ -84,8 +85,17 @@ without a video, and lets vision functions be tested without a manifest.
 
 ## Configuration
 
-- `configs/defaults.yaml` holds the baseline. `videos/<slug>/config.yaml` holds
-  overrides. Only the resolved result is hashed into the manifest.
+Three layers, each overriding the one before. Only the resolved result is hashed
+into the manifest.
+
+| Layer | File | Holds | Committed? |
+| --- | --- | --- | --- |
+| 1 | `configs/defaults.yaml` | Generic tool defaults | ✅ |
+| 2 | `projects/<name>.yaml` | *Which project* — inventory, scope, project aliases | ❌ |
+| 3 | `videos/<slug>/config.yaml` | *Which video* — framing, glare, thresholds | ✅ |
+
+- **Layers 1 and 3 must never name a consuming application.** That is what
+  layer 2 is for, and CI enforces it.
 - **Every config key needs a comment saying what it does and what moving it
   trades away.** These files are the tuning surface for someone who did not
   write the code — likely months later.
@@ -136,13 +146,14 @@ to revisit first — several would flip.
 ```bash
 uv sync                            # install
 uv run reframe init <video> --slug <slug>
-uv run reframe run <slug>          # all stages
+uv run reframe run <slug> --project <name>   # all stages
 uv run reframe stage 04 <slug>     # one stage
 uv run reframe fixture <slug>      # record validated ground truth
 uv run reframe verify              # regression-check every fixtured video
 uv run mypy src                    # type check
 uv run pytest                      # tests
 uv run ruff check src              # lint
+scripts/check_isolation.sh         # no project names leaked into the tool
 ```
 
 ---
@@ -153,6 +164,7 @@ uv run ruff check src              # lint
 - [ ] `uv run ruff check src` clean
 - [ ] `uv run pytest` passing
 - [ ] `uv run reframe verify` shows no regressions
-- [ ] No hardcoded thresholds — all tunables in config, documented
+- [ ] `scripts/check_isolation.sh` clean
+- [ ] No hardcoded thresholds — all tunables in the right config layer, documented
 - [ ] Files under 500 lines
 - [ ] New/changed decisions recorded in `DECISIONS.md`

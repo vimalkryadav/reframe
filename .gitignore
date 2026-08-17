@@ -15,8 +15,14 @@ out/*/montages/
 # Model response cache
 .cache/
 
-# Imported from rl_epic — regenerate with its export-inventory script
+# Project profiles — the tool ships knowing no consuming project (DEC-017).
+# _example.yaml is the committed template; real profiles stay local.
+projects/*.yaml
+!projects/_example.yaml
+
+# Inventories imported from consuming projects — regenerate with their exporters
 inventory.json
+*.inventory.json
 
 # Python
 __pycache__/

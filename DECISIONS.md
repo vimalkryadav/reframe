@@ -426,6 +426,81 @@ extracted as a graph.
 
 ---
 
+## DEC-017 — One repo, three config layers, never cloned per video
+
+**Status:** accepted
+
+**Context.** Videos are processed one at a time: process → build → validate →
+tune → next. The proposal was to **clone the repo fresh for each video**, so that
+no project details could be hardcoded and each run started clean.
+
+The instinct behind it is correct — nothing project-specific should be baked
+into the tool. The mechanism is not.
+
+**Why cloning fails.** Everything that makes the loop compound is shared state:
+
+| Lost per clone | Consequence |
+| --- | --- |
+| `fixtures/*.yaml` | `reframe verify` has nothing to check against; a tuning change for video 3 can break video 1 undetected |
+| Tuned `configs/defaults.yaml` | Re-tuning from factory defaults 8 times instead of once |
+| Accumulated aliases | Every misread screen name rediscovered from scratch |
+| Model response cache | Identical calls paid for repeatedly |
+
+Video 8 would be no more accurate than video 1 — a treadmill, not a ratchet,
+which is the exact outcome [DEC-015](#dec-015--fixtures-and-regression-verification-ship-in-v1)
+exists to prevent. Cloning also converts every bug fix from a `git merge` into
+manual copying across eight directories, with no way to verify the copies.
+
+Meanwhile the isolation cloning was meant to provide is already there:
+`videos/<slug>/` and `out/<slug>/` are per-video paths, and a clean slate is
+`rm -rf out/<slug>`.
+
+**Decision.** One repo, cloned once. Three config layers:
+
+```
+configs/defaults.yaml      tool defaults. Generic. Committed. Improves each round.
+projects/<name>.yaml       WHICH project: inventory path, modules in scope,
+                           project-wide aliases. GITIGNORED.
+videos/<slug>/config.yaml  WHICH video: framing, glare, thresholds. Generated fresh.
+```
+
+Resolved via `reframe run <slug> --project <name>`.
+
+This extracts the legitimate half of the original proposal: project knowledge is
+genuinely disposable and genuinely absent from the committed tool, while the
+learning stays shared.
+
+**Enforcement.** The isolation is a discipline, and disciplines decay across
+eight rounds of tuning — so it is checked mechanically.
+`scripts/check_isolation.sh` fails the build if a consuming project's name
+appears anywhere in `src/`, `configs/` or `tests/`. That guard addresses the real
+risk behind the original proposal directly, without giving up the merge flow.
+
+**Git flow.** Two repos, two independent flows. Because videos are processed
+sequentially, reframe's history is a chain rather than parallel branches:
+
+```
+reframe    git checkout -b video/<slug> → run → commit → merge to main
+           new files per video (config, fixture, out/) never conflict;
+           configs/defaults.yaml is the only shared mutable file
+
+<project>  git checkout -b feat/<thing> → build from BUILD_QUEUE.md → PR → main
+```
+
+A conflict in `configs/defaults.yaml` is **information**: two videos wanting
+different values means the key should not be a global default and should move
+into the per-video layer. That signal does not exist across clones.
+
+**Consequences.**
+- Reprocessing an early video with later improvements is a re-run, not an
+  archaeology exercise.
+- A fix made during video 4 is inherited by videos 5–8 automatically, and
+  `reframe verify` proves videos 1–3 still pass.
+- Adding a new consuming project means adding a line to the banned-name list in
+  `check_isolation.sh` — treat that as part of onboarding.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.

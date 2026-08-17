@@ -25,6 +25,7 @@ defends it.
 - [Config reference](#config-reference)
 - [Determinism rules](#determinism-rules)
 - [Fixtures and verification](#fixtures-and-verification)
+- [Working across videos](#working-across-videos)
 - [Out of scope](#out-of-scope)
 
 ---
@@ -121,7 +122,8 @@ what keeps stages independently testable against fixture frames.
 
 ```
 reframe/
-├── configs/defaults.yaml          baseline config, layered under every video
+├── configs/defaults.yaml          tool defaults — generic, committed
+├── projects/<name>.yaml           project profile — GITIGNORED
 ├── videos/<slug>/
 │   ├── config.yaml                per-video overrides — THE tuning surface
 │   └── source.txt                 absolute path + sha256 of the source video
@@ -491,8 +493,29 @@ data. Corrections go into `fixtures/<slug>.yaml`, not into the Markdown.
 
 ## Config reference
 
-Config is layered: `configs/defaults.yaml` → `videos/<slug>/config.yaml`.
-Only the resolved result is hashed into the manifest.
+Config resolves in three layers, each overriding the one before. Only the
+resolved result is hashed into the manifest.
+
+| Layer | File | Scope | Committed? |
+| --- | --- | --- | --- |
+| 1 | `configs/defaults.yaml` | Tool defaults. Generic. Improves as the tool learns across videos. | ✅ |
+| 2 | `projects/<name>.yaml` | *Which project*: inventory path, modules in scope, project-wide aliases, publish destination. | ❌ gitignored |
+| 3 | `videos/<slug>/config.yaml` | *Which video*: framing, glare, thresholds. Generated fresh by stage 00. | ✅ |
+
+```bash
+reframe run radiant-01 --project rl_epic
+```
+
+The middle layer is what keeps the tool project-agnostic ([DEC-017](DECISIONS.md#dec-017--one-repo-three-config-layers-never-cloned-per-video)).
+Nothing in layers 1 or 3 may name a consuming application, and
+`scripts/check_isolation.sh` fails the build if anything does.
+
+The alias tables in layers 2 and 3 are deliberately separate: a misread caused by
+the *app* (its chrome font, its abbreviations) is a project fact and belongs in
+layer 2, where every video inherits the correction; a misread caused by *one
+video's* footage quality belongs in layer 3.
+
+Layers 1 and 3 below; see `projects/_example.yaml` for layer 2.
 
 ```yaml
 sample:
@@ -537,9 +560,12 @@ confidence:
 
 classify:
   fuzzy_threshold: 0.82
-  modules_in_scope: [Radiology, Patient Care]
-  aliases: {}
+  aliases: {}                  # per-video corrections only
 ```
+
+Layer 2 (`projects/<name>.yaml`) adds the project-scoped keys — `inventory`,
+`classify.modules_in_scope`, project-wide `classify.aliases` and `publish_to`.
+They are absent from layers 1 and 3 by design.
 
 ---
 
@@ -596,6 +622,42 @@ missed_spans:
 
 Verification runs before any tuning change is accepted. This is what turns
 *process → validate → next* into a ratchet rather than a treadmill.
+
+---
+
+## Working across videos
+
+Videos are processed one at a time, and the repo is **cloned once, never per
+video** ([DEC-017](DECISIONS.md#dec-017--one-repo-three-config-layers-never-cloned-per-video)).
+Because the work is sequential, history is a chain rather than parallel
+branches, and the conflict surface is one file.
+
+```
+── reframe ────────────────────────────────────────────────────
+   git checkout -b video/<slug>
+   reframe init <video> --slug <slug>
+   reframe run <slug> --project <name>
+   reframe verify                     # all prior videos still pass
+   merge to main
+
+── consuming project ──────────────────────────────────────────
+   git checkout -b feat/<thing>
+   build from out/<slug>/BUILD_QUEUE.md
+   PR → main
+```
+
+Everything a video produces lands on a **new path** — `videos/<slug>/`,
+`fixtures/<slug>.yaml`, `out/<slug>/` — so it cannot conflict. The only shared
+mutable file is `configs/defaults.yaml`.
+
+**A conflict there is information.** If one video wants `hash_distance: 9` and
+another settled on `12`, git is telling you the key should not be a global
+default and belongs in the per-video layer instead. That signal is the reason
+the shared file is worth having.
+
+Video *N+1* branches from a main that already contains every fix and fixture
+from videos 1…*N*, and `reframe verify` proves those earlier videos still pass
+before any tuning change is accepted.
 
 ---
 

@@ -1,9 +1,18 @@
-# Baseline configuration, layered under every video's own config.yaml.
+# Tool defaults — the bottom config layer.
 #
-# Every tunable in the pipeline lives here or in videos/<slug>/config.yaml —
-# never as a literal in Python (DEC-014). Each key documents what moving it
-# trades away, because this file is the tuning surface for someone who did not
-# write the code.
+#   configs/defaults.yaml     THIS FILE. Generic tool defaults. Committed.
+#                             Improves as the tool learns across videos.
+#   projects/<name>.yaml      which project we're building for. Gitignored.
+#   videos/<slug>/config.yaml which video. Generated fresh by stage 00.
+#
+# Every tunable in the pipeline lives in one of those three files — never as a
+# literal in Python (DEC-014). Each key documents what moving it trades away,
+# because these files are the tuning surface for someone who did not write the
+# code.
+#
+# NOTHING PROJECT-SPECIFIC BELONGS IN THIS FILE. Knowledge about a consuming
+# application lives in projects/<name>.yaml (DEC-017), and CI fails the build if
+# a project name appears anywhere in src/ or here.
 #
 # Defaults are starting points chosen for phone-of-monitor footage of a laptop
 # screen. Expect per-video divergence; that is the design working.
@@ -103,9 +112,13 @@ classify:
   # Normalised similarity required for a fuzzy inventory match. Below this the
   # screen is `new` WITH a possible_match note — never silently unbuilt.
   fuzzy_threshold: 0.82
-  # Modules to build from. Everything else is catalogued as `other`.
-  modules_in_scope: []
-  # Per-video corrections, applied before fuzzy matching. This is where a
-  # validation round lands when the model consistently misreads a screen name:
+  # Per-VIDEO name corrections, applied before fuzzy matching. This is where a
+  # validation round lands when THIS video's footage quality causes a consistent
+  # misread. Corrections that are properties of the app rather than the footage
+  # belong in projects/<name>.yaml instead.
   #   "Bed Ctrl": "Bed Board"
   aliases: {}
+
+# NOTE: `inventory`, `classify.modules_in_scope` and project-wide aliases are
+# deliberately absent — they are project knowledge and live in
+# projects/<name>.yaml. See projects/_example.yaml and DEC-017.

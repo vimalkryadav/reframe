@@ -75,19 +75,33 @@ handheld, and the reasoning is recorded there rather than repeated in comments.
 ```bash
 uv sync
 
+# 0. once per consuming project — describes WHICH app, stays gitignored
+cp projects/_example.yaml projects/myapp.yaml && $EDITOR projects/myapp.yaml
+
 # 1. register a video and generate its config
-uv run reframe init ~/Downloads/IMG_2601.MOV --slug radiant-01
+uv run reframe init ~/Downloads/IMG_2601.MOV --slug video-01
 
 # 2. run the whole pipeline
-uv run reframe run radiant-01
+uv run reframe run video-01 --project myapp
 
-# 3. re-run a single stage after editing videos/radiant-01/config.yaml
-uv run reframe stage 04 radiant-01
+# 3. re-run a single stage after editing videos/video-01/config.yaml
+uv run reframe stage 04 video-01
 
 # 4. after you've validated: record ground truth, then check for regressions
-uv run reframe fixture radiant-01
+uv run reframe fixture video-01
 uv run reframe verify            # re-runs ALL videos against their fixtures
 ```
+
+### Configuration layers
+
+| Layer | File | Holds | Committed? |
+| --- | --- | --- | --- |
+| 1 | `configs/defaults.yaml` | Generic tool defaults | ✅ |
+| 2 | `projects/<name>.yaml` | *Which project* — inventory path, modules in scope, project aliases | ❌ |
+| 3 | `videos/<slug>/config.yaml` | *Which video* — framing, glare, thresholds | ✅ |
+
+Layer 2 is what keeps the tool project-agnostic; `scripts/check_isolation.sh`
+fails the build if a consuming app is named anywhere in layers 1 or 3.
 
 ---
 
@@ -97,14 +111,23 @@ uv run reframe verify            # re-runs ALL videos against their fixtures
 process video → build from the queue → validate against the video → tune → next video
 ```
 
-Accuracy is expected to be mediocre on video 1 and to improve on each pass. Two
+Accuracy is expected to be mediocre on video 1 and to improve on each pass. Three
 design properties exist purely to make that true:
 
-1. **Every tunable lives in `videos/<slug>/config.yaml`**, never as a literal in
-   code. A validation round edits YAML, not Python.
+1. **Every tunable lives in config**, never as a literal in code. A validation
+   round edits YAML, not Python.
 2. **Corrections are recorded as fixtures**, and `reframe verify` re-runs every
    prior video. Without this you fix video 1's misses and silently regress at
    video 4.
+3. **The repo is cloned once, not per video.** Fixtures, tuned defaults, the
+   alias table and the model cache are shared state — they *are* the compounding.
+   Video *N+1* branches from a main containing every fix from videos 1…*N*.
+   See [DEC-017](DECISIONS.md#dec-017--one-repo-three-config-layers-never-cloned-per-video).
+
+```
+reframe    git checkout -b video/<slug> → run → verify → merge to main
+<project>  git checkout -b feat/<thing> → build from BUILD_QUEUE.md → PR → main
+```
 
 ---
 
