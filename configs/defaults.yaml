@@ -158,6 +158,15 @@ identify:
   # Bump whenever the prompt in model/prompts.py changes, or the response cache
   # will silently serve stale results and make a tuning round meaningless.
   prompt_version: 1
+  # Read a second, different frame of every screen and compare the two names.
+  # This is the cross_frame confidence signal's only source of repeat sightings:
+  # matching them by band hash does not work on handheld footage (DEC-025).
+  #
+  # Roughly doubles the model calls for this stage. Turning it off does not
+  # lower confidence scores dishonestly — the signal is reported unmeasurable
+  # and drops out of the average — but with it off, most screens have too few
+  # measured signals to be accepted at all.
+  corroborate: true
 
 confidence:
   # Below this, a screen is escalated to NEEDS_REVIEW.md rather than accepted.

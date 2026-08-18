@@ -33,6 +33,19 @@ _OUT_ROOT_ENV: Final = "REFRAME_OUT_ROOT"
 _CACHE_DIR_ENV: Final = "REFRAME_CACHE_DIR"
 
 
+def display_path(path: Path, root: Path) -> str:
+    """A path as a human should read it in terminal output.
+
+    Relative to the checkout when it is inside one, absolute otherwise. Output
+    can now live off the checkout (REFRAME_OUT_ROOT), and a bare ``relative_to``
+    raises there — turning a successful run's final line into a traceback.
+    """
+    try:
+        return str(path.resolve().relative_to(root.resolve()))
+    except ValueError:
+        return str(path)
+
+
 def _override(name: str) -> Path | None:
     value = os.environ.get(name)
     return Path(value).expanduser() if value else None

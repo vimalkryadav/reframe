@@ -808,6 +808,60 @@ ratio and the bound it missed.
 
 ---
 
+## DEC-025 — Cross-frame corroboration comes from dedupe's grouping, not from matching hashes
+
+**[handheld]** Decided 2026-08-18, on the first real video.
+
+`cross_frame` asks whether repeat sightings of one screen get the same name. It
+is weighted 0.3 — joint-largest signal — and on the first real video it was
+measured on **0 of 133 screens**. Everything else followed from that: with the
+signal absent, coverage rarely cleared `MIN_SIGNAL_COVERAGE`, and 132 of 133
+screens escalated to review despite a median confidence of 0.82 against a 0.75
+threshold. A one-item catalogue and a 132-item review queue.
+
+The cause was how repeats were recognised. `group_repeat_sightings` matched band
+hashes **exactly**, on the reasoning — recorded in its own docstring — that a
+distance threshold had been tried and could not separate same-screen from
+different-screen pairs. That reasoning was right, and measuring it on real
+footage rather than on a fixture only sharpens it:
+
+| | same-name pairs | different-name pairs |
+| --- | --- | --- |
+| median hash distance | 70 | 83 |
+| caught at `<=12` | 1 of 1081 | 0 |
+| caught at `<=24` | 33 | 28 false merges (precision 0.54) |
+
+Exact matching produced **zero** collisions across 133 screens — camera
+micro-motion guarantees no two handheld frames are ever bit-identical. Loosening
+the threshold is a coin flip. Neither end of the dial works.
+
+**Decided:** stop trying to recognise repeats from pixels. Stage 04 has already
+grouped them — every screen record holds the frames dedupe folded into it, and
+those are genuinely different photographs of the same screen. Stage 06 reads a
+second one and compares the two names.
+
+- **The grouping comes from dedupe, not from the names being compared.** An
+  earlier proposal — group by hash distance *and* require the names to agree —
+  was rejected as circular: it would have scored every group 1.0 by construction,
+  which is worse than the signal being absent, because it looks like evidence.
+- **The frame chosen is the one furthest in time from the representative.** Two
+  adjacent frames are nearly the same photograph, and agreeing about them
+  corroborates almost nothing.
+- **It costs roughly double the model calls for stage 06**, so it is
+  `identify.corroborate` and can be turned off. Off is honest, not cheap: the
+  signal reports unmeasurable and drops out of the average rather than scoring
+  zero — but most screens then lack the evidence to be accepted at all.
+- `group_repeat_sightings` and its band-hash plumbing are deleted rather than
+  left unused. The reasoning that made exact matching look right is preserved
+  here, which is where someone will look for it.
+
+**Still open:** every screen on this corpus has at least two frames (133 of 133),
+so corroboration is always available. A screen seen in a single frame would have
+none, and would be unacceptable for want of evidence. That is the correct
+outcome, but it has not been observed yet and may need a second look when it is.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.

@@ -22,6 +22,7 @@ working.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from pathlib import Path
 
 from rich.progress import track
@@ -30,7 +31,6 @@ from reframe import confidence as scoring
 from reframe import montage
 from reframe.manifest import (
     ConfidenceRecord,
-    FrameRecord,
     Framing,
     IdentityRecord,
     RectifyMethod,
@@ -70,10 +70,13 @@ def run(ctx: StageContext) -> None:
         readings = _read_sheets(ctx, client, sheets)
         _apply(ctx, readings)
         _resolve_stragglers(ctx, client, readings)
+        corroborations = (
+            _corroborate(ctx, client) if identify.corroborate else {}
+        )
     except PromptVersionError as exc:
         raise StageError(str(exc)) from exc
 
-    _score(ctx)
+    _score(ctx, corroborations)
     _report(ctx)
 
 
@@ -82,24 +85,39 @@ def run(ctx: StageContext) -> None:
 # --------------------------------------------------------------------------
 
 
-def _build_sheets(ctx: StageContext) -> list[montage.Sheet]:
+def _build_sheets(
+    ctx: StageContext, frame_for: Mapping[str, tuple[str, Path]] | None = None
+) -> list[montage.Sheet]:
+    """Montage sheets, one strip per screen.
+
+    ``frame_for`` overrides which frame represents each screen, which is how
+    the corroboration pass reads a *different* image of the same screen.
+    """
     band_rect = _band_rect(ctx)
     strips: list[montage.Strip] = []
 
     for screen in ctx.manifest.screens:
-        path = _kept_path(ctx, screen)
-        if path is None:
-            continue
+        if frame_for is not None:
+            chosen = frame_for.get(screen.id)
+            if chosen is None:
+                continue
+            frame_id, path = chosen
+        else:
+            frame_id = screen.representative_frame
+            maybe = _kept_path(ctx, screen)
+            if maybe is None:
+                continue
+            path = maybe
         band = crop(read_image(path), band_rect)
         if band.size == 0:
             raise StageError(
                 f"dedupe.band_rect {list(band_rect)} produced an empty crop for "
-                f"{screen.representative_frame} — re-measure it against a frame in frames/kept/"
+                f"{frame_id} — re-measure it against a frame in frames/kept/"
             )
         strips.append(
             montage.Strip(
                 screen_id=screen.id,
-                frame_id=screen.representative_frame,
+                frame_id=frame_id,
                 t_ms=screen.t_ms_start,
                 band=band,
             )
@@ -254,22 +272,67 @@ def _identity_of(reading: ScreenReading) -> IdentityRecord:
     )
 
 
-def _score(ctx: StageContext) -> None:
+# --------------------------------------------------------------------------
+# Pass 3 — corroboration
+# --------------------------------------------------------------------------
+
+
+def _corroborate(ctx: StageContext, client: IdentifyClient) -> dict[str, str | None]:
+    """Read a second, different frame of each screen, for the cross-frame signal.
+
+    The signal asks whether repeat sightings of one screen get the same name. The
+    original implementation looked for repeats by matching band hashes exactly,
+    which never fires on handheld footage — measured over 133 real screens, not
+    one pair of hashes collided, and loosening to a distance threshold separates
+    same-screen from different-screen pairs at a precision of about 0.5 (DEC-025).
+
+    But stage 04 has already grouped the repeats: every screen record holds the
+    frames that were folded into it. Those are genuinely different images of the
+    same screen — different moment, different shake, different glare — and the
+    grouping comes from dedupe rather than from the names being compared, so
+    nothing here is circular.
+
+    The frame chosen is the one furthest in time from the representative, because
+    two adjacent frames are nearly the same photograph and agreeing about them
+    would corroborate very little.
+    """
+    frames = ctx.manifest.frames_by_id()
+    frame_for: dict[str, tuple[str, Path]] = {}
+    for screen in ctx.manifest.screens:
+        others = [fid for fid in screen.frame_ids if fid != screen.representative_frame]
+        for frame_id in reversed(others):
+            record = frames.get(frame_id)
+            if record is None:
+                continue
+            path = sibling_frame(ctx.absolute(record.path), "clean")
+            if path.exists():
+                frame_for[screen.id] = (frame_id, path)
+                break
+
+    if not frame_for:
+        return {}
+
+    sheets = _build_sheets(ctx, frame_for)
+    ctx.say(f"  corroborating {len(frame_for)} screen(s) on {len(sheets)} extra sheet(s)")
+    readings = _read_sheets(ctx, client, sheets)
+
+    by_screen = {frame_id: screen_id for screen_id, (frame_id, _) in frame_for.items()}
+    return {
+        by_screen[frame_id]: reading.name
+        for frame_id, reading in readings.items()
+        if frame_id in by_screen
+    }
+
+
+def _score(
+    ctx: StageContext, corroborations: Mapping[str, str | None]
+) -> None:
     """Compute confidence for every screen and escalate the ones that fail."""
     manifest = ctx.manifest
     weights = ctx.pipeline.confidence.weights
     threshold = ctx.pipeline.confidence.accept_threshold
     band_rect = _band_rect(ctx)
-    frames = manifest.frames_by_id()
 
-    groups = scoring.group_repeat_sightings(_band_hashes(manifest.screens, frames))
-    group_of = {member: leader for leader, members in groups.items() for member in members}
-    names_by_group: dict[str, list[str | None]] = {}
-    for screen in manifest.screens:
-        leader = group_of.get(screen.id, screen.id)
-        names_by_group.setdefault(leader, []).append(
-            screen.identity.name if screen.identity else None
-        )
 
     for screen in manifest.screens:
         path = _kept_path(ctx, screen)
@@ -283,7 +346,10 @@ def _score(ctx: StageContext) -> None:
                 screen.ocr.title_raw if screen.ocr else None,
             ),
             "cross_frame": scoring.cross_frame_agreement(
-                names_by_group.get(group_of.get(screen.id, screen.id), [])
+                [
+                    screen.identity.name if screen.identity else None,
+                    corroborations.get(screen.id),
+                ]
             ),
             "framing": scoring.framing_quality(_framing_records(ctx, screen)),
             "legibility": legibility,
@@ -310,18 +376,6 @@ def _score(ctx: StageContext) -> None:
                 + f" — {result.reason}",
                 frame_ids=[screen.representative_frame],
             )
-
-
-def _band_hashes(
-    screens: list[ScreenRecord], frames: dict[str, FrameRecord]
-) -> dict[str, str]:
-    """Each screen's representative band hash, for grouping repeat sightings."""
-    hashes: dict[str, str] = {}
-    for screen in screens:
-        record = frames.get(screen.representative_frame)
-        if record is not None and record.dedupe is not None:
-            hashes[screen.id] = record.dedupe.band_hash
-    return hashes
 
 
 def _unreadable_reason(screen: ScreenRecord) -> str | None:

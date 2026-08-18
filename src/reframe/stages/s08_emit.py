@@ -20,6 +20,7 @@ from pathlib import Path
 from reframe import render
 from reframe.config import section_hashes
 from reframe.manifest import StageId
+from reframe.paths import display_path
 from reframe.stages.base import StageContext, StageError
 from reframe.timecode import format_timecode
 
@@ -45,7 +46,7 @@ def run(ctx: StageContext) -> None:
         _write(out_dir / render.REVIEW_NAME, render.render_review(manifest)),
     ]
     for path in written:
-        ctx.say(f"  wrote {path.relative_to(ctx.paths.repo_root)}")
+        ctx.say(f"  wrote {display_path(path, ctx.paths.repo_root)}")
 
     _publish(ctx, written)
     _summarise(ctx)
