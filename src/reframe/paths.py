@@ -9,6 +9,7 @@ manifest never has to hold four paths that could disagree.
 
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Final, Literal
@@ -19,6 +20,22 @@ from typing import Final, Literal
 FrameSet = Literal["raw", "rect", "clean", "kept"]
 
 _ROOT_MARKERS: Final = ("configs/defaults.yaml", "pyproject.toml")
+
+# Where generated data goes, when it should not go in the checkout. Frames and
+# montages run to hundreds of megabytes per video, which is a poor fit for a repo
+# whose value is its config and its decision log — and DEC-013 already says they
+# are regenerable, because sampling is deterministic.
+#
+# Environment rather than config: this is a property of the machine, not of the
+# video or the project, and the resolved config is hashed into the manifest, where
+# a local storage choice has no business appearing.
+_OUT_ROOT_ENV: Final = "REFRAME_OUT_ROOT"
+_CACHE_DIR_ENV: Final = "REFRAME_CACHE_DIR"
+
+
+def _override(name: str) -> Path | None:
+    value = os.environ.get(name)
+    return Path(value).expanduser() if value else None
 
 
 class RepoRootNotFoundError(RuntimeError):
@@ -68,7 +85,13 @@ class Paths:
 
     @property
     def out_root(self) -> Path:
-        return self.repo_root / "out"
+        """Generated frames, montages and manifests.
+
+        ``REFRAME_OUT_ROOT`` moves them off the checkout. Slug directories are
+        created underneath either way, so switching relocates every video at once
+        and an existing run stays findable by moving the directory.
+        """
+        return _override(_OUT_ROOT_ENV) or self.repo_root / "out"
 
     @property
     def fixtures_dir(self) -> Path:
@@ -76,8 +99,12 @@ class Paths:
 
     @property
     def cache_dir(self) -> Path:
-        """Model response cache. Gitignored; keyed content lives inside."""
-        return self.repo_root / ".cache"
+        """Model response cache. Gitignored; keyed content lives inside.
+
+        ``REFRAME_CACHE_DIR`` moves it off the checkout. Worth keeping somewhere
+        durable: every entry is a model call already paid for.
+        """
+        return _override(_CACHE_DIR_ENV) or self.repo_root / ".cache"
 
     def project_profile(self, name: str) -> Path:
         return self.projects_dir / f"{name}.yaml"
