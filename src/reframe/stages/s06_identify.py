@@ -36,7 +36,8 @@ from reframe.manifest import (
     RectifyMethod,
     ScreenRecord,
 )
-from reframe.model.client import IdentifyClient, ModelError, ModelRefusalError, ModelSettings
+from reframe.model.backend import ModelError, ModelRefusalError
+from reframe.model.client import IdentifyClient, ModelSettings
 from reframe.model.prompts import PromptVersionError, format_hints
 from reframe.model.schema import ScreenReading
 from reframe.paths import sibling_frame
@@ -58,7 +59,11 @@ def run(ctx: StageContext) -> None:
 
     try:
         client = IdentifyClient(
-            ModelSettings(model=identify.model, prompt_version=identify.prompt_version),
+            ModelSettings(
+                provider=identify.provider,
+                model=identify.model,
+                prompt_version=identify.prompt_version,
+            ),
             ctx.paths.cache_dir,
         )
         sheets = _build_sheets(ctx)

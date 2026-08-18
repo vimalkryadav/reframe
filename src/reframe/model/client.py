@@ -1,14 +1,16 @@
-"""The Anthropic client, the response cache, and nothing else.
+"""Prompt selection, the response cache, and provider choice. No provider code.
 
-Stage 06 is the only stage allowed to call a model, and this is the only module
-that does (DEC-008).
+Stage 06 is the only stage allowed to call a model (DEC-008); the call itself
+lives in a backend behind :class:`~reframe.model.backend.ModelBackend`, so
+everything here is true whichever provider is configured.
 
 **Responses are cached, and the key covers the whole request.** The design named
 ``(montage_hash, prompt_version, model)``; this implementation hashes the rendered
 prompt text as well, because OCR hints are part of the request and change when
 stage 05 is re-tuned. A key that ignores them would replay an answer produced from
 different inputs — the same silent-staleness failure the versioned prompt table
-exists to prevent.
+exists to prevent. The key also carries the **provider**, not just the model name,
+so switching providers cannot serve the other one's answers under a new label.
 
 **A refusal is never cached.** It is not a reading of the screen, and caching one
 would make a transient policy outcome permanent for that montage.
@@ -16,7 +18,6 @@ would make a transient policy outcome permanent for that montage.
 
 from __future__ import annotations
 
-import base64
 import hashlib
 import json
 from dataclasses import dataclass
@@ -24,35 +25,21 @@ from pathlib import Path
 from typing import Final
 
 from reframe.model import prompts
+from reframe.model.backend import ModelBackend, ModelError
 from reframe.model.schema import FrameReading, MontageReading, ScreenReading
 
-# Enough for a full sheet of structured entries without streaming. The SDK refuses
-# non-streaming requests it expects to outlive the HTTP timeout, and 16k sits well
+# Enough for a full sheet of structured entries without streaming. The SDKs refuse
+# non-streaming requests they expect to outlive the HTTP timeout, and 16k sits well
 # inside that; a sheet of 20 short records needs a fraction of it.
 _MAX_TOKENS: Final = 16000
 _MEDIA_TYPE: Final = "image/jpeg"
 
-
-class ModelError(RuntimeError):
-    """The model could not be reached, or returned something unusable."""
-
-
-class ModelRefusalError(ModelError):
-    """The request was declined by policy.
-
-    Surfaced rather than retried on another model: this pipeline's answer to "the
-    model would not read this" is the same as its answer to "the model could not
-    read this" — escalate the timestamp to a human. Quietly substituting a
-    different model would put an unlabelled second opinion into the catalogue.
-    """
-
-    def __init__(self, category: str | None) -> None:
-        self.category = category
-        super().__init__(f"the model declined to answer (category: {category or 'unspecified'})")
+Provider = str
 
 
 @dataclass(frozen=True)
 class ModelSettings:
+    provider: Provider
     model: str
     prompt_version: int
 
@@ -65,13 +52,38 @@ class Reading:
     cached: bool
 
 
+def build_backend(settings: ModelSettings) -> ModelBackend:
+    """The backend named by config.
+
+    Imported inside the branch so a run against one provider never imports the
+    other's SDK, and an unknown name fails here with the list of valid ones
+    rather than as an attribute error inside a stage.
+    """
+    if settings.provider == "anthropic":
+        from reframe.model.anthropic_backend import AnthropicBackend
+
+        return AnthropicBackend(settings.model)
+    if settings.provider == "openai":
+        from reframe.model.openai_backend import OpenAIBackend
+
+        return OpenAIBackend(settings.model)
+    raise ModelError(
+        f"unknown identify.provider {settings.provider!r} — expected 'anthropic' or 'openai'"
+    )
+
+
 class IdentifyClient:
     """Reads montages and full frames. Caches by rendered request."""
 
-    def __init__(self, settings: ModelSettings, cache_dir: Path) -> None:
+    def __init__(
+        self,
+        settings: ModelSettings,
+        cache_dir: Path,
+        backend: ModelBackend | None = None,
+    ) -> None:
         self._settings = settings
         self._cache_dir = cache_dir / "identify"
-        self._client: object | None = None
+        self._backend = backend if backend is not None else build_backend(settings)
 
     # ---- public API -----------------------------------------------------
     def read_montage(self, *, payload: bytes, digest: str, strip_count: int, hints: str) -> Reading:
@@ -102,75 +114,23 @@ class IdentifyClient:
     def _request[T: MontageReading | FrameReading](
         self, payload: bytes, user_prompt: str, output_format: type[T]
     ) -> T:
-        client = self._ensure_client()
-        try:
-            response = client.messages.parse(  # type: ignore[attr-defined]
-                model=self._settings.model,
-                max_tokens=_MAX_TOKENS,
-                system=prompts.system_prompt(self._settings.prompt_version),
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "image",
-                                "source": {
-                                    "type": "base64",
-                                    "media_type": _MEDIA_TYPE,
-                                    "data": base64.standard_b64encode(payload).decode("ascii"),
-                                },
-                            },
-                            {"type": "text", "text": user_prompt},
-                        ],
-                    }
-                ],
-                output_format=output_format,
-            )
-        except Exception as exc:  # SDK raises a family of typed errors
-            raise ModelError(f"{type(exc).__name__}: {exc}") from exc
-
-        # Check the stop reason before the content: on a refusal the content is
-        # empty or partial, and indexing into it would report a policy outcome as
-        # an unreadable screen.
-        if getattr(response, "stop_reason", None) == "refusal":
-            details = getattr(response, "stop_details", None)
-            raise ModelRefusalError(getattr(details, "category", None))
-
-        parsed = getattr(response, "parsed_output", None)
-        if parsed is None:
-            raise ModelError(
-                "the model returned no structured output — "
-                f"stop_reason was {getattr(response, 'stop_reason', 'unknown')!r}"
-            )
-        if not isinstance(parsed, output_format):
-            raise ModelError(f"expected {output_format.__name__}, got {type(parsed).__name__}")
-        return parsed
-
-    def _ensure_client(self) -> object:
-        if self._client is not None:
-            return self._client
-        try:
-            from anthropic import Anthropic
-        except ImportError as exc:  # pragma: no cover - declared dependency
-            raise ModelError("the anthropic package is not installed") from exc
-        try:
-            self._client = Anthropic()
-        except Exception as exc:
-            raise ModelError(
-                "could not construct an Anthropic client — set ANTHROPIC_API_KEY, or "
-                "run `ant auth login` to store a credential profile.\n"
-                f"  {type(exc).__name__}: {exc}"
-            ) from exc
-        return self._client
+        return self._backend.request(
+            payload=payload,
+            media_type=_MEDIA_TYPE,
+            system=prompts.system_prompt(self._settings.prompt_version),
+            user_prompt=user_prompt,
+            output_format=output_format,
+            max_tokens=_MAX_TOKENS,
+        )
 
     # ---- cache ----------------------------------------------------------
     def cache_key(self, digest: str, user_prompt: str) -> str:
-        """``(image, prompt text, prompt version, model)`` — everything that was sent."""
+        """``(image, prompt text, prompt version, provider/model)`` — everything sent."""
         material = "\n".join(
             [
                 digest,
                 str(self._settings.prompt_version),
-                self._settings.model,
+                self._backend.label,
                 prompts.system_prompt(self._settings.prompt_version),
                 user_prompt,
             ]

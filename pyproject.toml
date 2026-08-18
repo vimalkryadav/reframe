@@ -12,6 +12,7 @@ dependencies = [
     "pillow>=11.0.0",         # montage composition, burnt-in labels
     "pytesseract>=0.3.13",    # OCR of chrome bands (needs system tesseract)
     "anthropic>=0.40.0",      # stage 06 only
+    "openai>=1.60.0",         # stage 06 only, alternative provider
     "rapidfuzz>=3.10.0",      # inventory matching
     "rich>=13.9.0",           # progress + readable stage output
 ]
