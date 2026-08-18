@@ -172,6 +172,7 @@ class IdentifyConfig(_Section):
     provider: Literal["anthropic", "openai"]
     model: str
     prompt_version: int = Field(ge=1)
+    corroborate: bool
 
 
 class ConfidenceConfig(_Section):

@@ -201,30 +201,3 @@ def framing_quality(
         ),
         4,
     )
-
-
-def group_repeat_sightings(band_hashes: Mapping[str, str]) -> dict[str, list[str]]:
-    """Group screen ids that are genuinely the same sighting: identical band hashes.
-
-    Repeat visits to one screen arrive as separate screen records — stage 04 keeps a
-    frame every time the view changes, so returning to a screen makes a new one.
-    Grouping those back together is what makes the cross-frame signal possible.
-
-    **Exact hash equality, not a distance threshold.** A near-match threshold was
-    tried and cannot work: measured on a fixture whose screens share their chrome
-    layout, two sightings of the *same* screen sat 3 bits apart and two *different*
-    screens also sat 3 bits apart. Any threshold wide enough to catch the repeat
-    also merges unrelated screens — and the consequence is not a missing signal but
-    a wrong one, penalising a correct reading for disagreeing with a screen it has
-    nothing to do with.
-
-    So the signal is measured only where the pixels are identical, and reported as
-    unmeasurable otherwise. Losing a signal is recoverable; a fabricated
-    disagreement is the failure this whole file exists to avoid.
-    """
-    groups: dict[str, list[str]] = {}
-    leaders: dict[str, str] = {}
-    for screen_id, band_hash in band_hashes.items():
-        leader = leaders.setdefault(band_hash, screen_id)
-        groups.setdefault(leader, []).append(screen_id)
-    return groups
