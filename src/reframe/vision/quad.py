@@ -14,7 +14,9 @@ This module reports.
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
+from itertools import pairwise
 from typing import Final
 
 import cv2
@@ -202,7 +204,9 @@ def _touches_border(corners: tuple[Point, ...], width: int, height: int) -> bool
     )
 
 
-def is_plausible_successor(previous: Quad, current: Quad, *, frame_diagonal: float) -> bool:
+def is_plausible_successor(
+    previous: Quad, current: Quad, *, frame_diagonal: float, max_jump_fraction: float
+) -> bool:
     """Whether a screen could have moved from ``previous`` to ``current``.
 
     A screen cannot jump. A detection that lands somewhere else entirely found
@@ -211,11 +215,41 @@ def is_plausible_successor(previous: Quad, current: Quad, *, frame_diagonal: flo
 
     The allowed movement is a fraction of the frame diagonal rather than a
     configured pixel count, so it holds at any capture resolution.
+
+    This answers "could the screen have moved there in one sample", not "is the
+    screen still where it was". A camera that is genuinely re-aimed fails this
+    check and should — see :func:`has_settled` for how re-acquisition happens.
     """
     if frame_diagonal <= 0:
         return True
     moved = _distance(previous.centre(), current.centre())
-    return moved <= 0.1 * frame_diagonal
+    return moved <= max_jump_fraction * frame_diagonal
+
+
+def has_settled(
+    candidates: Sequence[Quad], *, frame_diagonal: float, max_jump_fraction: float
+) -> bool:
+    """Whether a run of rejected detections agrees on a new stable position.
+
+    :func:`is_plausible_successor` compares against the last *accepted* quad, so a
+    camera that is genuinely re-aimed desyncs it permanently: every later frame is
+    measured against a position the screen has left, and rejection cascades to the
+    end of the video however steady the new framing is.
+
+    A screen cannot jump — but a camera can be moved, and the footage after that
+    move is as real as the footage before it. Agreement among consecutive rejected
+    detections is what separates the two cases: a reflection or a second bright
+    object wanders, while a re-aimed camera settles. Requiring the run to be
+    mutually consistent means re-acquisition needs evidence, not just persistence.
+    """
+    if len(candidates) < 2:
+        return False
+    if frame_diagonal <= 0:
+        return True
+    budget = max_jump_fraction * frame_diagonal
+    return all(
+        _distance(a.centre(), b.centre()) <= budget for a, b in pairwise(candidates)
+    )
 
 
 def median_smooth(

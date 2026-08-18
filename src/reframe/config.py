@@ -87,6 +87,8 @@ class RectifyConfig(_Section):
     smooth_window: int = Field(gt=0)
     min_quad_confidence: float = Field(ge=0.0, le=1.0)
     aspect_bounds: tuple[float, float]
+    max_jump_fraction: float = Field(gt=0.0, le=1.0)
+    reanchor_after_frames: int = Field(gt=1)
     manual_corners: list[ManualCorners]
 
     @model_validator(mode="after")
@@ -167,6 +169,7 @@ class OcrConfig(_Section):
 
 class IdentifyConfig(_Section):
     montage_rows: int = Field(gt=0)
+    provider: Literal["anthropic", "openai"]
     model: str
     prompt_version: int = Field(ge=1)
 
