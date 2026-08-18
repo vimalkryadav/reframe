@@ -35,6 +35,7 @@ from reframe.vision import read_image, write_image
 from reframe.vision.quad import (
     Quad,
     detect_screen_quad,
+    has_settled,
     interpolate_gaps,
     is_plausible_successor,
     median_smooth,
@@ -57,7 +58,7 @@ def run(ctx: StageContext) -> None:
     for stale in rect_dir.glob("*.jpg"):
         stale.unlink()
 
-    detected, pinned, rejected_jumps = _detect_all(ctx)
+    detected, pinned, rejected_jumps, reanchors = _detect_all(ctx)
     smoothed = median_smooth(detected, rectify.smooth_window, pinned=pinned)
     # A gap is only bridged across the smoothing window. Beyond that, inferring a
     # screen position for footage nobody looked at is a fabrication.
@@ -71,11 +72,33 @@ def run(ctx: StageContext) -> None:
             f"{rejected_jumps} detection(s) were discarded for jumping too far from the "
             "previous frame — a screen cannot move that fast, so something else was found",
         )
+    # Never silent: a re-anchor means the detector decided the camera was
+    # re-aimed. If it decided wrong, every frame after it is a confident crop of
+    # something that is not the screen — the one outcome worse than dropping
+    # them. So each one is escalated with its own timestamp, not merely counted.
+    for start, end in reanchors:
+        frames = manifest.frames[start : end + 1]
+        manifest.escalate(
+            "02",
+            t_ms_start=frames[0].t_ms,
+            t_ms_end=frames[-1].t_ms,
+            reason="reanchor",
+            detail=(
+                "detection re-acquired the screen at a new position here, after "
+                f"{rectify.reanchor_after_frames} consecutive frames agreed on it. "
+                "Confirm this is the camera being moved and not a bright object — "
+                "if it is wrong, every frame after this point is a confident crop "
+                "of the wrong thing"
+            ),
+            frame_ids=[f.id for f in frames],
+        )
     _escalate_framing(ctx)
     _report(ctx, methods)
 
 
-def _detect_all(ctx: StageContext) -> tuple[list[Quad | None], list[bool], int]:
+def _detect_all(
+    ctx: StageContext,
+) -> tuple[list[Quad | None], list[bool], int, list[tuple[int, int]]]:
     """Detect or read corners for every frame. Weak detections become gaps.
 
     A weak detection is dropped to ``None`` rather than used, so that the
@@ -88,7 +111,20 @@ def _detect_all(ctx: StageContext) -> tuple[list[Quad | None], list[bool], int]:
     detected: list[Quad | None] = []
     pinned: list[bool] = []
     rejected_jumps = 0
+    # Frame-index spans where the detector re-acquired, so each one can be
+    # escalated with a timestamp. "Check the re-anchors" is not actionable
+    # without saying which moments to check.
+    reanchors: list[tuple[int, int]] = []
     last_accepted: Quad | None = None
+    # Over-budget detections held back pending a verdict. If they turn out to
+    # agree on a new position the camera was re-aimed and they are kept; if the
+    # run breaks they were never a screen and they stay dropped.
+    pending: list[tuple[int, Quad]] = []
+
+    def _discard_pending() -> None:
+        nonlocal rejected_jumps
+        rejected_jumps += len(pending)
+        pending.clear()
 
     for frame in track(
         ctx.manifest.frames, description="  detecting screen", console=ctx.console
@@ -96,6 +132,7 @@ def _detect_all(ctx: StageContext) -> tuple[list[Quad | None], list[bool], int]:
         manual = _manual_for(rectify.manual_corners, frame.t_ms)
         if manual is not None:
             quad = _quad_from_manual(manual)
+            _discard_pending()
             detected.append(quad)
             pinned.append(True)
             last_accepted = quad
@@ -105,20 +142,40 @@ def _detect_all(ctx: StageContext) -> tuple[list[Quad | None], list[bool], int]:
         image = read_image(ctx.absolute(frame.path))
         candidate = detect_screen_quad(image, aspect_bounds=aspect_bounds)
         if candidate is None or candidate.confidence < rectify.min_quad_confidence:
+            _discard_pending()
             detected.append(None)
             continue
 
         diagonal = float(np.hypot(image.shape[1], image.shape[0]))
         if last_accepted is not None and not is_plausible_successor(
-            last_accepted, candidate, frame_diagonal=diagonal
+            last_accepted,
+            candidate,
+            frame_diagonal=diagonal,
+            max_jump_fraction=rectify.max_jump_fraction,
         ):
-            rejected_jumps += 1
+            pending.append((len(detected), candidate))
             detected.append(None)
+            run = [quad for _, quad in pending]
+            if len(run) >= rectify.reanchor_after_frames and has_settled(
+                run,
+                frame_diagonal=diagonal,
+                max_jump_fraction=rectify.max_jump_fraction,
+            ):
+                # The camera was re-aimed and held. Keep the frames that proved
+                # it — dropping them would blank the moment of the reposition.
+                for index, quad in pending:
+                    detected[index] = quad
+                last_accepted = run[-1]
+                reanchors.append((pending[0][0], pending[-1][0]))
+                pending.clear()
             continue
 
+        _discard_pending()
         detected.append(candidate)
         last_accepted = candidate
-    return detected, pinned, rejected_jumps
+
+    _discard_pending()
+    return detected, pinned, rejected_jumps, reanchors
 
 
 def _manual_for(spans: list[ManualCorners], t_ms: int) -> ManualCorners | None:

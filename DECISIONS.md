@@ -741,6 +741,73 @@ list people skim is the failure mode `verify` is also designed around.
 
 ---
 
+## DEC-024 — Detection re-acquires after a genuine reframe
+
+**[handheld]** Decided 2026-08-18, on the first real video (`v01`, 10:09 of
+handheld Epic Hyperspace footage).
+
+`is_plausible_successor` compares each detection against the last *accepted*
+quad, on the rule that a screen cannot jump. The rule is right. The
+implementation had no way to represent a second true statement: **a camera can
+be re-aimed, and the footage after the move is as real as the footage before
+it.**
+
+On `v01` the camera was repositioned once, at 07:07, moving the screen centre
+391px against a 220px budget. That frame was correctly rejected. But the anchor
+then stayed pinned at the pre-move position, so every subsequent frame was
+measured against somewhere the screen had left — and rejection cascaded to the
+end of the video. The camera had settled into a *new* stable position and held
+it to within 4–12px, the steadiest footage in the recording. All 181 frames of
+it were discarded: the last three minutes of the workflow, absent from the
+catalogue.
+
+The failure mode is the one this tool exists to prevent, arriving from an
+unexpected direction. It was not a silent hole — stage 02 warned, and the spans
+reached `NEEDS_REVIEW.md` — but a reviewer told "07:07–10:08 screen-not-found"
+would go looking for a problem in the footage, which is clean.
+
+**Decided:**
+
+- The movement budget becomes `rectify.max_jump_fraction` (default `0.10`).
+  It was `0.1 * frame_diagonal`, inline in the function body — a tunable living
+  in code, which DEC-014 forbids. Found only because it had to be changed.
+- Detection re-acquires. Over-budget detections are held rather than dropped;
+  when `rectify.reanchor_after_frames` (default `3`) of them agree with each
+  other to within the same budget, the anchor moves there and the held frames
+  are kept.
+- **Agreement, not persistence, is the evidence.** A reflection or a second
+  bright object wanders; a re-aimed camera settles. Requiring the run to be
+  mutually consistent is what distinguishes them. A single over-budget frame
+  never re-anchors, however confident.
+- Held frames are kept once the run fires, rather than discarded as the cost of
+  re-acquiring. Dropping them would blank the moment of the reposition — which
+  is often exactly when the operator moved to show something.
+- **A re-anchor is always recorded as a manifest warning.** If the detector
+  re-acquired onto the wrong thing, every frame after it is a confident crop of
+  something that is not the screen. That is the one outcome worse than dropping
+  the frames, so it is never silent.
+
+**Rejected:** raising the jump budget until the observed 391px move fits. It
+would have worked on this video and left the cascade latent for the next one —
+buying a green run at the cost of the failure recurring somewhere it would be
+harder to recognise.
+
+Also corrected in the same pass: `rectify.aspect_bounds` upper bound `1.9` →
+`2.2`. A 16:9 screen does not read as 1.78 in this footage — the detected bright
+region excludes the dark bezel and taskbar, and perspective compresses it
+vertically, so `v01` measures 1.94–2.13 across every sampled frame. The old
+bound rejected **100%** of them (0/96) at confidences of 0.55–0.67, and the
+manifest reported that as `screen-not-found`. Widened in `configs/defaults.yaml`
+rather than per-video: nothing about it is specific to this recording, and any
+handheld video would have hit the same wall.
+
+**Still open:** the manifest says `screen-not-found` when a candidate was found
+and then rejected on aspect. Those are different problems with different fixes,
+and the message should say which — the aspect case should report the measured
+ratio and the bound it missed.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.
