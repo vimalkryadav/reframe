@@ -157,7 +157,20 @@ identify:
   model: gpt-5.2
   # Bump whenever the prompt in model/prompts.py changes, or the response cache
   # will silently serve stale results and make a tuning round meaningless.
-  prompt_version: 1
+  prompt_version: 2
+  # Read every screen as a whole frame rather than as a strip on a contact sheet.
+  #
+  # A montage strip is the top band only, so anything the screen puts elsewhere is
+  # invisible — a left navigation list in particular, whose selected row is what
+  # distinguishes two views that share a heading. Where that is how the application
+  # is organised, strips cannot tell those views apart and the catalogue collapses
+  # them into one.
+  #
+  # Costs roughly one model call per screen instead of one per montage_rows
+  # screens. Leave it off for applications whose heading alone identifies a screen;
+  # turn it on when the manifest shows `section` never being filled and screens
+  # that should be distinct sharing a name.
+  full_frames: false
   # Read a second, different frame of every screen and compare the two names.
   # This is the cross_frame confidence signal's only source of repeat sightings:
   # matching them by band hash does not work on handheld footage (DEC-025).

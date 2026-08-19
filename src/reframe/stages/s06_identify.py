@@ -66,9 +66,14 @@ def run(ctx: StageContext) -> None:
             ),
             ctx.paths.cache_dir,
         )
-        sheets = _build_sheets(ctx)
-        readings = _read_sheets(ctx, client, sheets)
-        _apply(ctx, readings)
+        if identify.full_frames:
+            # Strips cannot show a sidebar, so there is nothing for a montage pass
+            # to contribute here beyond a name the full frame reads better.
+            readings: dict[str, ScreenReading] = {}
+        else:
+            sheets = _build_sheets(ctx)
+            readings = _read_sheets(ctx, client, sheets)
+            _apply(ctx, readings)
         _resolve_stragglers(ctx, client, readings)
         corroborations = (
             _corroborate(ctx, client) if identify.corroborate else {}
@@ -207,14 +212,18 @@ def _read_sheets(
 def _resolve_stragglers(
     ctx: StageContext, client: IdentifyClient, readings: dict[str, ScreenReading]
 ) -> None:
+    every = ctx.pipeline.identify.full_frames
     unresolved = [
         screen
         for screen in ctx.manifest.screens
-        if screen.identity is None or screen.identity.name is None
+        if every or screen.identity is None or screen.identity.name is None
     ]
     if not unresolved:
         return
-    ctx.say(f"  {len(unresolved)} screen(s) unresolved by montage — sending full frames")
+    ctx.say(
+        f"  reading {len(unresolved)} full frame(s)"
+        + ("" if every else " — the montage could not resolve them")
+    )
 
     for screen in track(unresolved, description="  reading frames  ", console=ctx.console):
         path = _kept_path(ctx, screen)
@@ -265,8 +274,10 @@ def _set_identity(screen: ScreenRecord, reading: ScreenReading) -> None:
 def _identity_of(reading: ScreenReading) -> IdentityRecord:
     return IdentityRecord(
         name=reading.name,
+        record=reading.record,
         module=reading.module,
         tabs=list(reading.tabs),
+        section=reading.section,
         dialog=reading.dialog,
         description=reading.structure,
     )

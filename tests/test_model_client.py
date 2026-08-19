@@ -41,8 +41,10 @@ class StubBackend:
         screen = ScreenReading(
             frame_id="f_000001",
             name="Some Screen",
+            record=None,
             module=None,
             tabs=[],
+            section=None,
             dialog=None,
             structure=None,
             unreadable=None,

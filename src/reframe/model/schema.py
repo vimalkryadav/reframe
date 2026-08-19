@@ -26,9 +26,18 @@ class ScreenReading(BaseModel):
     )
     name: str | None = Field(
         description=(
-            "The screen or activity name as printed in the title band. Null if the "
-            "text cannot be read with confidence — never a guess and never inferred "
-            "from the surrounding screens."
+            "The ACTIVITY name only, as printed. Where a heading names a record — "
+            "'Activity: SOME RECORD [12345]' — take the part before the colon and "
+            "put the rest in `record`. Null if the text cannot be read with "
+            "confidence: never a guess, never inferred from the surrounding screens."
+        )
+    )
+    record: str | None = Field(
+        description=(
+            "The specific record a heading names, if it names one — the part after "
+            "the colon in 'Activity: SOME RECORD [12345]', copied exactly. Null when "
+            "the heading names no record. This is kept apart from `name` so that a "
+            "hundred visits to one activity are one screen rather than a hundred."
         )
     )
     module: str | None = Field(
@@ -46,7 +55,18 @@ class ScreenReading(BaseModel):
     dialog: str | None = Field(
         description=(
             "The title of a dialog, modal or overlay covering the screen, if one is "
-            "open. Null if no dialog is visible."
+            "open — INCLUDING a progress or 'Launching ...' box. Null if none is "
+            "visible. A dialog is not a screen: put its title here, and put the "
+            "screen underneath it in `name`, or null if the dialog hides it."
+        )
+    )
+    section: str | None = Field(
+        description=(
+            "The selected item in a left navigation list or sidebar, exactly as "
+            "printed — the highlighted row, not the whole list. Null when there is "
+            "no sidebar, or when no selection is discernible. On screens whose "
+            "sidebar drives the content, this is what distinguishes one view from "
+            "another and the heading alone will not."
         )
     )
     structure: str | None = Field(
