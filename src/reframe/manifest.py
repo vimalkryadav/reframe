@@ -146,8 +146,16 @@ class IdentityRecord(_Record):
     is a review, not a guess."""
 
     name: str | None
+    # The record a heading named, kept out of `name` so a hundred visits to one
+    # activity are one screen. Never a value from a data row (DEC-011) — only a
+    # record the screen's own heading printed.
+    record: str | None = None
     module: str | None = None
     tabs: list[str] = Field(default_factory=list)
+    # The selected row of a left navigation list. On screens whose sidebar drives
+    # the content, this is the identity: two views share a heading and differ only
+    # here.
+    section: str | None = None
     dialog: str | None = None
     description: str | None = None
 

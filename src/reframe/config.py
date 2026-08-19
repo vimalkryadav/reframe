@@ -173,6 +173,7 @@ class IdentifyConfig(_Section):
     model: str
     prompt_version: int = Field(ge=1)
     corroborate: bool
+    full_frames: bool
 
 
 class ConfidenceConfig(_Section):
