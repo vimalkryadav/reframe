@@ -48,7 +48,9 @@ new component. If it is not a fit, say why rather than duplicating it.
 ### Variant A — compact lookup
 
 Observed once, on **NDC Admin** (`a-compact-detail.jpg`). A small centred
-dialog over the page, which stays visible around it.
+dialog over the page, which stays visible around it — and **not dimmed**.
+Measured: the hub's three regions read 171 behind the dialog against 180
+unobstructed, which is exposure drift, not a scrim. A 30% scrim would read ~126.
 
 - Title bar: `Launching NDC Admin`, `✕` at the right
 - A help paragraph, verbatim:
@@ -65,10 +67,17 @@ dialog over the page, which stays visible around it.
 ### Variant B — record picker
 
 Observed on four activities. A large dialog filling most of the window, its top
-edge just below the Epic title bar, with a dark surround.
+edge just below the Epic title bar.
+
+Earlier revisions of this brief called the surround a dark scrim. It is not —
+its luminance swings 38 / 71 / 124 / 158 across the four frames, which is the
+off-screen bezel of the photographed monitor, not anything the page renders.
+The dialog covers everything behind it, so variant B's real backdrop was never
+observable; use the repo default.
 
 - Title bar: `Launching <Activity>`, `✕` at the right
-- A label, an empty text input, and a `🔍 Search` button beside it
+- A label on its own row; below it an empty text input and a `🔍 Search` button
+  **joined together**, no gap between them
 - A results grid, already populated before any search
 - Row selection highlights the **entire row** in blue
 - Hovering a row shows a tooltip with that row's full text (seen on Med List
@@ -76,6 +85,10 @@ edge just below the Epic title bar, with a dark surround.
 - A vertical scrollbar
 - Footer left: `Records loaded: 30. More records to load.`
 - Footer right: `✔ Accept` · `✕ Cancel`
+- Buttons carry keyboard accelerator underlines, legible at 6x: `A̲ccept`,
+  `C̲ancel`, and `r` on both create buttons (which is why it does not collide
+  with Cancel). `Edit`'s accelerator is illegible even at 2.4x — render it
+  without one rather than guessing.
 
 ---
 
@@ -83,13 +96,19 @@ edge just below the Epic title bar, with a dark surround.
 
 Everything below is the same component with different inputs.
 
-| Activity | Field label | Grid columns | Create button |
-| --- | --- | --- | --- |
-| Med List Admin | `Formulary:` | Formulary Name · Formulary ID | **`➕ Create a New Record`** |
-| Medication Admin | `Medication:` | ID · Name · Generic Name | none |
-| Workstation Admin | `Workstation:` | Workstation Name · Type · Identifier · ID | none |
-| Dispensable Mapping | `Medication:` | ID · Name · Generic Name | none |
-| NDC Admin | `NDC:` | *(variant A — no grid)* | `➕ Create New` |
+**The dialog title is not always the activity name.** Verified at 5x: the menu
+reads `Medication List Admin` and `Dispensable Mapping Admin`, while the dialogs
+read `Launching Med List Admin` and `Launching Dispensable Mapping`. Epic
+shortens some of them. Store both — keying config on the dialog title makes
+those two activities unreachable from the menu.
+
+| Activity (menu name) | Dialog title | Field label | Grid columns | Create button |
+| --- | --- | --- | --- | --- |
+| Medication List Admin | Launching **Med List Admin** | `Formulary:` | Formulary Name · Formulary ID | **`➕ Create a New Record`** |
+| Medication Admin | Launching Medication Admin | `Medication:` | ID · Name · Generic Name | none |
+| Workstation Admin | Launching Workstation Admin | `Workstation:` | Workstation Name · Type · Identifier · ID | none |
+| Dispensable Mapping Admin | Launching **Dispensable Mapping** | `Medication:` | ID · Name · Generic Name | none |
+| NDC Admin | Launching NDC Admin | `NDC:` | *(variant A — no grid)* | `➕ Create New` |
 
 **Only Med List Admin shows a create button in variant B.** Do not add it to the
 others — that is observed, not an oversight.
@@ -120,6 +139,12 @@ frame, always reading 30, and the operator scrolls without it changing. So:
 What was **never observed**: the message after a further page loads, and whether
 loading is triggered by scroll or by a control. Build the first page and the
 message; leave the load trigger unresolved and say so.
+
+**Do not manufacture rows to reach 30.** Only 13–14 rows per set are legible in
+the frames. Seeding the rest would put invented masterfile records into the
+build, which is worse than a count that does not match the reference. Expect two
+honest consequences: the footer reads the real count, and the grid's scrollbar
+does not appear because the rows fit.
 
 ---
 
@@ -153,13 +178,21 @@ them — a column that does not vary in the sample.
 
 ---
 
+## `Accept` is evidenced — build it
+
+The transition animation is never in frame, but the destination is not in doubt:
+the activity opens showing the chosen record, which is why its heading reads
+`Medication: <record> [id]`. Enable `Accept`, require a selection, and navigate
+to the activity with the record id. A stub destination is fine.
+
+---
+
 ## Known unknowns — leave visibly incomplete
 
 Use the `disabled` + `title="… — not demonstrated"` idiom from brief 01.
 
 | Unknown | Why |
 | --- | --- |
-| What `Accept` does with a selection | the recording cuts to the activity; the transition itself is never in frame |
 | What `Create New` opens | never clicked |
 | Whether `Search` filters in place or re-queries | the field is empty in every frame |
 | What triggers the next page of 30 | never observed loading more |
