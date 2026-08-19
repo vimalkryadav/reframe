@@ -34,7 +34,10 @@ RectifyMethod = Literal["auto", "interpolated", "manual", "failed"]
 Framing = Literal["full", "partial", "lost"]
 Verdict = Literal["accepted", "review"]
 Bucket = Literal["built", "partial", "new", "other"]
-MatchKind = Literal["exact", "alias", "fuzzy", "none"]
+# `subset` is not a weaker `fuzzy`: it means one name's words are wholly inside
+# the other's, which scores 1.0 and is genuinely undecidable from the strings
+# alone. Kept distinct so a reviewer can see why it was not accepted.
+MatchKind = Literal["exact", "alias", "fuzzy", "subset", "none"]
 
 
 class _Record(BaseModel):

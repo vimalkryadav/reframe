@@ -216,7 +216,9 @@ def _classify(ctx: StageContext, inventory: inv.Inventory) -> None:
         if match.entry is None:
             screen.classification = ClassificationRecord(
                 bucket="new",
-                match_kind="none",
+                # Carry the kind through: `subset` and `none` both mean unmatched,
+                # but only one of them means the score was unusable rather than low.
+                match_kind=match.kind,
                 match_score=match.score,
                 possible_match=match.possible,
                 note=_unmatched_note(name, match),
@@ -248,6 +250,16 @@ def _classify(ctx: StageContext, inventory: inv.Inventory) -> None:
 def _unmatched_note(name: str | None, match: inv.Match) -> str:
     if not name:
         return "no screen name was read, so nothing could be matched"
+    if match.kind == "subset" and match.possible is not None:
+        # Not a low score — an undecidable one. Saying "below threshold" here
+        # would be plainly false (it scores 1.00) and would send a reviewer
+        # looking for a tuning problem that does not exist.
+        return (
+            f"one of this name and {match.possible.label!r} contains the other's "
+            "words, which scores a perfect match either way — treated as new, "
+            "because a shared word is not evidence of the same screen. Confirm it "
+            "and add the correction to classify.aliases if they are the same"
+        )
     if match.possible is not None:
         return (
             f"closest inventory entry is {match.possible.label!r} at "
@@ -286,7 +298,9 @@ def _escalate_unmatched(
     if match.possible is None:
         return
     classify = ctx.pipeline.classify
-    if match.possible.score < classify.fuzzy_threshold - classify.near_miss_margin:
+    if match.kind != "subset" and (
+        match.possible.score < classify.fuzzy_threshold - classify.near_miss_margin
+    ):
         # Not a near miss — a different name. The candidate is still recorded in
         # the manifest and in the build queue; it just does not claim a reviewer's
         # attention. Without this, every genuinely-new screen drags its
@@ -301,14 +315,25 @@ def _escalate_unmatched(
         "07",
         t_ms_start=screen.t_ms_start,
         t_ms_end=screen.t_ms_end,
-        reason="near-miss-match",
+        reason="contained-name" if match.kind == "subset" else "near-miss-match",
         detail=(
-            f"read as {read_as!r}; closest "
-            f"inventory entry {match.possible.label!r} scored {match.possible.score:.2f}, "
-            f"below classify.fuzzy_threshold {classify.fuzzy_threshold:.2f}. "
-            "If they are the same screen, add the correction to classify.aliases; if not, "
-            "it is genuinely new"
-        ),
+            (
+                f"read as {read_as!r}; one of this and "
+                f"{match.possible.label!r} contains the other's words. That scores "
+                "1.00 whichever way round it is, so the score cannot separate a "
+                "title with noise bled into it from a genuinely different, longer "
+                "activity name."
+            )
+            if match.kind == "subset"
+            else (
+                f"read as {read_as!r}; closest "
+                f"inventory entry {match.possible.label!r} scored "
+                f"{match.possible.score:.2f}, below classify.fuzzy_threshold "
+                f"{classify.fuzzy_threshold:.2f}."
+            )
+        )
+        + " If they are the same screen, add the correction to classify.aliases; "
+        "if not, it is genuinely new",
         frame_ids=[screen.representative_frame],
     )
 

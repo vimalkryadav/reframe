@@ -30,7 +30,7 @@ from typing import Literal, Self
 from pydantic import BaseModel, ConfigDict, Field
 
 from reframe.manifest import Bucket, MatchKind, PossibleMatch
-from reframe.text import normalise_label, similarity
+from reframe.text import is_token_subset, normalise_label, similarity
 
 # The contract's four status values. `patient_scoped` is domain vocabulary the
 # contract fixed before this module existed; Reframe treats it as an opaque
@@ -188,12 +188,22 @@ def resolve(
     best_entry, best_score = _closest(corrected or name, inventory)
     if best_entry is None:
         return Match(entry=None, kind="none", score=0.0)
-    if best_score >= fuzzy_threshold:
+
+    # A subset match scores 1.0 and would sail past any threshold, but it cannot
+    # be trusted either way: "Task List Signed In As Ana" -> "Task List" is a title
+    # with noise bled into it, and "Invoice" -> "Invoice Reconciliation" is
+    # a different activity, and the two are the same shape. Escalate rather than
+    # decide — claiming a screen is already built is the expensive direction to be
+    # wrong in, because nobody re-checks a screen the queue says is done.
+    subset = best_score >= fuzzy_threshold and is_token_subset(
+        corrected or name, best_entry.label
+    )
+    if best_score >= fuzzy_threshold and not subset:
         return Match(entry=best_entry, kind="fuzzy", score=best_score)
 
     return Match(
         entry=None,
-        kind="none",
+        kind="subset" if subset else "none",
         score=best_score,
         possible=PossibleMatch(
             label=best_entry.label,

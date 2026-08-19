@@ -44,3 +44,27 @@ def similarity(left: str, right: str) -> float:
     if not a or not b:
         return 0.0
     return round(float(fuzz.token_set_ratio(a, b)) / 100.0, 4)
+
+
+def is_token_subset(left: str, right: str) -> bool:
+    """Whether one name's words are wholly contained in the other's.
+
+    This is the case :func:`similarity` cannot judge. ``token_set_ratio`` scores a
+    subset 1.0, which is right for a title with noise bled into it — a session
+    name, a clipped tab label — and catastrophically wrong for a name that is
+    genuinely shorter than the activity it is being matched to.
+
+    Measured on real footage, the two are indistinguishable by any string metric:
+
+        "Task List Signed In As Ana" vs "Task List"       should match
+        "Invoice"                    vs "Invoice Reconciliation" must not
+
+    Both are subsets; the difference is whether the extra words carry meaning,
+    which is semantics, not edit distance. So the ambiguity is reported rather
+    than resolved, and the caller escalates instead of guessing.
+    """
+    a = set(normalise_label(left).split())
+    b = set(normalise_label(right).split())
+    if not a or not b or a == b:
+        return False
+    return a < b or b < a
