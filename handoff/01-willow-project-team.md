@@ -43,10 +43,21 @@ Nothing else in the module is reachable until this exists.
 ## Page shell
 
 Heading `Willow Project Team` with a dropdown caret, on its own row below the
-toolbar. Right of that row: three icon buttons (a view/layout toggle with its
-own caret, a filter funnel, a refresh circle) and a wrench.
+toolbar. Right of that row, **five controls in this order** — verified at 6x,
+because at 1x two of them read as something else entirely:
 
-Below the heading, three columns of roughly equal width, each with a plain
+1. layout-picker pill (a 3x3 grid glyph in a rounded rectangle)
+2. a caret `▾` belonging to it
+3. filter funnel
+4. a **broken ring** — a share/link glyph, not a refresh circle
+5. a **multi-colour petal mark** — not a wrench; it only reads as one at 1x
+6. a `⋮` More button at the far right, partly out of frame
+
+The same cluster in the same order already exists on `CadenceAdminDashboard` in
+this repo — reuse those glyphs rather than re-deriving them.
+
+Below the heading, three columns of equal width — they measure 566 vs 491 px in
+frame, but that is perspective skew from the handheld camera, not layout, each with a plain
 section title above a stack of bordered panels: **Follow-up Required**,
 **Reports**, **Links/Info**.
 
@@ -79,7 +90,9 @@ Different shape — a table, not a button.
 - Title, then `⊙ Data collected: Sat 8/8 02:18 PM`
 - Four columns: `Workqueue` · `Total Errors` · `Added Today` · `Last Accessed`
 - Rows carry a green circled check, a two-line workqueue name, and the count in
-  a rounded grey pill:
+  a rounded **green** pill — sampled interior RGB (143,151,141) against a neutral
+  panel of (187,186,187). The green is semantic here (no outstanding errors), so
+  it is one of the cases allowed to depart from the theme:
 
 | Workqueue | Total Errors | Added Today | Last Accessed |
 | --- | --- | --- | --- |
@@ -87,6 +100,10 @@ Different shape — a table, not a button.
 | Device Integration Interface Errors | `0` | 0 | Never |
 
 Only `Total Errors` is pill-rendered; the other two are plain text.
+
+**Card titles and the section title are the same size.** Measured width ratio in
+the frame is 1.626 and 1.621 at equal size in the DOM — there is no type
+hierarchy between them, despite how this document's headings are nested.
 
 ---
 
@@ -126,7 +143,9 @@ The list continues below the fold; five rows is what the viewport showed.
 ### Panel: Project Team Message Board
 
 A list of posts, each with a large title, a body paragraph, an optional
-sign-off, and a right-aligned `<date> <time> - <author>` line.
+sign-off, and a right-aligned `<date> <time> - <author>` line. A hairline rule
+sits **below** that line, not beside it (checked at 6x — at 1x it reads as an
+inline rule).
 
 Observed posts:
 
@@ -172,24 +191,38 @@ Content Management        ← partially below the fold, name uncertain
 Every other name gathered from this recording is a page *heading*, and a heading
 shows the record being edited rather than the activity.
 
+**One column, not two.** An earlier revision of this brief laid the list out in
+two columns to save space, which is not what the frame shows — the panel to the
+right of it is the already-open `Inventory Management Admin` submenu.
+
 ```
-Hospital/Clinic Admin          NDC Group Admin
-Unit/Department Admin          Set NDC Costs
-Care Area Admin                Merchandise and Fee Admin
-Pharmacy Admin                 Charge Table Admin
-Workstation Admin              Charge Mapping Admin
-Medication List Admin          Cart Admin
-Medication Admin               Willow Security
-Dispensable Mapping Admin      Pharmacy System Definitions
-NDC Admin                      Label Printer Setup
-                               Validate Barcodes
-                               Pharmacy Workflow Configuration
-                               Documents Definitions
-                               Inventory Management Admin  ▸
+Hospital/Clinic Admin
+Unit/Department Admin
+Care Area Admin
+Pharmacy Admin
+Workstation Admin
+Medication List Admin
+Medication Admin
+Dispensable Mapping Admin
+NDC Admin
+NDC Group Admin
+Set NDC Costs
+Merchandise and Fee Admin
+Charge Table Admin
+Charge Mapping Admin
+Cart Admin
+Willow Security
+Pharmacy System Definitions
+Label Printer Setup
+Validate Barcodes
+Pharmacy Workflow Configuration
+Documents Definitions
+Inventory Management Admin  ▸
 ```
 
-`Inventory Management Admin` opens a submenu: `Prescription Fill Event Engine`,
-`Payer Sheet Setup`, `Field Setup`, `Rule Deferral Admin ▸`.
+`Inventory Management Admin` opens a submenu, visible open in the frame:
+`Prescription Fill Event Engine`, `Payer Sheet Setup`, `Field Setup`,
+`Rule Deferral Admin ▸`.
 
 **Use these names for routes and menu entries.** A page heading reads
 `Medication` or `Hospital/Clinic`; the activities are `Medication Admin` and
@@ -213,11 +246,22 @@ do not build it here.
 | Unknown | Why |
 | --- | --- |
 | The last Common Links entry (`Content Management`?) | sits on the fold, never fully in frame |
+| Session user's full name — **resolved**, see below | not an unknown after all |
 | Whether any column scrolls | content ran past the viewport in all three |
 | What the heading's dropdown caret opens | never clicked |
 | Whether `Follow-up Required` is user-configurable | the pencil suggests yes; never used |
 | What the three top-right icon buttons do | never clicked |
 | Rows below the fifth in Rx Project Team Reports | never scrolled |
+
+---
+
+## Session identity — resolved
+
+`PRIME W.` is **not clipped by the window edge**; that is Epic's own display
+format — given name, surname initial, full stop. The avatar beside it reads
+`PW` in green. Department context is `EMH IP PHARMACY ▾`.
+
+So: user `Prime W.`, initials `PW`, department `EMH IP PHARMACY`.
 
 ---
 
