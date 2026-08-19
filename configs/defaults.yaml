@@ -157,7 +157,7 @@ identify:
   model: gpt-5.2
   # Bump whenever the prompt in model/prompts.py changes, or the response cache
   # will silently serve stale results and make a tuning round meaningless.
-  prompt_version: 2
+  prompt_version: 3
   # Read every screen as a whole frame rather than as a strip on a contact sheet.
   #
   # A montage strip is the top band only, so anything the screen puts elsewhere is

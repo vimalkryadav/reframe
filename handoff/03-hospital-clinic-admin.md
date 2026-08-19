@@ -20,7 +20,7 @@ the build session found at magnification, and it was right every time.
   section-verification.jpg             (03:37)
   section-inventory.jpg                (03:40)
   section-shipment-steps.jpg           (04:10)
-  section-calcium-phosphate.jpg        (04:43)
+  section-related-information.jpg      (04:43) — was mis-named, see below
 ```
 
 ---
@@ -29,7 +29,7 @@ the build session found at magnification, and it was right every time.
 
 The first activity reached through the record picker (brief 02), and the first
 page whose **sidebar drives the content**. One record — `CC CLINIC [10502]` —
-with 25 sections of settings hung off a nav tree.
+with 26 sections of settings hung off a nav tree.
 
 It is the longest single stretch in the recording: **2.5 minutes, 20 frames**,
 the operator walking down the tree section by section.
@@ -91,7 +91,7 @@ Inventory
 Related Information
 ```
 
-19 top-level nodes, 6 children, 25 in total. All three groups are shown expanded
+20 top-level nodes, 6 children, **26 in total**. All three groups are shown expanded
 in every frame; a collapsed state was never observed.
 
 Selected item: full-width pale highlight plus a solid accent bar on the left
@@ -104,8 +104,13 @@ Spans the full width, pinned below both sidebar and content.
 - Left: `Open Another Hospital/Clinic`, then `⏮ Restore` (greyed in every frame)
 - Right: `↑ Previous F7`, `↓ Next F8`, `✔ Accept`
 
-`Previous`/`Next` almost certainly step through sections, but that was never
-demonstrated — see unknowns.
+The bar **does not span the full width** — it starts at the content panel's left
+edge, and the sidebar runs full height beside it.
+
+`Previous`/`Next` step the tree, and this is evidenced rather than assumed:
+measured against the always-enabled `Open Another` label, on the first node
+`Previous` reads 0.56 contrast against `Next`'s 0.92; on the last node it
+inverts; in the middle both are enabled.
 
 ---
 
@@ -146,7 +151,17 @@ vertically; General shows one at the bottom.
 
 ## Observed section contents
 
-Ten of 25 sections were opened. Transcribe from the images — the fields below
+**Eight** of 26 sections were opened, not ten.
+
+Two frames I listed have no image shipped (`Dispense Prep`, `Home Infusion`), and
+one is mislabelled: the file named for `Calcium Phosphate Solubility` is actually
+**`Related Information`** — its sidebar accent bar is on the last row, and the
+panel holds cards, one of which is *titled* "Calcium Phosphate Solubility". That
+is where the wrong name came from. `Calcium Phosphate Solubility` itself was
+never opened.
+
+Treat every `section` label in this brief as a claim to check against the
+sidebar's highlighted row, not against anything in the panel. Transcribe from the images — the fields below
 are what is legible, not necessarily all of them.
 
 **General** — `Hospital/Clinic formulary:` (= `EPIC HOSPITAL FORMULARY`, + Open) ·
@@ -184,7 +199,7 @@ from a summary here; that is the point of shipping them.
 
 ## Rules carried forward
 
-**Do not manufacture content to fill a section.** Fifteen sections were never
+**Do not manufacture content to fill a section.** Eighteen sections were never
 opened. Render them as empty with an explicit note, not with plausible settings.
 The same rule the session applied to the picker's row counts applies here, and
 it matters more: an invented pharmacy setting reads as configuration someone
@@ -202,7 +217,7 @@ brief 01 for anything never exercised.
 
 | Unknown | Why |
 | --- | --- |
-| 15 of 25 sections' contents | never opened in the recording |
+| 18 of 26 sections' contents | never opened in the recording |
 | Whether tree groups collapse | all three shown expanded in every frame |
 | What `Previous F7` / `Next F8` step through | never pressed |
 | What `Accept` commits, and whether it closes | never pressed |
@@ -223,11 +238,11 @@ them.
 
 - Route under the activity, reached from the picker with a record id
 - Header shows `Hospital/Clinic: <record name> [<id>]` from the record, not a literal
-- Full 25-node tree with the three groups nested correctly, `Shipment Steps`
+- Full 26-node tree with the three groups nested correctly, `Shipment Steps`
   under `Home Infusion`
 - Tree scrolls independently; selection shows highlight + left accent bar
 - The ten observed sections render their observed controls
-- The fifteen unobserved sections render an explicit "not captured" state
+- The eighteen unobserved sections render an explicit "not captured" state
 - Footer bar with all five controls, `Restore` greyed
 - Checkbox checked-state matches the reference (filled block, white tick)
 - Yellow inline warning on General's disabled field

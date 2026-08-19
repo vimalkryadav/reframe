@@ -62,11 +62,14 @@ class ScreenReading(BaseModel):
     )
     section: str | None = Field(
         description=(
-            "The selected item in a left navigation list or sidebar, exactly as "
-            "printed — the highlighted row, not the whole list. Null when there is "
-            "no sidebar, or when no selection is discernible. On screens whose "
-            "sidebar drives the content, this is what distinguishes one view from "
-            "another and the heading alone will not."
+            "The one row in a left navigation list that is visibly SELECTED — "
+            "highlighted, or marked with a bar down its edge — copied exactly. "
+            "Null when there is no sidebar, or when no row is visibly marked. "
+            "\n\n"
+            "Read this from the sidebar and nowhere else. A heading, card or table "
+            "inside the content panel is not a section, even when it is worded like "
+            "one and even when the sidebar happens to contain a row of the same "
+            "name. If you cannot see which row is marked, the answer is null."
         )
     )
     structure: str | None = Field(
