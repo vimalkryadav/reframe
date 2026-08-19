@@ -1,15 +1,15 @@
 # Build brief 01 — Willow Project Team (the Rx Admin hub)
 
-**For:** a Claude session working in `rl_epic`
-**Branch:** `reframe/01-willow-project-team`. Do not commit to `main`.
-**Verification:** the operator replays `VID_20260809_004826592.mp4` against the
-built page and compares directly, so anything guessed here will be caught — and
+**Branch:** `pharmacy-admin` — one branch for the whole module. Every brief in
+this series lands on it. Do not commit to `main`.
+**Verification:** the operator replays the source recording against the built
+page and compares directly, so anything guessed here will be caught — and
 anything left honestly blank is cheaper than anything invented.
 
 ## Evidence — look at these before writing code
 
 ```
-~/reframe-data/handoff/01-willow-project-team/
+~/build-evidence/01-willow-project-team/
   dashboard-full.jpg            the whole page, unobstructed   (05:15)
   header-and-toolbar.jpg        shell chrome + page heading
   col-1-follow-up-required.jpg  left column, 2x
@@ -19,15 +19,15 @@ anything left honestly blank is cheaper than anything invented.
   rx-admin-menu-detail.jpg      that menu, 2x
 ```
 
-Source frames live in `~/reframe-data/out/v01/frames/kept/`. The footage is a
-handheld phone recording, so text is soft — where a label below is marked
-uncertain, it is because the pixels genuinely do not settle it.
+These are stills from a handheld phone recording of the reference application,
+so text is soft — where a label below is marked uncertain, it is because the
+pixels genuinely do not settle it.
 
 ---
 
 ## Why this screen first
 
-Across ten minutes the operator returns here **fourteen times**. Every activity
+Across ten minutes of recording the operator returns here **fourteen times**. Every activity
 is launched from it and comes back to it:
 
 ```
@@ -169,8 +169,8 @@ Content Management        ← partially below the fold, name uncertain
 
 `rx-admin-menu-detail.jpg` catches the toolbar's `Rx Admin` menu open. It is the
 **only** place in ten minutes of footage where activity names are visible.
-Everything else the pipeline catalogued is a page *heading*, and a heading shows
-the record being edited rather than the activity.
+Every other name gathered from this recording is a page *heading*, and a heading
+shows the record being edited rather than the activity.
 
 ```
 Hospital/Clinic Admin          NDC Group Admin
@@ -191,8 +191,8 @@ NDC Admin                      Label Printer Setup
 `Inventory Management Admin` opens a submenu: `Prescription Fill Event Engine`,
 `Payer Sheet Setup`, `Field Setup`, `Rule Deferral Admin ▸`.
 
-**Use these names for routes and menu entries.** The catalogue says `Medication`
-and `Hospital/Clinic`; the activities are `Medication Admin` and
+**Use these names for routes and menu entries.** A page heading reads
+`Medication` or `Hospital/Clinic`; the activities are `Medication Admin` and
 `Hospital/Clinic Admin`.
 
 The menu belongs to the shell, not this page. It likely needs its own brief —
@@ -224,7 +224,6 @@ do not build it here.
 ## Definition of done
 
 - Route exists, reachable from the module menu, added to `ACTIVITY_OVERRIDES`
-  so the next inventory export marks it `built`
 - Three-column layout matching `dashboard-full.jpg`
 - Report cards: title link, ▶ button, `Run report`, footer report line
 - Workqueue summary: four columns, green check, count pill

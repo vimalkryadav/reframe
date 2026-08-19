@@ -1,26 +1,19 @@
-# Task brief — inventory export for Reframe
+# Task brief — export the activity inventory
 
-**For:** a Claude session working in `rl_epic`
-**From:** Reframe (`~/Epic/reframe`), which needs this to classify screens
-**Branch:** work on `reframe-inventory-export`. Do not commit to `main`.
+**Branch:** `pharmacy-admin` — one branch for the whole module. Every brief in
+this series lands on it. Do not commit to `main`.
 
 ---
 
 ## Why this exists
 
-Reframe processes handheld video of the reference application and produces a
-catalogue of screens plus a build queue. To say *"you have already built this
-one"* it needs to know what `rl_epic` contains.
+Screens are being catalogued from recordings of the reference application, and
+that catalogue has to be checked against what this repo already contains —
+otherwise finished work reappears as something to build.
 
-**Reframe is forbidden from knowing anything about this project.** Its CI fails
-if the string `epic`, `hyperspace`, `willow` or similar appears anywhere in its
-`src/`, `configs/` or `tests/`. So the coupling is inverted: `rl_epic` describes
-itself in a generic format, and Reframe matches names against that list without
-ever knowing what application produced it.
-
-That description is the deliverable. One script, one JSON file.
-
-Full schema and rationale: `~/Epic/reframe/CONTRACT.md`.
+The checker is deliberately generic: it knows nothing about this project and
+matches names against a plain list. So this repo describes itself, in a fixed
+format, and that description is the deliverable. One script, one JSON file.
 
 ---
 
@@ -88,8 +81,8 @@ is the more specific statement, and it is how one label reaches a module-scoped
 page.
 
 **Duplicate labels are a hard error downstream.** One activity reachable from two
-menu paths is one screen — keep the first occurrence, skip the rest. Reframe
-matching one screen name to two entries has no right answer.
+menu paths is one screen — keep the first occurrence, skip the rest. Matching one
+screen name to two entries has no right answer.
 
 **An alias must never collide with a label, or with another entry's alias.** The
 menu's `aliases` exist to widen in-app search, which is a different job, so
@@ -99,22 +92,22 @@ matching and nobody finds out why. There is at least one real case:
 `"Patient Flight Tracking"` is both an alias of `"Flight Tracker"` and an
 activity in its own right.
 
-**Include activities that have a page but are absent from the menu.** Reframe
-will see them in a video regardless, and reporting a built screen as `new` puts
+**Include activities that have a page but are absent from the menu.** They turn
+up in the recordings regardless, and reporting a built screen as `new` puts
 finished work back in the queue. Walk `ACTIVITY_OVERRIDES` for labels the menu
 never produced and add them with `module: null`.
 
-**Emit `commit: null` rather than a placeholder if `git rev-parse` fails.**
-Reframe compares it against HEAD and aborts on a mismatch; a made-up value
-defeats that check.
+**Emit `commit: null` rather than a placeholder if `git rev-parse` fails.** It is
+compared against HEAD and a mismatch aborts the run; a made-up value defeats
+that check.
 
 ---
 
 ## Hard constraint: it must run with `node_modules` absent
 
-Reframe regenerates the inventory **before every classification run** and aborts
-if it does not match HEAD. An exporter that needs `pnpm install` first makes
-every run fragile.
+The inventory is regenerated **before every classification run** and the run
+aborts if it does not match HEAD. An exporter that needs `pnpm install` first
+makes every run fragile.
 
 That is not trivial, because the config files are TypeScript that uses the `@/`
 path alias and imports icon components. Node resolves neither. What works:
@@ -160,8 +153,8 @@ walk is missing a nesting level.
 
 ## A reference implementation exists
 
-Branch `reframe-inventory-export` in this repo has a working version, written
-against the contract above and producing exactly those counts. **It has not been
+Branch `pharmacy-admin` already carries a working version, written against the
+contract above and producing exactly those counts. **It has not been
 reviewed by anyone who knows this codebase.**
 
 Treat it as a starting point, not an answer. Reasonable outcomes: adopt it after
@@ -175,7 +168,7 @@ are the fiddly part.
 The obvious next question is *"which pharmacy screens should we build?"* — and
 that is **not ready to assign.**
 
-Reframe has catalogued 133 screens from one 10-minute video. Of those, a human
+133 screens have been catalogued from one 10-minute recording. Of those, a human
 has verified **five**. Two minutes of the footage produced no screens at all and
 nobody has watched those spans yet. Building from that would produce a
 confident-looking module with holes nobody can see, which is the exact failure
