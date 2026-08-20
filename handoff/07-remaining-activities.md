@@ -57,8 +57,13 @@ activity called "Orderable medication" — it is not one.
 ### Upper grid
 
 Columns: `Dispensable Drug` · `Patient Age` · `Patient Weight` · `Patient Rule` ·
-`Dose` · `Routes` · `Order Mode` · `From …` *(clipped at the frame edge — more
-columns exist)*.
+`Dose` · `Routes` · `Order Mode` · `From …`
+
+**Eight columns, and that is all of them.** A previous revision claimed more
+follow `From …`. Not supported: the grid's right border sits at x1563 with its
+scrollbar at x1565–1583, both inside the window, and there is no horizontal
+scrollbar. The ellipsis is the application's own column-width truncation, the
+same thing it does to two of NDC Admin's sidebar labels.
 
 Rows are numbered. Each `Dispensable Drug` cell carries a **double-chevron
 expander** before its text. Observed rows:
@@ -79,8 +84,16 @@ y480 with no step at any row boundary, and per cell the first column samples
 neutral on all four rows while every column right of it samples +14 to +20 on
 all four — row 4 included, and highest there.
 
-So the first column is white and editable, the rest tinted and read-only.
-**Model nothing as selection; there is nothing to model.**
+**And do not attach a meaning to it either.** A previous revision called the
+split "first column editable, the rest read-only". That is unsupported: all four
+row actions are greyed, which fits a wholly read-only grid; the tinted boundary
+falls exactly where the expander column ends, so "the hierarchy column has its
+own background" explains the same pixels; and this dialog's own DISABLED field
+measures B-R +2.97 against enabled fields at +3.76/+5.02, so blue-grey is not
+its read-only treatment at all.
+
+Record it as a **distinct fill on the first column** and leave what it means
+open. Model nothing as selection — there is nothing to model.
 
 ### Row actions
 
@@ -177,8 +190,8 @@ Build the empty state. Do not build filters you cannot see.
   four pages and does not here — `Package:` is NDC Admin, `Orderable medication:`
   is Dispensable Mapping. Both phantom activities in the catalogue came from
   this.
-- **Do not complete clipped text** — several grid cells and the `From …` column
-  are cut at the frame edge.
+- **Do not complete clipped text** — several grid cells are truncated by the
+  application itself, which is not the same as running off the frame.
 - **Render the observed enabled/disabled state**; behaviour in the tooltip.
 
 ---
@@ -190,11 +203,11 @@ Build the empty state. Do not build filters you cannot see.
 | NDC Admin's 13 unopened sections | only `Identity/ADS` was opened |
 | Build Wizard's populated state, and its filters | only the empty state was seen, and no filter control is visible |
 | What the two collapsed panels on Build Wizard hold | never expanded |
-| Dispensable Mapping's unseen grid rows | the scrollbar thumb covers ~18% of its track, so ~20 rows exist and 4 were seen |
-| Dispensable Mapping's columns after `From …` | clipped at the frame edge |
+| Dispensable Mapping's unseen grid rows | the thumb covers ~25% of a ~73px track, so ~12–15 rows exist and 4 were seen |
 | What the row expanders reveal | never expanded |
 | What `Test Mapping` does | never clicked |
 | Why all four row actions are greyed | nothing on screen explains it |
+| What the first column's distinct fill signifies | at least three readings fit the same pixels |
 | Whether Build Wizard's spinner means the frame is mid-load | it is; the frame may not show a settled state |
 
 ---
