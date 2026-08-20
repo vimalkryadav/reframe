@@ -224,6 +224,12 @@ Inventory Management Admin  ▸
 `Prescription Fill Event Engine`, `Payer Sheet Setup`, `Field Setup`,
 `Rule Deferral Admin ▸`.
 
+**There is at least one more row below it**, clipped by the bottom of the frame
+with only its ascenders showing. The menu extends past what was captured, so
+**22 is a floor, not a count** — treat it as "at least 23 entries, the 23rd
+unread and anything beyond it unknown". Render the clipped row as present and
+unnamed; do not read the ascenders into a name.
+
 **Use these names for routes and menu entries.** A page heading reads
 `Medication` or `Hospital/Clinic`; the activities are `Medication Admin` and
 `Hospital/Clinic Admin`.

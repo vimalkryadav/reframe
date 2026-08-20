@@ -14,14 +14,15 @@ Seven briefs have built everything one ten-minute recording supports. Measured:
 
 | | seen | total |
 | --- | --- | --- |
-| **Rx Admin activities** | **6** | **22** |
+| **Rx Admin activities** | **6** | **≥23** |
 | Hospital/Clinic Admin sections | 8 | 26 |
 | Medication Admin sections | 6 | 9 |
 | Workstation Admin sections | 3 | 3 |
 | Medication List Admin tabs | 1 | 4 |
 | NDC Admin sections | 1 | 14 |
 
-**Sixteen of twenty-two activities have never been seen at all.** Right now they
+**Sixteen of the twenty-two readable activities have never been seen at all**, and
+the menu holds at least one more row that the frame clips before its name. Right now they
 are simply absent — not in the ☰ module, and not anywhere else, because the
 `Rx Admin` toolbar menu has never been built. `TOOLBAR_ITEMS` is a billing list
 with no `Rx Admin` entry.
@@ -62,6 +63,7 @@ Validate Barcodes
 Pharmacy Workflow Configuration
 Documents Definitions
 Inventory Management Admin  ▸
+(one more row, clipped by the frame — name unread)
 ```
 
 `Inventory Management Admin` opens a submenu, visible open in that frame:
@@ -143,13 +145,16 @@ need rewriting.
 
 ## Definition of done
 
-- `Rx Admin ▾` exists in the toolbar with all 22 activities in the reference's
-  order, single column, plus the four-entry `Inventory Management Admin` submenu
+- `Rx Admin ▾` exists in the toolbar with all 22 readable activities in the
+  reference's order, single column, plus the four-entry submenu, plus the clipped
+  23rd row rendered present-but-unnamed
 - Six navigate; sixteen plus all four submenu entries are `disabled: true` with a
   tooltip saying they have not been observed in a recording
 - The ☰ Willow module matches
-- A fresh `node scripts/export-inventory.mjs` shows the sixteen as status
-  `disabled` and the six as `built`
+- A fresh `node scripts/export-inventory.mjs` shows the unseen entries as status
+  `disabled`. The six seen ones will **not** all be `built` — five are reached
+  through the record picker, and the exporter's own taxonomy carries that
+  distinction. Do not flatten it to match this sentence.
 - The gap doc carries the coverage table, generated, and records which recording
   each observation came from
 - The deliberate divergence from the reference is recorded as a decision
