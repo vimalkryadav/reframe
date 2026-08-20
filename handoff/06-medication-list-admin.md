@@ -108,19 +108,31 @@ The four are **equal 172px slots with centred labels** — the uneven label gaps
 
 Three visible columns: `P` · `ID` · `Medication`.
 
-`P` is a narrow marker column holding a **dot on some rows** — one dot, one
-state. Many rows carry none.
+`P` is a narrow marker column holding a **dot on some rows, in two tints** —
+bright and dark — with many rows carrying none.
 
-An earlier revision of this brief claimed two tints and asked for the tint to be
-recorded per row. **That was wrong.** Measured as the dot's green-dominance
-minus its own row's background, selected rows read 36–37 and unselected rows
-9–14 — the entire difference is the teal selection band showing through beneath
-the dot. Two adjacent dotted rows in one frame at identical exposure settle it.
-Store one boolean.
+A previous revision of this brief claimed the two tints were one dot plus the
+selection band showing through. **That was wrong, and the mechanism was
+arithmetically impossible.** A blend cannot be more chromatic than either of its
+constituents: the band alone measures G-R 30, an unselected dot 12–15, and a
+selected dot 74. The decisive control is the **footer legend dot** — same glyph,
+same size, no selection band within 400px — which reads G-R 49. A bright dot
+exists with nothing behind it.
 
-The footer's `● Include medication in preference list (F6)` uses the same dot,
+**Record both tints per row.** Bright: `109776`, `420954`. Dark: `420543`,
+`122472`, `420910`, `421038`. `420911` is **tint-unknown** — its only frame is
+glare-washed and its value straddles both bands. Store that as a third state,
+not as a guess either way.
+
+**And record a second thing as open.** The two bright rows are *exactly* the two
+rows the recording ever shows selected. So these frames cannot distinguish
+"bright is a property of the row" from "a dot draws bright when its row is
+selected". The footer dot proves bright dots exist unselected, but it is a
+legend, not a row. Leave both readings open.
+
+The footer's `● Include medication in preference list (F6)` uses the same glyph,
 which suggests the column marks preference-list membership. Suggestive, not
-shown. **Record whether a row has a dot; do not name what it means.**
+shown. **Record the tint; do not name what it means.**
 
 Selected row highlights across its full width.
 
@@ -145,24 +157,24 @@ clicked to prove the link. `Close` where briefs 03–05 have `Accept`.
 
 ## Seed data
 
-Rows legible across the three scroll positions. `●` marks a dot present —
-**there is only one kind**; ignore the two marks an earlier revision used:
+Rows legible across the three scroll positions. `●` bright dot, `◐` dark dot,
+no mark = no dot. Verify each against `detail-p-column.jpg`:
 
 `109776` ● ABIRATERONE ACETATE 250 MG PO TABS ·
 `139026` ABIRATERONE ACETATE 500 MG PO TABS ·
 `410045` ADO-TRASTUZUMAB CHEMO IVPB ·
-`420543` ● ADO-TRASTUZUMAB EMTANSINE (KADCYLA) CHEMO IV ORDERABLE ·
+`420543` ◐ ADO-TRASTUZUMAB EMTANSINE (KADCYLA) CHEMO IV ORDERABLE ·
 `120086` ADO-TRASTUZUMAB EMTANSINE 100 MG IV SOLR ·
 `120087` ADO-TRASTUZUMAB EMTANSINE 160 MG IV SOLR ·
 `4300031` ADO-TRASTUZUMAB EMTANSINE 20 MG/ML IV (WRAPPED WET SOLR VIAL) ·
-`122472` AFATINIB DIMALEATE 20 MG PO TABS ·
+`122472` ◐ AFATINIB DIMALEATE 20 MG PO TABS ·
 `122473` AFATINIB DIMALEATE 30 MG PO TABS ·
 `122474` AFATINIB DIMALEATE 40 MG PO TABS ·
 `410290` ALDESLEUKIN IVPB IN 25 ML D5W ·
 `410001` ALDESLEUKIN IVPB IN 50 ML D5W ·
-`420910` ● ALDESLEUKIN IVPB ORDERABLE ·
+`420910` ◐ ALDESLEUKIN IVPB ORDERABLE ·
 `420954` ● ALEMTUZUMAB (LEMTRADA) IV ORDERABLE ·
-`421038` ● ALEMTUZUMAB (LEMTRADA) IV ORDERABLE IN 100 ML/M2 (PEDIATRIC) ·
+`421038` ◐ ALEMTUZUMAB (LEMTRADA) IV ORDERABLE IN 100 ML/M2 (PEDIATRIC) ·
 `400998` ALEMTUZUMAB (LEMTRADA) IVPB ·
 `127653` ALEMTUZUMAB 12 MG/1.2ML IV SOLN ·
 `91000` AMIFOSTINE 500 MG IV SOLR ·
@@ -172,8 +184,10 @@ Rows legible across the three scroll positions. `●` marks a dot present —
 A third run in `f_000348` adds `400079`, `420911`, `420936`, `206937`, `206938`
 — **25 rows in total**, not the 20 an earlier revision listed.
 
-Read the dots off `detail-p-column.jpg`. Mine is a reading of a soft frame and
-one of the marks above was already wrong once.
+`420911` in that third run is tint-unknown — glare-washed in its only frame.
+
+Read every dot off `detail-p-column.jpg`. This column has now been called wrong
+twice from prose, in both directions.
 
 ---
 
@@ -181,7 +195,7 @@ one of the marks above was already wrong once.
 
 - **Do not manufacture rows** to fill the grid, and do not invent what the three
   unopened tabs contain.
-- **Do not name what the dot means.** Record its presence; leave the meaning open.
+- **Do not name what the tints mean.** Record them; leave the meaning open.
 - **Do not complete clipped text.**
 - **Render the observed enabled/disabled state**; behaviour in the tooltip.
 
@@ -192,7 +206,9 @@ one of the marks above was already wrong once.
 | Unknown | Why |
 | --- | --- |
 | `ADS`, `Billing`, `Related Information` contents | never opened — three of four tabs |
-| What the `P` dot means at all | the footer legend is suggestive, not proof |
+| What the two `P` dot tints distinguish | the footer legend is suggestive, not proof |
+| Whether bright is a row property or a selected-row rendering | every bright row in the recording is also the selected row |
+| `420911`'s tint | its only frame is glare-washed |
 | What `Show additional columns` reveals | never ticked; the grid may be wider than three columns |
 | What any of the seven toolbar actions do | none clicked |
 | Whether `Add`/`Remove` are greyed *because* of read-only | plausible, never demonstrated |
@@ -216,7 +232,7 @@ are a *subset*, not the schema. Model the grid so columns are data.
   from data rather than hardcoded
 - Four-tab strip with `Medications` selected; the other three render an explicit
   "not captured" state
-- Grid with `P` · `ID` · `Medication`, dot presence recorded per row (one state),
+- Grid with `P` · `ID` · `Medication`, dot tint recorded per row (bright / dark / unknown / none),
   full-width row selection, scrolling
 - Footer: two left controls, five right actions, `Close` not `Accept`
 - Read-only state reused from brief 05, not reimplemented
