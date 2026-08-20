@@ -1,0 +1,601 @@
+# Ground truth for v01, recorded from a validated run.
+#
+# Two kinds of fact live here and verify treats them differently (DEC-019):
+#
+#   name, module, and the presence of a screen at a timestamp are STABLE.
+#     They are properties of the footage and are true forever. If a later run
+#     disagrees, that is a REGRESSION and `reframe verify` fails.
+#
+#   bucket is TIME-VARYING. It is a property of the consuming project at the
+#     commit recorded below. new -> built after you build something is DRIFT,
+#     which is reported and expected, not a failure.
+#
+# Edit freely: correct a name the model misread, delete a screen that is not
+# really there, and add a missed_spans entry for anything the run walked past.
+# A missed span is not a failure — it is a gap you can prove you closed later.
+
+slug: v01
+inventory_commit: 8a1c6d2d
+
+screens:
+  - t: "00:10"
+    name: null
+    bucket: new
+    note: "identified at 0.99 — verify this name"
+  - t: "00:12"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.97 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "00:17"
+    name: "Search for a Patient"
+    bucket: new
+    note: "identified at 0.72 — verify this name; resembles 'Patient CRM' (0.78)"
+  - t: "00:27"
+    name: "Search for a Patient"
+    bucket: new
+    note: "identified at 0.71 — verify this name; resembles 'Patient CRM' (0.78)"
+  - t: "00:33"
+    name: "Patient Encounter Selection"
+    bucket: new
+    note: "identified at 0.74 — verify this name; resembles 'Encounter' (1.00)"
+  - t: "00:36"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.97 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "00:38"
+    name: "Orders"
+    bucket: new
+    note: "identified at 0.81 — verify this name; resembles 'Anc Orders' (1.00)"
+  - t: "00:47"
+    name: "Chart Review"
+    module: "Radiology"
+    bucket: built
+    note: "identified at 0.95 — verify this name"
+  - t: "00:58"
+    name: "Orders"
+    bucket: new
+    note: "identified at 0.94 — verify this name; resembles 'Anc Orders' (1.00)"
+  - t: "01:00"
+    name: "Timeline"
+    bucket: new
+    note: "identified at 0.96 — verify this name; resembles 'Estimates' (0.47)"
+  - t: "01:04"
+    name: "Timeline"
+    bucket: new
+    note: "identified at 0.93 — verify this name; resembles 'Estimates' (0.47)"
+  - t: "01:07"
+    name: "Summary"
+    bucket: new
+    note: "identified at 0.93 — verify this name; resembles 'Bed Events Summary' (1.00)"
+  - t: "01:09"
+    name: "Medications"
+    bucket: new
+    note: "identified at 0.96 — verify this name; resembles 'Immunizations' (0.67)"
+  - t: "01:18"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.67 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "01:23"
+    name: "Search for a Patient"
+    bucket: new
+    note: "identified at 0.73 — verify this name; resembles 'Patient CRM' (0.78)"
+  - t: "01:27"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.63 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "01:30"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.97 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "01:33"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.95 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "01:36"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.95 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "01:44"
+    name: null
+    bucket: new
+    note: "identified at 0.97 — verify this name"
+  - t: "01:48"
+    name: "Report Settings - (New)"
+    bucket: new
+    note: "resembles 'ABN Report' (0.75)"
+  - t: "01:55"
+    name: "Report Settings - (New)"
+    bucket: new
+    note: "resembles 'ABN Report' (0.75)"
+  - t: "01:57"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.69 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "02:01"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "02:03"
+    name: "Launching Hospital/Clinic Admin"
+    bucket: new
+    note: "identified at 0.58 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "02:07"
+    name: "Willow Project Team"
+    module: "Hospital/Clinic Admin"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "02:09"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "02:41"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "02:54"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:10"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:14"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "identified at 0.61 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "03:33"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:35"
+    name: "Hospital/Clinic"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:37"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:40"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "03:43"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "identified at 0.58 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:04"
+    name: "Hospital/Clinic"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.60 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:08"
+    name: "Hospital/Clinic"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.63 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:10"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "04:12"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:18"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "04:21"
+    name: null
+    bucket: new
+    note: "identified at 0.87 — verify this name"
+  - t: "04:23"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "resembles 'Hospital Chart' (0.73)"
+  - t: "04:29"
+    name: "Hospital/Clinic"
+    module: "Hospital/Clinic Admin"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:39"
+    name: "Hospital/Clinic Admin"
+    bucket: new
+    note: "identified at 0.60 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:41"
+    name: "Hospital/Clinic"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:43"
+    name: "Hospital/Clinic"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'Hospital Chart' (0.73)"
+  - t: "04:49"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.75 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "04:51"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "04:54"
+    name: null
+    bucket: new
+    note: "identified at 0.67 — verify this name"
+  - t: "04:56"
+    name: null
+    bucket: new
+    note: "identified at 0.66 — verify this name"
+  - t: "04:58"
+    name: null
+    bucket: new
+    note: "identified at 0.72 — verify this name"
+  - t: "05:01"
+    name: null
+    bucket: new
+    note: "identified at 0.70 — verify this name"
+  - t: "05:03"
+    name: "Workstation"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.61 — verify this name; resembles 'Registration' (0.70)"
+  - t: "05:06"
+    name: "Workstation"
+    bucket: new
+    note: "resembles 'Registration' (0.70)"
+  - t: "05:08"
+    name: "Workstation"
+    bucket: new
+    note: "identified at 0.64 — verify this name; resembles 'Registration' (0.70)"
+  - t: "05:10"
+    name: "Workstation"
+    bucket: new
+    note: "identified at 0.95 — verify this name; resembles 'Registration' (0.70)"
+  - t: "05:13"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:15"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:17"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:19"
+    name: null
+    bucket: new
+    note: "identified at 0.70 — verify this name"
+  - t: "05:22"
+    name: "Launching Med List Admin"
+    bucket: new
+    note: "identified at 0.53 — verify this name; resembles 'Pull List' (0.62)"
+  - t: "05:26"
+    name: null
+    bucket: new
+    note: "identified at 0.66 — verify this name"
+  - t: "05:28"
+    name: null
+    bucket: new
+    note: "identified at 0.68 — verify this name"
+  - t: "05:30"
+    name: null
+    bucket: new
+    note: "identified at 0.66 — verify this name"
+  - t: "05:33"
+    name: "Medication List"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:35"
+    name: "Medication List"
+    bucket: new
+    note: "identified at 0.74 — verify this name; resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:37"
+    name: "Medication List"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:39"
+    name: "Medication List"
+    bucket: new
+    note: "identified at 0.61 — verify this name; resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:41"
+    name: "Medication List"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:46"
+    name: "Medication List"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:48"
+    name: "Medication List"
+    bucket: new
+    note: "identified at 0.62 — verify this name; resembles 'Medication Reconciliation' (0.80)"
+  - t: "05:50"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:52"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:54"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "05:56"
+    name: null
+    bucket: new
+    note: "identified at 0.65 — verify this name"
+  - t: "05:59"
+    name: null
+    bucket: new
+    note: "identified at 0.64 — verify this name"
+  - t: "06:02"
+    name: null
+    bucket: new
+    note: "identified at 0.67 — verify this name"
+  - t: "06:04"
+    name: "Launching Medication Admin"
+    bucket: new
+    note: "identified at 0.52 — verify this name; resembles 'Medication Reconciliation' (0.63)"
+  - t: "06:06"
+    name: null
+    bucket: new
+    note: "identified at 0.63 — verify this name"
+  - t: "06:11"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.58 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:23"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.59 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:25"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.63 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:27"
+    name: "Medication"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:29"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.65 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:31"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:34"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.65 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:37"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:39"
+    name: null
+    bucket: new
+    note: "identified at 0.86 — verify this name"
+  - t: "06:41"
+    name: null
+    bucket: new
+    note: "identified at 0.94 — verify this name"
+  - t: "06:43"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.67 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:45"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.61 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:47"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:49"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:51"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.56 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "06:56"
+    name: null
+    bucket: new
+    note: "identified at 0.91 — verify this name"
+  - t: "06:58"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.58 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:00"
+    name: "Medication"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.60 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:02"
+    name: "Medication"
+    module: "Medication Admin"
+    bucket: new
+    note: "identified at 0.65 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:04"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.14 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:07"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:09"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.72 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:14"
+    name: "Medication"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.72 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:20"
+    name: "Medication"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:38"
+    name: "Medication"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:40"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "07:50"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:17"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:19"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:21"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:27"
+    name: "Medication"
+    bucket: new
+    note: "identified at 0.66 — verify this name; resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:29"
+    name: "Medication"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (1.00)"
+  - t: "08:32"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "08:34"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "08:38"
+    name: null
+    bucket: new
+    note: "identified at 0.68 — verify this name"
+  - t: "08:40"
+    name: null
+    bucket: new
+    note: "identified at 0.67 — verify this name"
+  - t: "08:42"
+    name: "Dispensable Mapping"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Discharge Planning' (0.54)"
+  - t: "08:44"
+    name: "Dispensable Mapping"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Discharge Planning' (0.54)"
+  - t: "08:46"
+    name: "Dispensable Mapping"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.75 — verify this name; resembles 'Discharge Planning' (0.54)"
+  - t: "08:48"
+    # Corrected: "Orderable medication:" is the record-type label in the heading.
+    # The activity tab reads "Dispensable Mapping".
+    name: "Dispensable Mapping"
+    bucket: new
+    note: "resembles 'Medication Reconciliation' (0.67)"
+  - t: "08:50"
+    name: "Dispensable Mapping"
+    bucket: new
+    note: "resembles 'Discharge Planning' (0.54)"
+  - t: "08:52"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.68 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "08:54"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.74 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "08:57"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "09:00"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.74 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "09:03"
+    name: "Willow Project Team"
+    bucket: new
+    note: "identified at 0.75 — verify this name; resembles 'Patient Station' (0.47)"
+  - t: "09:08"
+    name: "NDC Admin"
+    bucket: new
+    note: "identified at 0.63 — verify this name; resembles 'Cadence Admin Dashboard' (0.71)"
+  - t: "09:37"
+    # Corrected: "Package:" is the record-type label in the heading. The activity
+    # tab reads "NDC Admin", confirmed also by the footer button and an identical
+    # sidebar tree.
+    name: "NDC Admin"
+    module: "NDC Admin"
+    bucket: new
+    note: "resembles 'Triage Call' (0.44)"
+  - t: "09:59"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "10:01"
+    name: "Build Wizard List"
+    bucket: new
+    note: "resembles 'Pull List' (0.62)"
+  - t: "10:03"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+  - t: "10:05"
+    name: null
+    bucket: new
+    note: "identified at 0.80 — verify this name"
+  - t: "10:07"
+    name: "Willow Project Team"
+    bucket: new
+    note: "resembles 'Patient Station' (0.47)"
+
+# Spans this run failed to catalogue. Add one per stretch of footage that
+# shows a screen the catalogue above does not contain, e.g.:
+#   - {from: "31:10", to: "33:40", note: "scroll through the order list"}
+missed_spans: []
+
+# Spans the run walked past with nothing catalogued. Recorded so a later run can
+# prove it closed them — a missed span is a gap you can measure against, not a
+# failure. None of these has been watched yet; that is the outstanding review.
+missed_spans:
+  - from: "02:09"
+    to: "02:41"
+    note: "32s uncatalogued — not yet watched"
+  - from: "03:43"
+    to: "04:04"
+    note: "21s uncatalogued — not yet watched"
+  - from: "07:50"
+    to: "08:17"
+    note: "27s uncatalogued — not yet watched"
+  - from: "09:08"
+    to: "09:37"
+    note: "29s uncatalogued — not yet watched"
+  - from: "09:37"
+    to: "09:59"
+    note: "22s uncatalogued — not yet watched"
