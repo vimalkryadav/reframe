@@ -15,22 +15,23 @@ page. Trust the images over this text.
 
 ```
 ~/build-evidence/04-medication-admin/
-  sidebar-tree.jpg                 the whole tree, 3.4x — it fits without scrolling
-  section-packaging.jpg            (06:31)
-  section-billing.jpg              (06:49)
-  section-overrides.jpg            (07:07)
-  section-prescription.jpg         (07:20)
-  section-equivalency.jpg          (07:50)
-  section-dispense-prep-cnr.jpg    (08:19)
-  section-related-information.jpg  (08:29)
-  detail-info-callout.jpg          the ⓘ callout, 1.9x
-  detail-editable-table.jpg        the row-action table, 1.9x
-  detail-related-cards.jpg         the card stack, 1.7x
+  sidebar-tree.jpg          the whole tree, 3.4x — it fits without scrolling
+  f_000391-t06m31s.jpg      Packaging
+  f_000409-t06m49s.jpg      Packaging again — a lookup open, a second table row
+  f_000427-t07m07s.jpg      Overrides
+  f_000440-t07m20s.jpg      Prescription
+  f_000470-t07m50s.jpg      Equivalency
+  f_000499-t08m19s.jpg      Dispense Prep/CNR
+  f_000509-t08m29s.jpg      Related Information
+  detail-info-callout.jpg   the ⓘ callout, 1.9x
+  detail-editable-table.jpg the row-action table, 1.9x
+  detail-related-cards.jpg  the card stack, 1.7x
 ```
 
-**Check each section against the sidebar's accent bar, not against anything in
-the panel.** A frame in brief 03 was mis-attributed exactly that way — a card
-titled like a section was read as the selection.
+**Files are named by frame id, and the section beside each is a claim to check,
+not a label to trust.** Two frames in earlier briefs were filed under the wrong
+section because the filename came from a model reading nobody re-verified. The
+section is whichever sidebar row carries the accent bar — measure it.
 
 ---
 
@@ -39,7 +40,7 @@ titled like a section was read as the selection.
 Reached as: hub → `Rx Admin ▸ Medication Admin` → picker → this page.
 
 One record, `2-DEOXY-D-GLUCOSE POWD [25782]`, across **2.3 minutes and 30
-frames**. Seven of nine sections were opened — the best-covered activity in the
+frames**. Six of nine sections were opened — still the best-covered activity in the
 recording.
 
 ---
@@ -64,9 +65,13 @@ brief 03's 26.
 `Overrides` and `Prescription` are **children of `Billing`**. Only `Billing`
 expands; the other six top-level nodes are leaves.
 
-**Observed:** Packaging · Billing · Overrides · Prescription · Equivalency ·
+**Observed — six:** Packaging · Overrides · Prescription · Equivalency ·
 Dispense Prep/CNR · Related Information.
-**Not opened:** `Identity/ADS` · `Inventory`.
+**Not opened — three:** `Billing` · `Identity/ADS` · `Inventory`.
+
+`Billing` was never opened. Two frames show `Packaging` selected; the second
+(`f_000409`) has a lookup open over it and a second table row inserted, which is
+what makes it look like a different section at a glance.
 
 *(`Identity/ADS` does appear later in the recording, but on a different
 activity — a `Package` record at 09:37, not this one. Do not borrow it.)*
@@ -87,12 +92,18 @@ is enabled.
 
 ## Three controls brief 03 does not cover
 
-### 1. Info callout
+### 1. Info callout — two of them, plus a third variant
 
 Distinct from brief 03's yellow inline warning. Full panel width, a ⓘ glyph, a
 **bold title line**, then a body paragraph. Neutral background, not yellow.
 
-Observed on Packaging, verbatim:
+Observed twice: on Packaging (below) and on Prescription as
+`Adjudication Timing`. A third case on **Overrides** is yellow like brief 03's
+but **full-width at the top of the panel**, not in the right margin —
+`Billing Overrides only apply to medical billing.` Treat that as a placement
+variant of one component, not a second component.
+
+The Packaging one, verbatim:
 
 > ⓘ **No setting found at ERX.**
 > This setting can be overridden at the NDC and NDG level. If the implied unit
@@ -111,7 +122,22 @@ Fieldset `Linked Procedure Override`, columns
 other three.
 
 Beneath the table, four buttons: `➕ Insert (F4)` · `➖ Remove (Shift+F4)` ·
-`↑ Move Up` · `↓ Move Down`. All four appear greyed with no row selected.
+`↑ Move Up` · `↓ Move Down`.
+
+**The enable rule is observed, not assumed.** With no row selected all four are
+greyed. `f_000409` has a row selected: sampling label ink at p3 across the two
+frames gives Insert 104→71 and Remove 102→74 (enabling), while Move Up 104→110
+and Move Down 109→114 stay put. So **Insert and Remove enable on selection;
+Move Up/Down do not.** Insert's effect is observed too — one table row becomes
+two between the frames.
+
+### 2b. Lookups opened over the panel
+
+Three magnifiers were actually opened in this recording, so their contents are
+known rather than inferred: a **Department** lookup (6 columns, 13 rows) over
+Packaging, and a **SmartText** lookup (2 columns, 11 rows) over
+Dispense Prep/CNR. Brief 03 has a third, the Lot/Exp grouper list. Wire each to
+the cell whose magnifier opened it; every other magnifier stays inert.
 
 ### 3. Card stack — `Related Information`
 
@@ -155,18 +181,18 @@ read like section names. Worth building so the resemblance is visible.
 
 | Unknown | Why |
 | --- | --- |
-| `Identity/ADS` and `Inventory` contents | never opened on this activity |
+| `Billing`, `Identity/ADS`, `Inventory` contents | never opened on this activity |
 | The card above `Duplicate Therapy Class Rules` | scrolled off the top edge |
 | What `Run Build Inspector` does | never clicked |
 | What `Hide OK results` / `Show acknowledged results` toggle | never clicked |
-| Whether the row-action buttons enable with a selection | no row ever selected |
 | What the `Grouper Records` link opens | never clicked |
 | Whether `Billing` collapses | shown expanded in every frame |
 | What the ⚠ on each card signifies | no card ever showed a non-warning state |
 
-That last one is worth stating plainly: every card carries the same triangle, so
-whether it means "attention needed" or is simply the card style is not
-determinable from this recording.
+On that last one: the pill, title, triangle and left accent bar all sample
+**violet** (accent bar 111,98,149) against a neutral card body of (187,189,192).
+So it is card styling rather than a warning colour — which sharpens the unknown
+rather than resolving it. Do not render it as a warning.
 
 ---
 
@@ -175,8 +201,8 @@ determinable from this recording.
 - Route under the activity, reached from the picker with a record id
 - Heading renders `Medication: <record name> [<id>]` from the record
 - 9-node tree with `Overrides` and `Prescription` under `Billing`; no scrolling
-- The seven observed sections render their observed controls
-- `Identity/ADS` and `Inventory` render an explicit "not captured" state
+- The six observed sections render their observed controls
+- `Billing`, `Identity/ADS` and `Inventory` render an explicit "not captured" state
 - Info callout, editable table with its four row actions, and the card stack
 - Footer reads `Open Another Medication`; `Next F8` greyed on the last node
 - Every unknown left visibly incomplete and listed when you report back
