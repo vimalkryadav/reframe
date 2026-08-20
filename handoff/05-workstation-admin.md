@@ -18,12 +18,19 @@ page. Trust the images over this text.
   f_000310-t05m10s.jpg      Point of Sale Settings
   detail-mode-toolbar.jpg   heading, mode bar and lock banner, 2.4x
   detail-sidebar.jpg        the three-node tree, 3.4x
-  detail-value-list.jpg     the selected-value and list-box controls, 2.1x
+  detail-value-list.jpg     the field row with a value, and the list box, 2.1x
 ```
 
 Files are named by frame id. The section beside each is a claim to check against
 the sidebar's accent bar — two frames in earlier briefs were filed wrong because
 a name was trusted instead of measured.
+
+**`f_000303` is a mid-load frame** — a spinner over a double-rendered pane, with
+the whole footer drawn undisabled. It cannot corroborate any enabled/disabled
+reading. Use it for layout only.
+
+In the page chrome, `?` help, `✕` close and the header `Search` all measure
+**enabled**; the `← →` back/forward pair and the `⋯` overflow measure greyed.
 
 ---
 
@@ -43,11 +50,19 @@ The whole page is in a read state, and it is signalled three ways at once.
 
 ### A mode toolbar, under the heading
 
-`✎ Edit` · `🔒 Read-Only` · `🖥 Open Workstation`
+`✎ Edit` · `🔭 Read-Only` · `🖥 Open Workstation`
 
-`Read-Only` is the **selected** one — rendered as a filled accent block with a
-light glyph and label, the same treatment as a checked checkbox in brief 03.
-The three read as a segmented mode control, not as three loose buttons.
+The `Read-Only` glyph is **binoculars** — two barrels joined by a bridge, clear
+at 7x. Not a padlock. The padlock is real but belongs to the banner line below.
+
+`Read-Only` is the **selected** one — a filled accent block with a light glyph
+and label, carrying a light outer ring and rounded corners. The three read as a
+segmented mode control, not three loose buttons.
+
+`Jump to an item (Alt+F9)` and its `Search` button sit on **this row**, not the
+heading row — roughly 6–14px from the mode bar and 36–58px from the heading,
+slope-corrected across the settled frames. Briefs 03 and 04 have no mode bar and
+put them beside the heading; do not unify them.
 
 ### A lock banner
 
@@ -90,17 +105,21 @@ No groups, no children, no scrolling. All three observed.
 
 ---
 
-## Two controls not in briefs 03 or 04
+## Controls not in briefs 03 or 04
 
-### Selected-value row
+### A value inside an ordinary field row — not its own control
 
-Under a sub-heading, a single value rendered as a **filled accent block with
-light text**, sitting alone on its row: `Primary Screen [2]` under
-`Customer Sale Completion Method`.
+`Primary Screen [2]` under `Customer Sale Completion Method` looks like a
+bespoke control and is not one. It is the value sitting in a standard
+full-width field row: the row measures 37px between two parallel full-width
+rules, `Print Receipt by Default` further down the same panel is that identical
+row with nothing in it, and `Scanner Name` is a third instance.
 
-It reads as the current selection from a set, not as a text input — no border,
-no magnifier. What the unselected members are, and how one is chosen, is not
-observable.
+The value itself renders as a filled accent block with a thin light outline,
+flush to the field's left edge. **Do not build a new component for it** — it is
+the existing field row with a selected value in it.
+
+What the unselected members are, and how one is chosen, is not observable.
 
 ### Multi-row list box
 
@@ -130,8 +149,12 @@ sub-heading `Available Signature Methods` with the list box above; sub-heading
 `Print Receipt by Default` with an empty field; sub-heading `Cash Drawer`
 *(cut off at the fold — do not invent its contents)*.
 
-`Prescription Printing` and `Scanner Settings` each have their own frames.
-Transcribe from those rather than from a summary here.
+**Scanner Settings** holds two controls not otherwise in these briefs: a
+three-member segmented group `Scanner Type` — `WIA` · `TWAIN` · `None`,
+equal-width, `WIA` current — and a **field pair** putting `Color Scheme` and
+`Resolution (DPI)` side by side on one row.
+
+`Prescription Printing` has its own frame; transcribe from it.
 
 ---
 
@@ -157,8 +180,9 @@ Transcribe from those rather than from a summary here.
 | The other values `Primary Screen [2]` selects among | only the selection is shown |
 | Whether the list box's empty row adds | never clicked |
 | Whether other activities can be read-only | see below |
+| The table columns after `Tray` | ~63% of the table is off-view and it was never scrolled |
 
-On that last one: `Medication List Admin` is **also** read-only in this
+On read-only being shared: `Medication List Admin` is **also** read-only in this
 recording, with a differently-worded banner. So read-only is a page state that
 several activities can be in, not something specific to this one. Build it as
 shared state rather than a Workstation feature — brief 06 covers the other case.

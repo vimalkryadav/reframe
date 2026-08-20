@@ -121,13 +121,13 @@ Fieldset `Linked Procedure Override`, columns
 **date inputs carrying calendar glyphs** for From/To and lookup fields for the
 other three.
 
-Beneath the table, four buttons: `➕ Insert (F4)` · `➖ Remove (Shift+F4)` ·
+Beneath the table, four buttons: `➕ Insert (F4)` · `➖ Delete (Shift+F4)` ·
 `↑ Move Up` · `↓ Move Down`.
 
 **The enable rule is observed, not assumed.** With no row selected all four are
 greyed. `f_000409` has a row selected: sampling label ink at p3 across the two
-frames gives Insert 104→71 and Remove 102→74 (enabling), while Move Up 104→110
-and Move Down 109→114 stay put. So **Insert and Remove enable on selection;
+frames gives Insert 104→71 and Delete 102→74 (enabling), while Move Up 104→110
+and Move Down 109→114 stay put. So **Insert and Delete enable on selection;
 Move Up/Down do not.** Insert's effect is observed too — one table row becomes
 two between the frames.
 
