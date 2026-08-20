@@ -1,12 +1,19 @@
-# Build brief 07 — the four barely-observed activities
+# Build brief 07 — the three barely-observed activities
 
 **Branch:** `pharmacy-admin` — same branch as 01–06.
 
-**Read this framing before anything else.** These four activities were visited
-in passing at the end of the recording: one has five frames, the other three
-have **one frame each**. This brief is deliberately thin, and it is thin because
-the evidence is. Three of the four will be mostly not-captured panels, and that
-is the correct outcome — not a gap to fill in.
+**Read this framing before anything else.** These activities were visited in
+passing at the end of the recording: one has five frames, one has two, one has
+one.
+
+**An earlier revision of this brief listed four activities. There are three.**
+`Package` is not an activity — it is the record-type label in **NDC Admin's**
+heading. Same trap this brief documents for `Orderable medication:` one section
+later, walked into two sections earlier.
+
+This brief is deliberately thin, and it is thin because the evidence is. Two of
+the three will be mostly not-captured panels, and that is the correct outcome —
+not a gap to fill in.
 
 Do not treat "one frame" as "enough to infer the rest."
 
@@ -22,9 +29,9 @@ Do not treat "one frame" as "enough to infer the rest."
   detail-dm-grid.jpg     its grid, 1.7x
   detail-dm-form.jpg     its lower form, 1.9x
 
-  f_000548-t09m08s.jpg   NDC Admin        — one frame
-  f_000577-t09m37s.jpg   Package          — one frame
-  f_000601-t10m01s.jpg   Build Wizard     — one frame
+  f_000548-t09m08s.jpg   NDC Admin — mid-load, contributes the tree only
+  f_000577-t09m37s.jpg   NDC Admin — the settled frame ("Package:" is its record)
+  f_000601-t10m01s.jpg   Build Wizard — one frame
 ```
 
 Named by frame id. Everything below is a claim to check.
@@ -65,10 +72,15 @@ expander** before its text. Observed rows:
 
 `Patient Weight` and `Dose` are empty on every observed row.
 
-Rows 1–3 carry a band that rows 4+ do not. Whether that is a multi-row
-selection, a grouping, or something else is **not determinable** — do not model
-it as selection without more evidence. This is the same trap as brief 06's dot
-tints.
+An earlier revision claimed rows 1–3 carry a band that row 4 does not, and
+flagged it as possible selection. **There is no band.** The tint is *columnar*,
+not row-wise: a vertical profile reads B-R +18/+19 continuously from y318 to
+y480 with no step at any row boundary, and per cell the first column samples
+neutral on all four rows while every column right of it samples +14 to +20 on
+all four — row 4 included, and highest there.
+
+So the first column is white and editable, the rest tinted and read-only.
+**Model nothing as selection; there is nothing to model.**
 
 ### Row actions
 
@@ -88,7 +100,8 @@ Right-aligned on the same row: `Test Mapping`.
 - `Outpatient failsafe dispensable drug:` → the same value
 - `Edit rate, administration duration, and label comments when placing orders:` →
   empty
-- An ⓘ callout: *"Editing rate, administration duration, and label comments is
+- A **circled `?`** callout — the same help glyph as briefs 03/05/06, not the
+  `ⓘ` an earlier revision described: *"Editing rate, administration duration, and label comments is
   DISABLED. All default values will come from the selected dispensable record."*
 
 ### Footer
@@ -98,38 +111,36 @@ Right-aligned on the same row: `Test Mapping`.
 
 ---
 
-## 2. NDC Admin — one frame
+## 2. NDC Admin — two frames
 
-`f_000548-t09m08s.jpg`. A **sidebar page** — same archetype as briefs 03–05, so
-it should reuse `AdminRecordPage` with its own tree and content.
+A **sidebar page** — same archetype as briefs 03–05, so it reuses
+`AdminRecordPage` with its own tree and content.
 
-**Transcribe the tree and the visible section from the frame.** I am not
-summarising it here: with one frame and no second view to cross-check, my
-reading would be a single unverified source, and this brief has already been
-wrong twice from exactly that.
+**Both frames are this activity.** `f_000577`'s heading reads
+`Package: 9999990180 (Active) (CEFOTAXIME SODIUM 500 M…` and its activity tab
+reads `NDC Admin`. `Package:` is the record-type label, exactly as
+`Orderable medication:` is for Dispensable Mapping.
 
-Everything not visible in that one frame is not captured.
+That gives NDC Admin **two frames, not one**, and makes its `Identity/ADS`
+section transcribable — an `Identity Settings` table above `ADS Settings`
+fields. An earlier revision filed that content under a separate activity.
 
----
+Note the record carries a status in parentheses — `(Active)` — which no other
+activity's record does.
 
-## 3. Package — one frame
+`f_000548` is **mid-load**: no heading rendered, no sidebar row selected, the
+panel a skeleton, and the footer drawing everything undisabled. It contributes
+the tree and nothing else. Brief 05's `f_000303` rule.
 
-`f_000577-t09m37s.jpg`. Also a **sidebar page**. Record
-`9999990180 (Active) (CEFOT…)` — note the record carries a status in parentheses,
-which no other activity's record does.
+**`Identity/ADS` also appears in Medication Admin's tree** (brief 04), unopened.
+That is a third activity again — **do not borrow this content for it.**
 
-The visible section shows an `Identity Settings` table above `ADS Settings`
-fields. Its sidebar row is `Identity/ADS`.
-
-**That name also appears in Medication Admin's tree** (brief 04), where it was
-never opened. They are different activities — **do not borrow this content for
-that one.** Brief 04 says so explicitly.
-
-Transcribe from the frame; everything else is not captured.
+Transcribe the tree and the section from the frames; everything else is not
+captured.
 
 ---
 
-## 4. Build Wizard — one frame, an empty state
+## 3. Build Wizard — one frame, an empty state
 
 `f_000601-t10m01s.jpg`. Reached from the hub's `Common Links ▸ Build Wizard`
 (brief 01).
@@ -158,9 +169,14 @@ Build the empty state. Do not build filters you cannot see.
 
 ## Rules carried forward
 
-- **Do not manufacture content** from one frame. Three of these four have one
-  frame; almost everything about them is not captured.
-- **Do not model the banded rows as selection** without evidence.
+- **Do not manufacture content** from one frame. Build Wizard has one; NDC Admin
+  has one settled frame and one skeleton. Almost everything about them is not
+  captured.
+- **Read the activity from the activity tab, never from the heading.** The
+  heading's prefix is a record-type label. It matched the activity on the first
+  four pages and does not here — `Package:` is NDC Admin, `Orderable medication:`
+  is Dispensable Mapping. Both phantom activities in the catalogue came from
+  this.
 - **Do not complete clipped text** — several grid cells and the `From …` column
   are cut at the frame edge.
 - **Render the observed enabled/disabled state**; behaviour in the tooltip.
@@ -171,11 +187,10 @@ Build the empty state. Do not build filters you cannot see.
 
 | Unknown | Why |
 | --- | --- |
-| Everything about NDC Admin beyond one frame | one frame |
-| Everything about Package beyond one frame | one frame |
+| NDC Admin's 13 unopened sections | only `Identity/ADS` was opened |
 | Build Wizard's populated state, and its filters | only the empty state was seen, and no filter control is visible |
 | What the two collapsed panels on Build Wizard hold | never expanded |
-| What the band on Dispensable Mapping rows 1–3 means | could be selection, grouping, or neither |
+| Dispensable Mapping's unseen grid rows | the scrollbar thumb covers ~18% of its track, so ~20 rows exist and 4 were seen |
 | Dispensable Mapping's columns after `From …` | clipped at the frame edge |
 | What the row expanders reveal | never expanded |
 | What `Test Mapping` does | never clicked |
