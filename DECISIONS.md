@@ -862,6 +862,63 @@ outcome, but it has not been observed yet and may need a second look when it is.
 
 ---
 
+## DEC-026 — `section` is a hint, and a prompt fix for it made things worse
+
+**[handheld]** Decided 2026-08-20, after two mis-attributed frames.
+
+The `section` field records which row of a left navigation list is selected. On
+sidebar-driven screens it *is* the screen's identity — two views share a heading
+and differ only by the highlighted row — so a wrong value is not a cosmetic
+error, it names the wrong screen.
+
+Twice, on two different activities, the model reported a section that was not
+the selected row. Both were plausible: the reported name was a real row in the
+same sidebar, on the right page, at a confidence indistinguishable from the
+correct reads around it. One came from a card *titled* like a section; the other
+from the row below the highlighted one. A human found both by measuring where
+the accent bar sits.
+
+**What was tried.** Prompt v3 tightened the field: read the marked row and
+nowhere else, a heading in the content panel is not a section even when the
+sidebar contains a row of that name, an unmarked sidebar means null. The
+observed failure was quoted in the prompt.
+
+**What happened.** Measured over four trials on a frame whose truth was verified
+at 3.4x:
+
+| | trials | correct |
+| --- | --- | --- |
+| v2 | Packaging, Packaging, Packaging, Billing | 3/4 |
+| **v3** | None, Billing, Billing, Overrides | **0/4** |
+
+The fix made it worse, and it was shipped as the default before being measured.
+The extra prohibitions appear to have made the model doubt a read it was
+otherwise getting right — telling it a plausible-looking answer might be wrong
+did not make it more accurate, it made it less certain about the correct one.
+
+**Decided:**
+
+- **Revert to v2.** v3 stays in the table, marked superseded, because a log that
+  cannot show what was rejected is not much of a log.
+- **`section` is a hint, not a measurement.** It is useful for grouping and for
+  drawing attention; it must not be treated as the identity of a screen without
+  a human confirming the accent bar. The four trials above also show it is not
+  deterministic at v2 — 3/4, not 4/4.
+- **Stop naming evidence by it.** Both failures reached a downstream consumer
+  because a file was *named* from the model's reading, which turned a hint into
+  an assertion nobody re-checked. Evidence ships under its frame id, and the
+  section is stated as a claim to verify.
+- **No further prompt tuning without a measured baseline.** This change was
+  reasonable, well-argued, and wrong, and only trials showed it. A prompt edit is
+  a tuning change and gets the same evidence bar as a threshold.
+
+**Rejected:** raising `confidence.weights` scrutiny of `section`, or gating it
+behind a legibility floor. Neither addresses the failure — every wrong read here
+was of a perfectly legible sidebar. The model was not struggling to see; it was
+answering a different question.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.

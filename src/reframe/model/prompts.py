@@ -121,6 +121,7 @@ Partial reads are welcome. A strip where the title is legible but the tabs are n
 should carry the name and an empty tab list, not a refusal.\
 """
 
+# SUPERSEDED — measured worse than v2 and not in use. See DEC-026.
 _SYSTEM_V3 = """\
 You read the chrome of a desktop application from photographs of a screen, and you
 report only what the pixels support.
