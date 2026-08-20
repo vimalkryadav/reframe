@@ -61,7 +61,7 @@ list of route strings. Each carries different information for the build queue.
 | Status | Meaning | Classifier maps to |
 | --- | --- | --- |
 | `built` | A real page exists at `route`. | `built` |
-| `patient_scoped` | Reached via a patient-lookup modal, then a patient-scoped route. Built, but not directly addressable. | `built` |
+| `lookup_scoped` | Reached by choosing a record in a lookup first — a patient, but equally a formulary, a medication or a workstation. Built, but not directly addressable. | `built` |
 | `disabled` | The activity is **known and deliberately unbuilt** — in `rl_epic` this is a `disabled: true` marker in `menuConfig.ts`. | `new` |
 | `stub` | Falls through to a generic `/activity/<slug>` placeholder page. Reachable, but not implemented. | `new` |
 
@@ -81,7 +81,7 @@ which are already maintained as part of normal development:
 | Source | Entries (at commit `9a0a4ad9`) | Contributes |
 | --- | --- | --- |
 | `frontend/lib/nav.ts` → `ACTIVITY_OVERRIDES` | 85 | Activity label → real route. Status `built`. |
-| `frontend/components/shell/modalActivities.ts` | 34 | Patient-scoped activities. Status `patient_scoped`. |
+| `frontend/components/shell/modalActivities.ts` | 34 | Lookup-scoped activities. Status `lookup_scoped`. |
 | `frontend/components/shell/menuConfig.ts` → `disabled: true` | 27 | Known but unbuilt. Status `disabled`. |
 | `frontend/app/**/page.tsx` | 150 | Ground truth on which routes actually exist. |
 
@@ -173,3 +173,17 @@ The minimum useful inventory is a list of `{label, status}` — `route`, `module
 and `component_paths` improve the output but nothing breaks without them. A
 project with no concept of "deliberately unbuilt" simply never emits
 `status: disabled`.
+
+---
+
+## Superseded status names
+
+`lookup_scoped` was called `patient_scoped` until a pharmacy module arrived whose
+activities are reached by choosing a formulary, a medication or a workstation —
+no patient involved. The mechanism was always "pick a record first"; only the
+name assumed which kind of record.
+
+**Exporters emitting `patient_scoped` keep working.** It is accepted on input and
+normalised to `lookup_scoped`; nothing needs changing in a consuming project
+before it is convenient to. Unknown values are still rejected, so this cannot
+turn a typo into a valid status.

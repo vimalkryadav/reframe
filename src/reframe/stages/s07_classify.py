@@ -277,7 +277,7 @@ def _matched_note(entry: inv.InventoryEntry, bucket: str) -> str | None:
         )
     if entry.status == "stub":
         return "reachable but falls through to a placeholder page"
-    if entry.status == "patient_scoped" and bucket == "built":
+    if entry.status == "lookup_scoped" and bucket == "built":
         return "built, but reached through a record-scoped lookup rather than a direct route"
     return None
 

@@ -27,16 +27,31 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal, Self
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from reframe.manifest import Bucket, MatchKind, PossibleMatch
 from reframe.text import is_token_subset, normalise_label, similarity
 
-# The contract's four status values. `patient_scoped` is domain vocabulary the
-# contract fixed before this module existed; Reframe treats it as an opaque
-# marker meaning "built, but reached through a record-scoped lookup rather than a
-# directly addressable route".
-EntryStatus = Literal["built", "patient_scoped", "disabled", "stub"]
+# The contract's four status values.
+#
+# `lookup_scoped` was called `patient_scoped` until a pharmacy module turned up
+# whose activities are reached by choosing a formulary, a medication or a
+# workstation — no patient anywhere. The mechanism was always "pick a record
+# first"; only the name assumed which kind. The old spelling is still accepted,
+# because a rename that breaks every exporter is not an improvement.
+EntryStatus = Literal["built", "lookup_scoped", "disabled", "stub"]
+
+#: Superseded spellings, mapped to what they meant. Read on input, never emitted.
+_STATUS_ALIASES: dict[str, EntryStatus] = {"patient_scoped": "lookup_scoped"}
+
+
+def normalise_status(value: str) -> str:
+    """Accept a superseded status spelling and return the current one.
+
+    Unknown values pass through untouched so that validation reports them as
+    unknown, rather than this quietly turning a typo into a valid status.
+    """
+    return _STATUS_ALIASES.get(value, value)
 
 # How each status maps to a build-queue bucket. `disabled` and `stub` both mean
 # "not built", but they are kept distinct in the inventory because `disabled` says
@@ -44,7 +59,7 @@ EntryStatus = Literal["built", "patient_scoped", "disabled", "stub"]
 # information from never having heard of it, and worth carrying into the queue.
 _STATUS_BUCKET: dict[EntryStatus, Bucket] = {
     "built": "built",
-    "patient_scoped": "built",
+    "lookup_scoped": "built",
     "disabled": "new",
     "stub": "new",
 }
@@ -68,6 +83,12 @@ class InventoryEntry(BaseModel):
 
     label: str
     status: EntryStatus
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def _accept_superseded_status(cls, value: object) -> object:
+        """Let an exporter written against an older contract keep working."""
+        return normalise_status(value) if isinstance(value, str) else value
     aliases: list[str] = Field(default_factory=list)
     route: str | None = None
     module: str | None = None
