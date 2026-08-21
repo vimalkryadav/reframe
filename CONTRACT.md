@@ -11,8 +11,8 @@ generic file; Reframe matches names against a list.
 ```
 rl_epic/scripts/export-inventory.mjs  →  inventory.json  →  reframe stage 07
    (knows nav.ts, menuConfig.ts,          (generic:            (knows nothing
-    modalActivities.ts, app/ routes)       label, route,        about Epic)
-                                           status, aliases)
+    modalActivities.ts, moduleChrome.ts,   label, route,        about Epic)
+    app/ routes)                           status, aliases)
 ```
 
 ---
@@ -25,7 +25,8 @@ rl_epic/scripts/export-inventory.mjs  →  inventory.json  →  reframe stage 07
   "project": "rl_epic",
   "generated_from": {
     "commit": "9a0a4ad9",
-    "sources": ["lib/nav.ts", "shell/modalActivities.ts", "shell/menuConfig.ts", "app/**/page.tsx"]
+    "sources": ["lib/nav.ts", "shell/modalActivities.ts", "shell/menuConfig.ts",
+                "shell/moduleChrome.ts", "app/**/page.tsx"]
   },
   "entries": [
     {
@@ -75,7 +76,7 @@ attached.
 
 ## What the `rl_epic` exporter must do
 
-Lives at `rl_epic/scripts/export-inventory.mjs`. Reads four sources, all of
+Lives at `rl_epic/scripts/export-inventory.mjs`. Reads five sources, all of
 which are already maintained as part of normal development:
 
 | Source | Entries (at commit `9a0a4ad9`) | Contributes |
@@ -83,7 +84,33 @@ which are already maintained as part of normal development:
 | `frontend/lib/nav.ts` → `ACTIVITY_OVERRIDES` | 85 | Activity label → real route. Status `built`. |
 | `frontend/components/shell/modalActivities.ts` | 34 | Lookup-scoped activities. Status `lookup_scoped`. |
 | `frontend/components/shell/menuConfig.ts` → `disabled: true` | 27 | Known but unbuilt. Status `disabled`. |
+| `frontend/components/shell/moduleChrome.ts` → toolbar dropdowns | 22 | Activities reachable only from the activity toolbar, not the ☰ menu. |
 | `frontend/app/**/page.tsx` | 150 | Ground truth on which routes actually exist. |
+
+### Why the toolbar is a source
+
+Added for brief 12. The exporter walked `MODULE_ITEMS` — the ☰ activity menu — and
+nothing else, so a transcribed **toolbar** dropdown was invisible to `inventory.json`
+however well evidenced it was: brief 10's `Find Patients ▾` contributed nothing, and
+brief 12's `Inventory ▾` and `Beacon Admin ▾` would have added another twenty-one
+labels the app renders and this contract cannot see. Those come back `bucket: new`
+with no matching entry — indistinguishable from a screen the target really lacks,
+which is the one confusion this file exists to remove.
+
+A dropdown row is an activity by any reasonable reading: same label, same screen,
+resolved through the same `activityHref`. Its `module` is the toolbar BUTTON's label
+(`Inventory`, `Beacon Admin`, `Find Patients`), which is the menu path a reader needs
+to find the row again.
+
+The alternative was attaching each menu into a ☰ module's activity list so the
+existing walker caught it. Rejected: it changes what the ☰ fly-out *renders* in order
+to fix what the exporter *reads*, and in `rl_epic` only `Rx Admin` has the evidence to
+claim it is a module's own activity list.
+
+Corollary, same change: `disabled` no longer cascades from a menu ROW to its submenu
+rows — a parent and its children are separate claims about separate screens, and
+`rl_epic`'s `Therapy Plan Tools ▸` is a parent nobody opened whose two children were
+both filmed. A `disabled` MODULE still cascades to everything under it.
 
 Requirements:
 
