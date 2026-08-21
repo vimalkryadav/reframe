@@ -32,9 +32,15 @@ from reframe.manifest import Bucket, Manifest, ScreenRecord
 from reframe.timecode import format_timecode, parse_timecode
 
 # How far a fixtured timestamp may sit from a screen's span and still be the same
-# sighting, expressed in sampling intervals rather than seconds so it holds at any
-# sample.fps. Two intervals covers a screen boundary landing on either side of a
-# sample.
+# sighting, in sampling intervals. Two covers a screen boundary landing on either
+# side of a sample.
+#
+# The interval is taken from the **slower** of the two rates involved — the one the
+# fixture was recorded at, and the one the run used. A screen occupies a span and
+# the pipeline picks one instant inside it; re-sampling moves that instant by up to
+# one interval of the coarser rate. Scaling to the run's rate alone tightens the
+# tolerance exactly when raising fps makes the drift larger, which is backwards, and
+# turns a re-sample into a wall of false regressions.
 _TOLERANCE_INTERVALS = 2
 
 
@@ -77,6 +83,10 @@ class Fixture(BaseModel):
     # Which snapshot of the consuming project the buckets below were true against,
     # so drift can always be explained rather than merely noticed.
     inventory_commit: str | None = None
+    # The sample rate this fixture was recorded at. Absent in fixtures written
+    # before it was carried, in which case the run's own rate is assumed — the old
+    # behaviour, and correct whenever the rate has not changed.
+    sample_fps: float | None = None
     screens: list[FixtureScreen] = Field(default_factory=list)
     missed_spans: list[MissedSpan] = Field(default_factory=list)
 
@@ -119,7 +129,7 @@ class Finding:
         return f"{marks[self.status]} {self.slug} @ {format_timecode(self.t_ms)}  {self.message}"
 
 
-def record(manifest: Manifest) -> str:
+def record(manifest: Manifest, *, sample_fps: float | None = None) -> str:
     """Render a fixture from a run the operator has just validated.
 
     Written as commented YAML rather than dumped, because the file is meant to be
@@ -129,6 +139,7 @@ def record(manifest: Manifest) -> str:
     """
     video = manifest.video
     commit = manifest.inventory.commit if manifest.inventory else None
+    fps_line = [f"sample_fps: {sample_fps:g}"] if sample_fps else []
     lines = [
         f"# Ground truth for {video.slug}, recorded from a validated run.",
         "#",
@@ -151,6 +162,9 @@ def record(manifest: Manifest) -> str:
     lines.append(
         f"inventory_commit: {commit}" if commit else "inventory_commit: null  # not classified"
     )
+    # Recorded so a later run at a different rate is compared at the coarser of
+    # the two, rather than reporting every re-sampled timestamp as a regression.
+    lines.extend(fps_line)
     lines.append("")
 
     if not manifest.screens:
@@ -209,6 +223,8 @@ def _yaml_scalar(value: str | None) -> str:
 
 def compare(fixture: Fixture, manifest: Manifest, *, fps: float) -> list[Finding]:
     """Check a run against ground truth, separating regression from drift."""
+    # Compare at the coarser of the two rates; see _TOLERANCE_INTERVALS.
+    fps = min(fps, fixture.sample_fps) if fixture.sample_fps else fps
     tolerance_ms = int(_TOLERANCE_INTERVALS * 1000 / fps) if fps > 0 else 2000
     # The commit the run's buckets were true against, so drift names both ends of
     # the change rather than only where it landed.

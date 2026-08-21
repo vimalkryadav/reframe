@@ -16,6 +16,13 @@
 
 slug: v01
 inventory_commit: 8a1c6d2d
+# The rate this was recorded at. Carried so a run at a different rate is compared
+# at the coarser of the two (DEC-028) — and so that a cross-rate comparison is
+# readable as one, rather than as a wall of regressions with no stated cause.
+#
+# 1 fps is also the rate this video settled on (DEC-027), so a normal re-run
+# matches this exactly.
+sample_fps: 1.0
 
 screens:
   - t: "00:10"

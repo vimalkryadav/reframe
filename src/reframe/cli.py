@@ -224,7 +224,10 @@ def fixture(
                 "lose the corrections already recorded in it."
             )
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(fixtures.record(manifest), encoding="utf-8")
+        path.write_text(
+            fixtures.record(manifest, sample_fps=resolve_config(paths, slug).pipeline.sample.fps),
+            encoding="utf-8",
+        )
         console.print(
             f"wrote {path.relative_to(paths.repo_root)} — "
             f"{len(manifest.screens)} screen(s)\n"
