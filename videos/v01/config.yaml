@@ -16,12 +16,25 @@
 # projects/<name>.yaml and CI fails the build if it leaks (DEC-017).
 
 sample:
-  # Sized from this video's duration, so a truncation warning means something.
-  # Sampling more than this records a warning rather than silently stopping.
-  max_frames: 611
-
-  # Frames per second. Raise for fast navigation; costs linear time and disk.
+  # Left at the default 1.0 — the first pass, per DEC-027.
+  #
+  # This video HAS been run at 2.0 as well, so nobody needs to redo it to find
+  # out. The comparison is in `handoff/10-v01-gap-closure.md`; the short version
+  # is that doubling the rate surfaced exactly one screen the 1 fps pass did not
+  # (a toolbar menu open for about a second at 01:45), and that the 1 fps pass had
+  # already SAMPLED that second — stage 04 folded the frame into its neighbour and
+  # elected the menu-shut one as representative. So the lever was dedupe, not the
+  # sample rate. Against that: twice the disk and runtime, and 47 fixture
+  # regressions from every representative instant moving (DEC-028).
+  #
+  # To re-run the sweep, set `fps: 2.0` and `max_frames: 1250` together, and send
+  # it somewhere else so it does not overwrite this run:
+  #   REFRAME_OUT_ROOT=~/reframe-data/out-2fps uv run reframe run v01 --project <name>
   # fps: 1.0
+
+  # Sized from this video's duration at the fps above, so a truncation warning
+  # means something. Must be raised alongside fps or the run stops halfway.
+  max_frames: 611
 
   # Spans where the screen is not visible at all — intros, desk shots, the
   # camera being picked up. Skipped frames leave a gap in the frame ids, which
