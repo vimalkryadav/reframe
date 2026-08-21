@@ -77,9 +77,10 @@ Footer: `× Close`.
 - Grid columns: `Matched On` | `Inventory Item` | `Is Active?`
 - Rows are real and transcribable: `Abilify Maintena 300 MG intramuscular prsy`,
   `Abilify Maintena 400 MG intramuscular prsy`, `Abraxane 100 MG intravenous susr`,
-  `acebutolol 200 MG oral capsule` (selected), `acetaminophen 120 MG rectal
-  suppository`, `acetaminophen 160 MG/5ML oral solution, 5 mL`, … all `Is Active? =
-  Yes`. `Matched On` reads `Inventory Item` on every visible row.
+  `acebutolol 200 MG oral capsule`, `acetaminophen 120 MG rectal suppository`,
+  `acetaminophen 160 MG/5ML oral solution, 5 mL`, … all `Is Active? = Yes`.
+  `Matched On` reads `Inventory Item` on every visible row. **See correction C2 —
+  no row is selected, and the list is 23 rows in a plain string sort.**
 - `Show inactive` checkbox, bottom left, unchecked
 - `Accept` / `Close` bottom right, both **greyed**
 
@@ -247,9 +248,8 @@ way it went in the component comment.
 - `launching-inventory-picker-f_000036` — a **Location** picker: `Location` search
   field + `Search`, two-column grid `Location ID` | `Location Name`,
   `Accept` / `Cancel`.
-- `location-picker-unnamed-f_000151` — a nearly blank window with `Location:`, an
-  empty field and `Search`. Almost certainly the same picker mid-load. Treat as
-  one component in two states; do not seed two.
+- `location-picker-unnamed-f_000151` — **misnamed by me; see correction C1. It is
+  `Launching Adjust Par Levels`.**
 
 ---
 
@@ -276,3 +276,73 @@ way it went in the component comment.
 - [ ] `WILLOW_CAPTURE_GAPS.md` records what each screen did **not** show — no
       populated grid anywhere in this module, no submitted request, no completed
       transfer, and `Create Request ▾` / `More ▾` / `Display Options` never opened
+
+
+---
+
+# Corrections after the build
+
+Four, all found by the build session and all verified against the frames.
+
+## C1. `f_000151` is `Launching Adjust Par Levels`, and Adjust Par Levels is launcher-scoped
+
+I filed this frame as `location-picker-unnamed` and guessed it was the
+`Launching Inventory` Location picker mid-load. Both wrong. At 4× the title reads
+**`Launching Adjust Par Levels`** unambiguously.
+
+So `Adjust Par Levels` is reached through a launcher, which this brief never said.
+Its `Location:` field and `Search` button are the launcher's, not the activity's.
+
+The frame is also mid-load — `Loading records…` in both the grid and the footer —
+so its rows and even its column headers were never on screen. Its column set was
+taken from the two sighted sibling pickers and **recorded as an inference, not as
+evidence**. That is the right way to carry it; do not let a later reader mistake
+it for a transcription.
+
+## C2. Nothing is selected in `Inventory Item Selection`, and the list is 23 rows
+
+I wrote `acebutolol 200 MG oral capsule` **(selected)**. It is **hovered**.
+
+`f_000021` settles it: the same highlight band sits on `acetaminophen 325 MG
+rectal suppository`, the cursor is on that row, and the row's tooltip is open
+showing the same string. A band that follows the cursor is a hover state.
+
+The corroboration is stronger than the band: **`Accept` is greyed in all three
+sightings**, and a picker holding a selection would enable it. `Close` is greyed
+in all three too. So the dialog opens with no selection.
+
+The row list is also longer than the one frame I transcribed. The three sightings
+scroll and overlap at rows 11–13, so together they give a contiguous prefix of
+**23 rows**.
+
+**The order is a plain string sort, not numeric** — `acetaminophen 250 mg` before
+`30 mg/0.94 mL` before `325 MG oral tablet` before `40 mg oral tbdp` before
+`500 MG` before `60 MG` before `650 MG` before `80 MG`. Keep it as observed. A
+numeric sort would reorder eight rows and would look more correct while being
+wrong.
+
+## C3. `Inventory Workqueues` has three clipped headers and no activity tab
+
+My grid listing named three clipped headers — `Workque…`, `Request N…`, `Bloc…` —
+and then said "(two clipped)". Three is right; the parenthetical was wrong.
+
+Separately: this screen has **no activity tab at all**, unlike the other eight in
+the module. Its heading sits directly under the workspace tab. That is an
+observed structural difference, not a framing accident.
+
+## C4. Not corrections, but worth keeping
+
+- **Lot and Expiration Manager's right-hand controls are enabled.** They read as
+  washed out, and measurement says otherwise: 69–90 ink against 81 for that
+  frame's known-enabled grid header — no separation. It is the frame's
+  illumination gradient. This is the same method that showed brief 10's four row
+  actions were *all* greyed, applied here to the opposite conclusion.
+- **`1302`, not `1,302`.** The Inventory footer count was rendered through
+  `toLocaleString()`. The frame shows no thousands separator.
+- **Two balloon captions were left blank on purpose** — Draft Medication Request
+  and Shortages both cut theirs off, and their siblings are captioned. Inventing
+  them from the siblings would have been the easy wrong move.
+- **No populated grid exists anywhere in this module.** Shortages, lots,
+  workqueues and par levels are all empty in every frame, so no column set for
+  those tables is evidenced. Recorded as one module-wide gap rather than four
+  screens' worth of guesses.
