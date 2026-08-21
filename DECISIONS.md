@@ -917,6 +917,165 @@ behind a legibility floor. Neither addresses the failure — every wrong read he
 was of a perfectly legible sidebar. The model was not struggling to see; it was
 answering a different question.
 
+**Amended 2026-08-21 — it is every chrome-structure field, not just `section`.**
+
+A second pass over v01 put three more `section` misreads on the record, both by
+the mechanisms above: two frames of a scrolled `Related Information` panel
+reported as `Dispense Prep` and `Calcium Phosphate Solubility` (the panel's first
+*card* title), and a `Packaging` frame reported as `Billing` (the expanded parent
+row above the accented one). Five cases now, no new mechanism. The consuming
+project caught all three by measuring the accent bar, which is what this entry
+already tells a reader to do.
+
+`tabs` fails the same way and was not covered:
+
+- **It flattens nesting.** A dialog with three tabs, one of which has five
+  sub-tabs, came back as one list of eight. Both levels were legible; nothing was
+  guessed; the hierarchy was simply discarded.
+- **It occasionally adds a member.** A four-tab strip came back with a fifth
+  (`AQS` beside a real `ADS`).
+
+Both landed at 0.79–0.82, inside `accept_threshold`, exactly as the `section`
+failures did. So the scope of this decision widens: **no chrome-structure field —
+`section`, `tabs`, `dialog` — is a measurement.** Each is a hint that points a
+human at a frame, and none may be treated as an assertion without one.
+
+**Still rejected: fixing it in the prompt.** The v3 trial above is the reason.
+Any future attempt needs a measured baseline over repeated trials first, per this
+entry's last bullet — and a flattening failure suggests the schema, not the
+prompt, is the thing that cannot express a nested tab row.
+
+---
+
+## DEC-027 — Sample rate is a two-pass strategy, and 1 fps is the first pass
+
+**[handheld]** Decided 2026-08-21, after running one video at both rates.
+
+`sample.fps` was raised from 1.0 to 2.0 on v01 on the argument that a screen
+visible for under a second can fall between samples — the toolbar's activity menu
+appeared in one frame of 609, and a second either way would have lost every
+activity name in the module. Reasonable, and untested until both rates had run.
+
+**What the paired runs measured.** Same video, same code, same cache, all stages:
+
+| | 1 fps | 2 fps |
+| --- | --- | --- |
+| frames sampled | 609 | 1219 |
+| screens after dedupe | 133 | 145 |
+| distinct names | 22 | 21 |
+| accepted | 53 | 46 |
+| review spans | 209 | 236 |
+
+Doubling the rate found **one** thing the 1 fps pass did not surface: a second
+toolbar menu, open for about a second. It cost twice the disk, twice the runtime,
+and 47 fixture regressions (DEC-028).
+
+**And that one find was not a sampling failure.** The 1 fps pass *sampled* that
+second — the frame is in `frames/clean/`. Stage 04 folded it into the neighbouring
+screen and elected the menu-shut frame as representative, so it never reached the
+model. The lever was `dedupe.min_gap_frames` and representative selection, not
+`sample.fps`. Raising fps happened to dodge a dedupe choice, which is why it
+looked like it worked.
+
+The rate also moved every screen's representative instant, which is what produced
+the regression wall — a cost paid on every fixtured video, forever, in exchange
+for one frame.
+
+**Decided:**
+
+- **1 fps is the default and the first pass.** It is enough to catalogue screens,
+  pages and modals, which is what the first pass is for.
+- **A 2 fps sweep is a deliberate second pass**, run when the first pass leaves a
+  specific question — a suspected short-lived screen, an unexplained gap in the
+  timeline — and compared against the first pass rather than replacing it. Keep
+  the two runs in separate output roots (`REFRAME_OUT_ROOT`) so neither
+  overwrites the other; v01's 2 fps pass overwrote its 1 fps outputs and only the
+  fixture survived.
+- **A missing short-lived screen is a dedupe question first.** Check
+  `dedupe.min_gap_frames` and which frame a screen elected as representative
+  before reaching for the sample rate.
+
+**Rejected:** 2 fps as the default. One find per doubling, against a permanent
+fixture-comparison cost, is not a trade worth making on every video. Also
+rejected: deleting the 2 fps run. It is the evidence for this entry, and the
+second pass is a real part of the workflow now.
+
+---
+
+## DEC-028 — A fixture carries the rate it was recorded at, and comparison uses the coarser
+
+**[handheld]** Decided 2026-08-21.
+
+A fixture pins a screen's name to a timestamp. A screen occupies a *span*, and
+the pipeline records one instant inside it — the representative frame's. Change
+the sample rate and that instant moves, so the same screen compares as a
+different one.
+
+Tolerance was already expressed in sampling intervals rather than seconds, which
+holds while the rate does not change. Scaling it to *the run's* rate is backwards:
+raising fps makes the drift larger and the tolerance smaller, exactly when it
+needs to be wider.
+
+**Decided:**
+
+- A fixture records `sample_fps`, the rate it was recorded at. Absent means "the
+  run's rate", which is the old behaviour and correct whenever the rate is
+  unchanged.
+- Comparison takes the interval from the **coarser** of the two rates.
+
+**What this does not fix, measured.** With the tolerance widened from 1 s to 2 s,
+a 1 fps fixture against a 2 fps run still reports 47 regressions on v01 — 22 of
+them "screen no longer detected". At the finer rate dedupe re-partitions the
+timeline, so a screen the fixture pins at 09:00 may not exist as a screen at
+09:00 at all; it has become two screens at 08:57 and 09:01, and one of them is
+unnamed. **Widening a window cannot survive a re-partition.** Matching a fixture
+against a screen's span rather than its representative instant would, and is not
+built.
+
+So the honest statement is that a fixture validates the rate it was recorded at.
+Cross-rate comparison is *less* wrong than it was, not right. Under DEC-027 that
+is tolerable: the first pass is always 1 fps, so fixtures and runs agree by
+default, and a 2 fps sweep is read as a comparison rather than gated by verify.
+
+**Rejected:** re-recording every fixture at every new rate — it discards the
+human corrections in the file, which are the whole point of a fixture. Also
+rejected: dropping the timestamp and matching on name alone, which would stop
+`verify` noticing a screen that moved to a different part of the video.
+
+---
+
+## DEC-029 — The model's output ceiling is a tunable, because reasoning spends it
+
+Decided 2026-08-21.
+
+The per-request output cap lived in `model/client.py` as a constant, at 16000,
+with a comment reasoning that "a sheet of 20 short records needs a fraction of
+it". That arithmetic is right about the answer and silent about the reasoning.
+
+On a reasoning model the ceiling covers the thinking as well as the reply. A
+full-frame read of a dense screen exhausted 16000 before finishing the JSON, and
+the SDK surfaced the truncation as a parse error — which reads as *the model
+returned nonsense* when it means *the model ran out of room*. Those have
+different fixes and only one of them is a config change.
+
+**Decided:**
+
+- `identify.max_output_tokens` is a tunable in `configs/defaults.yaml`, default
+  48000. It is a ceiling, not a target: calls that do not need it are unaffected,
+  so raising it costs nothing and lowering it caps spend at the price of
+  truncation.
+- The OpenAI backend detects a mid-JSON cutoff and raises a `ModelError` that
+  names the key and its current value, and says that on a reasoning model the
+  budget covers reasoning too.
+- It is **not** part of the response cache key. The cache is keyed by what was
+  *sent* — image, prompt text, prompt version, provider/model. A ceiling that was
+  not reached changes nothing about the answer, and putting it in the key would
+  discard every cached response on a spend adjustment.
+
+**Rejected:** retrying automatically at a higher ceiling. It hides a
+misconfiguration behind a doubled bill, and the error already says which key to
+move.
+
 ---
 
 ## Open questions
@@ -932,3 +1091,14 @@ Not yet decided. None block starting.
 - **Capture resolution.** If the laptop ran at a high resolution, text will be
   physically small in frame and OCR will struggle more. May push `sample.fps` or
   the montage crop. Checkable on the first frame.
+- **How a fixture records a read the model gets wrong every time.** This one is
+  blocking a checklist item, so it needs deciding soon. v01's fixture carries two
+  hand-corrections — `Package` → `NDC Admin`, `Orderable medication` →
+  `Dispensable Mapping`. The model still reads the uncorrected value, and will on
+  every future run, so `verify` reports two regressions forever and "shows no
+  regressions" in the pre-commit checklist can never be satisfied. A permanent
+  known-wrong read is not a regression; it is a standing defect, and the fixture
+  has no way to say so. Options: a `known_misread` field that reports separately
+  and does not fail the gate; treating a corrected entry as expected-to-differ;
+  or accepting a non-zero floor and stating it per video. The first looks right
+  but none is measured, and picking wrong makes `verify` either noisy or blind.
