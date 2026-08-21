@@ -173,6 +173,17 @@ identify:
   # turn it on when the manifest shows `section` never being filled and screens
   # that should be distinct sharing a name.
   full_frames: false
+  # Ceiling on what one model call may produce.
+  #
+  # On a reasoning model this covers the reasoning as well as the answer, so a
+  # budget that looks generous for a short JSON record is not. Measured: at
+  # 16000 a full-frame read of a dense screen was cut mid-object and surfaced
+  # as a JSON parse error, which reads like the model returned nonsense rather
+  # than like it ran out of room.
+  #
+  # Raising it costs nothing on calls that do not need it — it is a ceiling, not
+  # a target. Lower it only to cap spend, and expect truncation if you do.
+  max_output_tokens: 48000
   # Read a second, different frame of every screen and compare the two names.
   # This is the cross_frame confidence signal's only source of repeat sightings:
   # matching them by band hash does not work on handheld footage (DEC-025).

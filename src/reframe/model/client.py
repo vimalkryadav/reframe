@@ -28,10 +28,6 @@ from reframe.model import prompts
 from reframe.model.backend import ModelBackend, ModelError
 from reframe.model.schema import FrameReading, MontageReading, ScreenReading
 
-# Enough for a full sheet of structured entries without streaming. The SDKs refuse
-# non-streaming requests they expect to outlive the HTTP timeout, and 16k sits well
-# inside that; a sheet of 20 short records needs a fraction of it.
-_MAX_TOKENS: Final = 16000
 _MEDIA_TYPE: Final = "image/jpeg"
 
 Provider = str
@@ -42,6 +38,7 @@ class ModelSettings:
     provider: Provider
     model: str
     prompt_version: int
+    max_output_tokens: int
 
 
 @dataclass(frozen=True)
@@ -120,7 +117,7 @@ class IdentifyClient:
             system=prompts.system_prompt(self._settings.prompt_version),
             user_prompt=user_prompt,
             output_format=output_format,
-            max_tokens=_MAX_TOKENS,
+            max_tokens=self._settings.max_output_tokens,
         )
 
     # ---- cache ----------------------------------------------------------

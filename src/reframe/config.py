@@ -174,6 +174,7 @@ class IdentifyConfig(_Section):
     prompt_version: int = Field(ge=1)
     corroborate: bool
     full_frames: bool
+    max_output_tokens: int = Field(gt=0)
 
 
 class ConfidenceConfig(_Section):

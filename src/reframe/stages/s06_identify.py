@@ -63,6 +63,7 @@ def run(ctx: StageContext) -> None:
                 provider=identify.provider,
                 model=identify.model,
                 prompt_version=identify.prompt_version,
+                max_output_tokens=identify.max_output_tokens,
             ),
             ctx.paths.cache_dir,
         )

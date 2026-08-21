@@ -71,6 +71,16 @@ class OpenAIBackend:
                 text_format=output_format,
             )
         except Exception as exc:
+            # A response cut off by the token ceiling surfaces from the SDK as a
+            # JSON parse failure, which reads as "the model returned nonsense"
+            # when it means "the model ran out of room". Say which, because the
+            # two have different fixes and only one of them is a config change.
+            if "EOF while parsing" in str(exc):
+                raise ModelError(
+                    f"the response was cut off mid-JSON — identify.max_output_tokens "
+                    f"({max_tokens}) was not enough for this screen. On a reasoning "
+                    f"model that budget covers the reasoning too. ({type(exc).__name__})"
+                ) from exc
             raise ModelError(f"{type(exc).__name__}: {exc}") from exc
 
         # Refusal before content: on a decline the parsed output is absent, and

@@ -55,7 +55,9 @@ class StubBackend:
 
 
 def settings(provider: str = "openai", model: str = "m") -> ModelSettings:
-    return ModelSettings(provider=provider, model=model, prompt_version=1)
+    return ModelSettings(
+        provider=provider, model=model, prompt_version=1, max_output_tokens=48000
+    )
 
 
 class TestBuildBackend:

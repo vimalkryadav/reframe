@@ -614,8 +614,15 @@ ocr:
 
 identify:
   montage_rows: 20
-  model: claude-opus-5
-  prompt_version: 1
+  provider: openai
+  model: gpt-5.2
+  prompt_version: 2
+  # Ceiling on one call's output. On a reasoning model this covers the reasoning
+  # as well as the answer, which is why it is a tunable and not a constant
+  # (DEC-029). Not part of the response cache key.
+  max_output_tokens: 48000
+  corroborate: true
+  full_frames: false
 
 confidence:
   accept_threshold: 0.75
