@@ -238,3 +238,104 @@ unnamed because the title band was illegible, which a higher rate does not fix.
 
 Check `dedupe.min_gap_frames` and representative-frame selection first. That is
 where v01's one genuine 2 fps find actually lived.
+
+---
+
+# 9. Frame pass — the corrected numbers
+
+Section 5's tiering was wrong and is superseded. It gated buildability on frame
+count (≥10 frames = buildable), which produced "14 of 45". A frame pass over one
+representative frame per screen shows that was the wrong criterion twice over:
+`Order Group Builder` at 3 frames is one of the most completely legible screens in
+the recording, and the repo's own precedent — Report Settings, built to full
+fidelity from **two** frames — already said so.
+
+The right criterion is: **is there one frame where the screen is legible and
+unoccluded?** A static replica needs one good look, not thirty.
+
+## What 46 names actually resolve to
+
+| | count | share |
+| --- | --- | --- |
+| Already built | 1 | 2% |
+| **Not a screen at all** — a label misread as one | 7 | 15% |
+| Alias of another screen (heading vs activity tab) | 4 | 9% |
+| Configuration of one shared launcher component | 6 | 13% |
+| **Real screens to build** | **28** | **61%** |
+
+### The 7 that are not screens
+
+- `Pharmacy Admin`, `Workbench`, `SmartTools` — **workspace tab** labels. Same
+  class of error as v01's `Package`.
+- `Locator`, `Protocol`, `Protocol Version`, `Order Group Contact` — **stepper tab
+  labels inside the `Launching …` picker modals.**
+
+That last group is the significant find. The `Launching X Builder` pickers are a
+**two-step wizard**: step 1 picks the record, step 2 picks the version/contact.
+Confirmed in three frames — `f_000239` (Treatment Modification Builder: `Locator`
+→ `Locator Version`), `f_000328` (Therapy Protocol Builder: `Protocol` →
+`Protocol Version`), `f_000226` (Order Group Builder: `Order Group` → `Order Group
+Contact`). Each shows a grid, a `Create a New …` action, and Continue/Accept +
+Cancel. One component, six observed configurations.
+
+### The 4 aliases
+
+`Inventory: EMC Central Fill` = `Inventory` · `Episode Type Admin` =
+`Episode Type` · `SmartForm Designer - (LEGACY) AUTH APPEAL…` =
+`SmartForm Designer` · `SmartText - (DEPRECATED) - EHS SBO…` = `SmartText`.
+In every case the long name is the heading with a record loaded and the short one
+is the activity tab.
+
+### One identity resolved
+
+**`MODIFICATION` is `Treatment Modification Builder`.** `f_000243`'s heading reads
+`MODIFICATION ONCBCN RSH TRASTUZUMAB REDUCTION [2038] - 11/06/2013 [1] -
+Treatment Modification B…`. The model returned the record's first word as the
+screen name. Section 2's "do not seed it under either name" is now settled.
+
+## Of the 28, how much is specifiable
+
+24 inspected directly; 4 not yet opened (`Relationship Builder`, `SmartList`,
+`System SmartList`, `SmartPhrase Lookup`). Of the 24:
+
+- **22 are fully specifiable** — heading, toolbar, tabs, field labels, control
+  types, states, grid columns and visible rows all legible.
+- **2 are chrome-only and genuinely empty**: `Cycle Count` (toolbar + "Open
+  another location" + an empty body) and `Macro Editor` (search/Find/Create New
+  Macro/Alphabetize over an empty body). These are `observed_empty` — the state
+  was observed and it is empty — not `not_captured`. `Macro Editor` had 20 frames
+  of dwell and still shows nothing, which is the clearest proof that dwell time
+  and content are different things.
+
+## Five shells cover nineteen of the screens
+
+The build is far smaller than 28 separate screens:
+
+| Shell | Screens on it |
+| --- | --- |
+| **Workbench builder** — left rail breadcrumb, Open/Version/Save/Save As/Restore toolbar, read-only banner + `Try Lock`, tabs, tree or grid | Protocol Builder, Therapy Protocol Builder, Treatment Modification Builder, Order Group Builder, SmartForm Designer, Infusion Duration Table (6) |
+| **Security Class Editor** — Name + Comments, Security Points/Usage Report tabs, Toggle All + filter, Active/Number/Name/Categories grid, help-text pane | Beacon -, Therapy Plan - (2) |
+| **SmartTools** — icon rail (SmartTexts / SmartList / SmartPhrases / SmartLinks), editor pane, right-hand Settings panel | SmartText, System SmartPhrase, SmartLink, SmartList, System SmartList (5) |
+| **Two-step launcher wizard** | 6 picker configurations |
+| **Inventory activity pages** — mostly distinct, sharing the empty-state illustration idiom | Update Balances, Draft Medication Request, Direct Transfer, Inventory, Shortages, Inventory Workqueues, Lot and Expiration Manager, Adjust Par Levels, Cycle Count (9) |
+
+Standalone: `Episode Type` (11 tabs + overflow), `ProcDoc Charge Mapping Tester`,
+`Macro Editor`, `Inventory Item Selection`, `Relationship Builder`,
+`SmartPhrase Lookup`.
+
+## Bonus enumerations the frame pass turned up
+
+- **`Inventory: EMC Central Fill`'s own toolbar** lists the module's activities —
+  Create Request, Direct Transfer, Update Balances, Request Queue, Lot and
+  Expiration Manager, Inventory Item Report, Print Item List, Print Item Labels,
+  Adjust Par Levels, More. It includes both rows the `Inventory ▾` menu never
+  opened, so they are reachable two ways.
+- **The SmartTools left rail** lists SmartTexts, SmartList, SmartPhrases,
+  SmartLinks — partially recovering the `SmartTool Editors ▸` denominator that
+  section 2 recorded as unknown.
+
+## Headline
+
+**28 screens, 5 shells, 1 launcher wizard, 2 menus.** Not 45 pages, and not the
+14 I first estimated. 22 of the 28 are specifiable today from frames already in
+hand; 4 need a look; 2 are legitimately empty.
