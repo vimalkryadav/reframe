@@ -82,10 +82,26 @@ which are already maintained as part of normal development:
 | Source | Entries (at commit `9a0a4ad9`) | Contributes |
 | --- | --- | --- |
 | `frontend/lib/nav.ts` → `ACTIVITY_OVERRIDES` | 85 | Activity label → real route. Status `built`. |
-| `frontend/components/shell/modalActivities.ts` | 34 | Lookup-scoped activities. Status `lookup_scoped`. |
+| `frontend/components/shell/modalActivities.ts` | 34 | Lookup-scoped activities. Status `lookup_scoped`. Also a LABEL source — see below. |
 | `frontend/components/shell/menuConfig.ts` → `disabled: true` | 27 | Known but unbuilt. Status `disabled`. |
 | `frontend/components/shell/moduleChrome.ts` → toolbar dropdowns | 22 | Activities reachable only from the activity toolbar, not the ☰ menu. |
 | `frontend/app/**/page.tsx` | 150 | Ground truth on which routes actually exist. |
+
+### Why `modalActivities.ts` is a label source too
+
+Added for brief 15, and the same failure as the toolbar one. Five activities built
+in that brief had real pages but no menu path, because their menu path is a submenu
+nobody ever expanded. `modalActivities.ts` was already read for *status* but not
+for *labels*, so those five were invisible to `inventory.json` and would have come
+back `bucket: new` — a screen that exists reported as one that does not.
+
+Attaching them to a menu was not available: it would have meant inventing the
+contents of the unexpanded submenu. Reading the map that already lists them was.
+294 → 300 entries; the sixth was a pre-existing gap, `Patient Lookup`.
+
+The general rule this establishes: **if the app can reach an activity, some file
+names it, and that file is a candidate source.** A screen's reachability and its
+menu path are different facts, and the catalogue needs the first.
 
 ### Why the toolbar is a source
 
