@@ -12,7 +12,7 @@ no. Inherit spacing from existing primitives.
 
 ---
 
-## Read this first: three names in the catalogue are not screens
+## Read this first: four names in the catalogue are not screens
 
 The v02 catalogue lists `Protocol`, `Protocol Version`, `Order Group Contact` and
 `Locator` as screens. **They are not.** They are the two step labels of the
@@ -24,7 +24,12 @@ tab these builders open in. Do not create pages for any of them.
 
 ---
 
-## 1. The launcher wizard — one component, five configurations
+## 1. The launchers — TWO shapes, seven configurations
+
+> **SUPERSEDED — read the corrections at the end of this brief first.** This
+> section models every launcher as one two-step wizard with five configurations.
+> Both halves are wrong: three of the seven are single-step pickers with no step
+> chevrons at all, and the count is seven, not five.
 
 Every builder in this brief opens through the same two-step dialog. Three frames
 show it, and they agree on the shape:
@@ -321,3 +326,100 @@ renumber, and do not invent 2, 6, 7, 8.
 - [ ] `WILLOW_CAPTURE_GAPS.md` records: `Study Maintenance` never opened, ten of
       Episode Type's eleven tabs never opened, both Security Class Editor grids
       scroll beyond what was seen, and no builder was ever unlocked or edited
+
+
+---
+
+# Corrections after the build
+
+Seven, from the build session. The first three are structural and I verified each
+against the frames myself.
+
+## C1. There are TWO launcher shapes, not one
+
+My "one two-step wizard" model is wrong. The frames show two distinct dialogs:
+
+**Single-step pickers** — no step chevrons anywhere. A labelled search field, one
+grid, `+ Create a New Record`, then `✓ Accept` / `✗ Cancel`.
+
+| activity | search label | grid columns | rows |
+| --- | --- | --- | --- |
+| Beacon Security (`f_000311`) | `Security Class:` | `Security Class ID` · `Security Class Name` · `Application` | 8, `Records loaded: 8. All records loaded.` |
+| Episode Type Admin (`f_000252`) | `Episode Type:` | `Episode Type Name` · `Episode Type ID` | 13 visible, `Records loaded: 30. More records to load.` |
+| Therapy Plan Security | `Security Class:` | as Beacon Security | 7 |
+
+**Two-step wizards** — the chevron stepper, `Continue` on step 1, `Accept` on
+step 2. Protocol Builder, Treatment Modification Builder, Therapy Protocol
+Builder, Order Group Builder.
+
+So a launcher's shape depends on whether the record is versioned. Security classes
+and episode types are picked outright; protocols, order groups and treatment
+modifications need a contact chosen after the record.
+
+## C2. Three of the four "mid-load" launchers are fully captured
+
+I marked four configurations as mid-load and told you to seed their grids
+`not_captured`. Only **Protocol Builder's step 1** is genuinely mid-load. Beacon
+Security, Therapy Plan Security and Episode Type Admin are all fully loaded with
+their grids legible — see the table above. Transcribe them; do not mark them
+uncaptured.
+
+## C3. `f_000201` is Protocol Builder's step 2, and it has a sixth column
+
+I filed it as `protocol-step` and never described it. It is `Launching Protocol
+Builder` step 2, fully loaded, and its grid carries **`Contents`** — a column
+neither other step-2 grid has:
+
+`Number` · `Contact Date` · `Release Status` · `Publish Status` · **`Contents`** ·
+`Version Comment`
+
+Rows: `3 · 10/21/19 · Released · Not Published · Clinical Only` (selected) ·
+`2 · 7/12/18 · Released · Not Published · Clinical Only` ·
+`1 · 6/28/18 · Released · Not Published · Clinical Only`. All three `Released`,
+unlike the other two step-2 grids where only the top row is. `Contacts loaded: 3.
+All contacts loaded.`
+
+So the step-2 grid is **column-configured per activity**, not one fixed shape.
+
+## C4. `f_000252` is the picker, not the screen mid-load
+
+I wrote "the same screen mid-load; do not seed it as a second screen." Do not seed
+it as a second screen — but because it is the **`Launching Episode Type Admin`
+picker**, a different dialog entirely, not a half-rendered `Episode Type`.
+
+## C5. The `Recent` group is session state, not seed data
+
+At 04:14 the Episode Type picker has no `Recent` group and reads `Records loaded:
+30`. At 05:02, after that record had been opened, `Recent` holds exactly it and
+the count reads `31`. So `Recent` is produced by the session's own history.
+
+Do not seed a `Recent` group with fixed contents — it is a consequence of use.
+
+## C6. Order Group step 2's bottom two rows are legible
+
+I left rows 1 and 2 without a status. Both are `Retired` / `Retired`.
+
+## C7. Counting slips
+
+The "three names are not screens" heading lists four (plus `Workbench`, five).
+And §1 said "five configurations" while naming seven. Both fixed above.
+
+---
+
+## A measurement caution worth carrying forward
+
+The build session tried to verify my per-button greyed/enabled calls on the four
+builder toolbars by ink contrast, tilt-corrected and glyph-excluded, and **could
+not**. The split tracks the **glyph**, not the state: `Open`'s folder, `Save As`'s
+disk and `Metadata`'s pin all land at 127–154 regardless of state, while the low
+band mixes `Save` (transcribed greyed) with `Add Order` (transcribed enabled).
+
+So ink-contrast measurement resolves **label-only** controls — which is why it
+settled brief 10's four row actions — and is confounded by **iconned** ones. My
+toolbar greyed states in this brief therefore remain an eyeball transcription and
+should be treated as unverified until a cleaner capture exists. The negative
+result and its numbers are recorded in the gaps doc so nobody "corrects" the
+build from those measurements later.
+
+That is the right outcome: measurement that cannot decide should be reported as
+undecided, not resolved in whichever direction it leans.
