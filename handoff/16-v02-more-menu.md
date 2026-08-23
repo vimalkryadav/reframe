@@ -63,26 +63,58 @@ Three rows appear to carry **no icon** — `Medication Display Name Replacer`,
 and transcribe the absence rather than filling it, the way brief 12 handled the
 four unglyphed Beacon rows.
 
-### The one thing this frame does NOT settle: which parent owns the flyout
+### RESOLVED: `Build Tools` owns the flyout
 
-**Do not resolve this by inference.** Two readings, and the frame supports both:
+**This section previously reserved the parentage as unresolvable. That was wrong,
+and it was wrong because of a defect in my own reading.** Recorded here rather
+than deleted, because the reason matters more than the answer.
 
-- **Positional:** the flyout's first row (`Rule Editor`) sits level with
-  `Build Tools`, and Epic aligns a flyout to the row that opened it. → Build Tools.
-- **Highlight:** the box is on `Troubleshooting Tools`, not `Build Tools`. The
-  cursor is inside the flyout, so the parent row keeps its highlight — which
-  argues the highlighted row is the parent. → Troubleshooting Tools.
+What I claimed: the flyout aligns with `Build Tools`, but the highlight box sits on
+`Troubleshooting Tools`, so the two arguments conflict and the frame cannot decide.
 
-There is also a semantic lean: a list containing `Rule Editor`, `Property
-Editor`, `Column Editor`, `Grouper Editor`, `Data Courier`, `Compare Record`,
-`Category List Maintenance` and `Workflow Engine Rule` reads far more like build
-tooling than troubleshooting. **That is a guess about meaning, not evidence about
-pixels**, and it must not decide the seed.
+What measurement shows. Per-row background sampled as **blue-minus-red**, chosen
+because a selection tint raises blue relative to red while a lighting gradient
+moves all channels together:
 
-So: transcribe the 20 rows, attach them to **neither** parent, and record the
-ambiguity with both arguments. Both parents keep `hasMore: true`. This is the same
-treatment brief 15 gave `ProcDoc Charge Mapping Tester`'s parentage, and for the
-same reason.
+| row | b−r | luminance |
+| --- | --- | --- |
+| Troubleshooting Tools | −5.0 | 229.0 |
+| **Build Tools** | **+11.0** | 201.3 |
+| Content Management | −3.0 | 210.0 |
+| Record Viewer | −4.0 | 205.0 |
+| flyout background, y200 / y400 / y700 | −5.0 / −5.0 / −5.0 | 184.7 → 179.7 |
+
+Two independent confirmations beyond the 16-unit separation:
+
+1. **The metric's invariance is demonstrated on this frame.** The flyout background
+   holds b−r = −5.0 across a 500px span while luminance drifts 184.7 → 179.7. So
+   the +11.0 on `Build Tools` is chromatic, not illumination.
+2. **The blue plateau spans y78–120 — one 41px row pitch, bracketing `Build
+   Tools`.** Extent corroborates magnitude.
+
+And the confound is identified: `Troubleshooting Tools` is the **brightest** band in
+the panel (lum 229, R 230) while chromatically neutral. I read the brightest row as
+the highlighted row. That is a luminance artifact of handheld footage — the same
+error class as brief 13's Lot and Expiration controls, which looked washed out and
+measured enabled.
+
+So the positional and highlight arguments **agree**: attach the 20 rows to
+`Build Tools`.
+
+`Troubleshooting Tools` keeps `hasMore: true` with **no children** — its submenu
+genuinely was never expanded. It simply is not this flyout's parent.
+
+**Why this overrides "do not resolve by inference".** That instruction bars
+guessing from meaning — the "these look like build tools" argument, which remains
+inadmissible. Measurement on an illumination-invariant metric, corroborated by
+plateau extent, is not inference. The same method correctly reported brief 14's
+toolbar greyed states as *undecided* when it turned out to be glyph-confounded; a
+method that reports its own failures is one to trust when it reports a result.
+
+**Exporter consequence.** As `Build Tools` children the 20 rows now reach
+`inventory.json` with `module` = the toolbar button's label, `More`, per brief 12's
+decision. The entry count will move well past 300 — state the new total so the jump
+is explained rather than discovered later.
 
 ### `Security Class Editor` appears here too
 
@@ -159,9 +191,9 @@ it a dismiss path, say in the comment that the path is unevidenced.
 - [ ] `More ▾` opens a real menu; its row count is stated as exact **only** if the
       panel's bottom border is visible under `Record Viewer`, otherwise recorded
       as a floor
-- [ ] The 20 flyout rows are transcribed in order, attached to **neither** parent,
-      with both parents keeping `hasMore: true` and the ambiguity recorded
-      including the positional and highlight arguments
+- [ ] The 20 flyout rows are transcribed in order and attached to **`Build
+      Tools`**, per the resolved measurement; `Troubleshooting Tools` keeps
+      `hasMore: true` with no children
 - [ ] `Medication Warnings Admin ▸` and `Medication Management ▸` have chevrons
       and no children
 - [ ] Unglyphed rows are transcribed as unglyphed
