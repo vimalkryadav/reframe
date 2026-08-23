@@ -54,6 +54,48 @@ OurPractice Advisory               Report/HTML Assistance
 Read as a single column top-to-bottom in that order — the two columns above are
 this document's layout, not the menu's.
 
+**CORRECTED: the flyout has seven separators, and this listing omitted them.**
+Measured after the fact — a 15–36 point dark dip at each, against +2 to +3 for
+ordinary row gaps, with row pitch widening to 43–45px from 38–41px at exactly the
+same seven boundaries. Ink and layout agreeing on the same positions, and the dips
+confined to the panel rather than crossing it, which rules out a scanline or
+gradient artifact.
+
+Rules fall after rows 7, 9, 10, 11, 14, 15 and 19, giving eight groups:
+
+```
+Rule Editor · Property Editor · Scoring System Editor · Column Editor ·
+Medication Warnings Admin ▸ · Medication Management ▸ · Medication Display Name Replacer
+———
+Frequency Editor · Order-Specific Question Editor
+———
+OurPractice Advisory
+———
+Grouper Editor
+———
+Data Courier · Compare Record · Content Management · Category List Maintenance
+———
+User Security
+———
+Security Class Editor · Second Sign Editor - Full Access · Workflow Engine Rule
+———
+Report/HTML Assistance
+```
+
+Four of the eight groups are singletons, which looks odd and is idiomatic here:
+`RX_ADMIN_GROUPS` already has three — `Medication List Admin`, `Merchandise and Fee
+Admin` and `Cart Admin` each sit alone. No defence needed.
+
+Two things to settle while building: whether seven is the **total or a floor** (a
+rule clipped at the flyout's top or bottom edge would change the grouping — same
+border test as the `More ▾` panel's four rows), and whether the dip and the pitch
+signals ever **disagree**. If any boundary has one without the other it is weaker
+than the other six and should be recorded that way rather than averaged in.
+
+This is the second time a menu's separators were missing from one of my listings —
+brief 12's Beacon menu was the first. Menu transcriptions should record group
+boundaries as a matter of course, not as an afterthought.
+
 `Medication Warnings Admin ▸` and `Medication Management ▸` carry their own
 chevrons and **were not expanded**. Give them `hasMore: true` and no children, as
 brief 12 did for `SmartForms` and `SmartTool Editors`.
@@ -194,6 +236,8 @@ it a dismiss path, say in the comment that the path is unevidenced.
 - [ ] The 20 flyout rows are transcribed in order and attached to **`Build
       Tools`**, per the resolved measurement; `Troubleshooting Tools` keeps
       `hasMore: true` with no children
+- [ ] The flyout renders **eight groups** separated by seven rules, in the
+      positions above; seven is stated as exact or as a floor per the edge check
 - [ ] `Medication Warnings Admin ▸` and `Medication Management ▸` have chevrons
       and no children
 - [ ] Unglyphed rows are transcribed as unglyphed
