@@ -62,7 +62,12 @@ Rail shows `A [103487]` selected under `SmartPhrases`.
 - Then `📖 Synonyms` and **`Overrides`**, both collapsed.
 - Footer: `Open` · `Preview` · `× Close`.
 
-**`Mnemonic` does not exist on brief 15's loaded SmartLink** (`smartlink-f_000538`),
+**`Mnemonic` does not exist as a FIELD on brief 15's loaded SmartLink**
+(`smartlink-f_000538`). It does already appear in the repo as a grid *column* in one
+of brief 15's pickers — that is a different thing, and finding it there is not
+evidence the editor has it. Here it is an editable Settings field.
+
+The loaded view (`smartlink-f_000538`)
 which shows `Refreshable Settings`, `Default Configuration`, `Contexts`,
 `Admin Notes` and `Used By SmartTools` instead. That asymmetry is the evidence these
 are two states of one screen rather than two screens — model accordingly.
