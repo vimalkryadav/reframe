@@ -113,6 +113,34 @@ The corollary for reviewers: a PR that adds a menu, a dropdown, a cascade or a
 route-only screen should be checked against the exporter's output, not just against
 the screen. The entry count moving is the evidence the change is finished.
 
+#### `disabled` is a claim about the menu row, not about the screen
+
+Found while merging a parallel implementation: deriving status from menu semantics
+alone reported `Record Viewer` as `disabled` with no route, when it has been built
+at `/roi/record-viewer` since the HIM work. A greyed menu row means *this row does
+not navigate*. It does not mean the screen is absent, and `disabled` must not
+short-circuit the ladder before reachability is read.
+
+So: **an `ACTIVITY_OVERRIDES` entry is evidence of reachability and outranks a menu
+row's `disabled` flag.** A screen can be greyed in one menu and live at a route,
+and the catalogue has to say `built`, because that is what a consumer needs to know.
+
+#### The remedy for menu data held inside a component is to move it, not to parse it
+
+Two more instances turned up on `main` — a `MoreMenu` and a `BuildToolsMenu` holding
+their rows as inline component data, so an In Basket suite and `Department
+Providers` are named by no file the exporter reads.
+
+By the rule above they are sources. But the fix is **not** to teach the exporter to
+parse components: inline JSX data is a moving target, and an exporter that guesses at
+it will eventually emit an entry nobody wrote. The fix is to extract the data to a
+config module, which is what `willowMenus.ts` already exists to be — brief 10 split
+the Willow menus out of a component for exactly this reason.
+
+**Menu contents are configuration. A menu whose rows live only inside its renderer
+is uncataloguable by construction**, and that is a defect in the component rather
+than a gap in the contract.
+
 ### Why `modalActivities.ts` is a label source too
 
 Added for brief 15, and the same failure as the toolbar one. Five activities built
