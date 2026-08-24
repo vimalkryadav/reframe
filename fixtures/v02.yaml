@@ -30,11 +30,14 @@ sample_fps: 1
 #
 # NOT CHECKED, and left exactly as the run wrote it:
 #   * `bucket` on every entry — a property of the project, not the footage
-#   * the 20 entries with `name: null` — the title band was illegible. ONE of
-#     them is known: 02:31 is `Launching Adjust Par Levels`, read at 4x. It is
-#     left null rather than corrected because `known_misread` records a WRONG
-#     read, not an ABSENT one, so naming it here would report a regression on
-#     every run. See DECISIONS.md open questions.
+#   * three of the twenty formerly-null entries — 00:42, 04:56 and 05:48. Each is
+#     the hub with a menu open; the hub is built, so nothing turns on naming them
+#     and nobody has opened those particular frames.
+#
+# The other seventeen formerly-null entries now carry `unread: true` with the name
+# a human read off the frame (DEC-031). `unread` says "expect the pipeline to
+# return nothing, and here is the truth" — so the knowledge lives in the fixture
+# where verify can see it, instead of in a comment where it cannot.
 # CHECKED since: `Workbench` at 03:36/03:48 and `SmartTools` at 08:36/08:49 were
 #     all four workspace tab labels, now corrected below. Two are alternate states
 #     of screens already built (Protocol Builder scrolled, Order Group Builder).
@@ -64,7 +67,9 @@ screens:
     bucket: new
     note: "identified at 0.66 — verify this name; resembles 'Inventory Management Admin' (0.60)"
   - t: "00:21"
-    name: null
+    # Read off the frame — the picker itself; built by brief 13.
+    name: "Inventory Item Selection"
+    unread: true
     bucket: new
     note: "identified at 0.74 — verify this name"
   - t: "00:23"
@@ -89,7 +94,9 @@ screens:
     module: "Willow"
     bucket: built
   - t: "00:36"
-    name: null
+    # Read off the frame — a Location picker; built by brief 13.
+    name: "Launching Inventory"
+    unread: true
     bucket: new
     note: "identified at 0.70 — verify this name"
   - t: "00:42"
@@ -175,11 +182,15 @@ screens:
     bucket: new
     note: "resembles 'Estimates' (0.56)"
   - t: "01:43"
-    name: null
+    # Read off the frame — with the Affected Packages lookup open — brief 17.
+    name: "Shortages"
+    unread: true
     bucket: new
     note: "identified at 0.92 — verify this name"
   - t: "01:46"
-    name: null
+    # Read off the frame — the same lookup, scrolled — brief 17.
+    name: "Shortages"
+    unread: true
     bucket: new
     note: "identified at 0.92 — verify this name"
   - t: "01:48"
@@ -231,7 +242,9 @@ screens:
     bucket: built
     note: "identified at 0.96 — verify this name"
   - t: "02:31"
-    name: null
+    # Read off the frame — read at 4x; the title band defeats the pipeline.
+    name: "Launching Adjust Par Levels"
+    unread: true
     bucket: new
     note: "identified at 0.69 — verify this name"
   - t: "02:36"
@@ -325,7 +338,9 @@ screens:
     bucket: built
     note: "identified at 0.58 — verify this name"
   - t: "03:44"
-    name: null
+    # Read off the frame — step 1 of the launcher; built by brief 14.
+    name: "Launching Order Group Builder"
+    unread: true
     bucket: new
     note: "identified at 0.71 — verify this name"
   - t: "03:46"
@@ -355,7 +370,9 @@ screens:
     bucket: built
     note: "identified at 0.55 — verify this name"
   - t: "03:57"
-    name: null
+    # Read off the frame — mid-load; built by brief 14.
+    name: "Launching Treatment Modification Builder"
+    unread: true
     bucket: new
     note: "identified at 0.75 — verify this name"
   - t: "03:59"
@@ -394,7 +411,9 @@ screens:
     bucket: new
     note: "identified at 0.57 — verify this name; resembles 'NDC Admin' (0.71)"
   - t: "04:14"
-    name: null
+    # Read off the frame — built by brief 14.
+    name: "Launching Episode Type Admin"
+    unread: true
     bucket: new
     note: "identified at 0.68 — verify this name"
   - t: "04:17"
@@ -455,11 +474,15 @@ screens:
     bucket: new
     note: "identified at 0.58 — verify this name; resembles 'NDC Admin' (0.71)"
   - t: "05:04"
-    name: null
+    # Read off the frame — built by brief 14.
+    name: "Launching Episode Type Admin"
+    unread: true
     bucket: new
     note: "identified at 0.69 — verify this name"
   - t: "05:06"
-    name: null
+    # Read off the frame — built by brief 14.
+    name: "Launching Episode Type Admin"
+    unread: true
     bucket: new
     note: "identified at 0.68 — verify this name"
   - t: "05:08"
@@ -493,7 +516,9 @@ screens:
     bucket: built
     note: "identified at 0.93 — verify this name"
   - t: "05:26"
-    name: null
+    # Read off the frame — built by brief 14.
+    name: "Launching Therapy Protocol Builder"
+    unread: true
     bucket: new
     note: "identified at 0.70 — verify this name"
   - t: "05:28"
@@ -536,7 +561,9 @@ screens:
     module: "Willow"
     bucket: built
   - t: "05:53"
-    name: null
+    # Read off the frame — built by brief 15.
+    name: "Research Study Lookup"
+    unread: true
     bucket: new
     note: "identified at 0.87 — verify this name"
   - t: "06:01"
@@ -567,7 +594,9 @@ screens:
     bucket: built
     note: "identified at 0.96 — verify this name"
   - t: "06:31"
-    name: null
+    # Read off the frame — launcher-shaped; built by brief 15.
+    name: "Select a SmartForm"
+    unread: true
     bucket: new
     note: "identified at 0.93 — verify this name"
   - t: "06:34"
@@ -596,7 +625,9 @@ screens:
     module: "Willow"
     bucket: built
   - t: "07:06"
-    name: null
+    # Read off the frame — built by brief 15.
+    name: "Launching Relationship Builder"
+    unread: true
     bucket: new
     note: "identified at 0.69 — verify this name"
   - t: "07:08"
@@ -666,7 +697,9 @@ screens:
     bucket: new
     note: "identified at 0.44 — verify this name; resembles 'SmartTools' (0.63)"
   - t: "07:58"
-    name: null
+    # Read off the frame — built by brief 15.
+    name: "Launching SmartTexts"
+    unread: true
     bucket: new
     note: "identified at 0.66 — verify this name"
   - t: "08:00"
@@ -698,7 +731,9 @@ screens:
     bucket: new
     note: "identified at 0.74 — verify this name; resembles 'SmartTools' (0.74)"
   - t: "08:25"
-    name: null
+    # Read off the frame — built by brief 15.
+    name: "Launching SmartLists"
+    unread: true
     bucket: new
     note: "identified at 0.71 — verify this name"
   - t: "08:27"
@@ -735,7 +770,9 @@ screens:
     bucket: new
     note: "identified at 0.93 — verify this name; resembles 'Pharmacy System Definitions' (0.53)"
   - t: "08:47"
-    name: null
+    # Read off the frame — built by brief 15.
+    name: "Launching SmartLinks"
+    unread: true
     bucket: new
     note: "identified at 0.65 — verify this name"
   - t: "08:49"

@@ -65,6 +65,14 @@ class FixtureScreen(BaseModel):
     # Only ever set this from a frame a human has actually read. Recording a value
     # here silences a regression, so a guess would silence a real one.
     known_misread: str | None = None
+    # True when the pipeline reads NO name here and a human has read one off the
+    # frame. The sibling of `known_misread`: that field records a wrong read, this
+    # one an absent read. Without it, recording the truth reports a regression on
+    # every run and the name has to live in a comment instead (DEC-031).
+    #
+    # Set it only alongside a `name` a human has actually read. On its own it says
+    # nothing; with a name it says "expect null, the truth is this".
+    unread: bool = False
     note: str | None = None
 
     def t_ms(self) -> int:
@@ -292,7 +300,19 @@ def _compare_screen(
     if expected.name and actual_name != expected.name:
         # A read the fixture already records as wrong is a standing defect, not a
         # new one. Reported either way; only an UNEXPECTED name fails the gate.
-        if expected.known_misread is not None and actual_name == expected.known_misread:
+        if expected.unread and actual_name is None:
+            findings.append(
+                Finding(
+                    status="misread",
+                    slug=fixture.slug,
+                    t_ms=expected.t_ms(),
+                    message=(
+                        f"still unread; truth is {expected.name!r} "
+                        "(read off the frame by a human)"
+                    ),
+                )
+            )
+        elif expected.known_misread is not None and actual_name == expected.known_misread:
             findings.append(
                 Finding(
                     status="misread",
@@ -313,6 +333,12 @@ def _compare_screen(
                     + (
                         f" (recorded misread was {expected.known_misread!r})"
                         if expected.known_misread is not None
+                        else ""
+                    )
+                    + (
+                        " (recorded as unread — the pipeline now returns a name, "
+                        "which is progress, but not the expected one)"
+                        if expected.unread and actual_name is not None
                         else ""
                     ),
                 )

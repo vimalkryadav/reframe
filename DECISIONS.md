@@ -1121,6 +1121,46 @@ regressions, which would mask a genuine break as soon as one landed.
 
 ---
 
+## DEC-031 — A fixture can record a name the pipeline cannot read
+
+Decided 2026-08-24, extending DEC-030 to the case it explicitly did not cover.
+
+DEC-030 let a fixture record a read the pipeline gets **wrong**. It could not record
+one the pipeline does not make **at all** — a screen whose title band is illegible to
+OCR and to the model, but which a human has read off the frame at high zoom. Writing
+the truth into `name` reported a regression on every run; leaving `name: null`
+recorded less than was known. So the knowledge went into a YAML comment, where
+`verify` cannot see it.
+
+That looked like one entry. It was seventeen — about a tenth of v02's fixture,
+holding `null` for screens whose identity the build sessions had already
+established: pickers named by their own dialog title, the Shortages lookup that
+became brief 17, and `Launching Adjust Par Levels`, read at 4x.
+
+**Decided:** a fixture screen may carry `unread: true` alongside a `name`. It means
+*expect the pipeline to return nothing here, and the truth is this*.
+
+- A `null` read reports `misread`, not a regression, and names the human-read truth.
+- **Any other value is still a regression**, with a message saying the entry was
+  recorded as unread — the pipeline producing a name is progress, but progress that
+  disagrees must not pass silently.
+- A run that reads it **correctly** reports nothing. As with `known_misread`, a
+  closed gap goes quiet.
+- The flag alone excuses nothing. Without a `name` it says nothing at all, so it
+  cannot be used to wave away an entry nobody has actually read.
+
+**Why it earns its keep.** The pair now covers both ways a read can be wrong, and
+the reason is the same one DEC-030 gave: a fixture that cannot express a standing
+defect turns the gate into noise. Seventeen instances is a stronger case than the
+two that motivated DEC-030, not a weaker one.
+
+**Rejected:** filling the names in without a flag — that is option C, seventeen
+regressions per run, exactly where DEC-030 started. Also rejected: leaving them in
+comments, which keeps the fixture honest and thin while making it unable to notice
+either a fix or a new misread on any of the seventeen.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.
@@ -1134,13 +1174,8 @@ Not yet decided. None block starting.
 - **Capture resolution.** If the laptop ran at a high resolution, text will be
   physically small in frame and OCR will struggle more. May push `sample.fps` or
   the montage crop. Checkable on the first frame.
-- **How a fixture records a name the pipeline cannot read at all.** DEC-030
-  settled the wrong-read case; the unread case is still open. v02's 02:31 is
-  `Launching Adjust Par Levels`, read off the frame at 4x, and the fixture leaves
-  it `null` because recording the truth would report a regression on every run.
-  Nineteen more entries are `null` and unaudited, so this will recur. Options: a
-  sentinel `known_misread` meaning "reads nothing", a separate `unread: true`, or
-  accepting that a fixture cannot hold what the pipeline cannot express.
+- **(SETTLED by DEC-031) How a fixture records a name the pipeline cannot read at
+  all.** Kept for the trail.
 - **(SETTLED by DEC-030) How a fixture records a read the model gets wrong every
   time.** Kept for the trail. v01's fixture carries two
   hand-corrections — `Package` → `NDC Admin`, `Orderable medication` →
