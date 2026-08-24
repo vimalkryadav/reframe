@@ -27,8 +27,14 @@ the Settings fields.
 
 ## 1. `f_000516` (08:36) — a blank editor with a `Levels` panel
 
-The rail still shows `16676 [21538]` selected under `SmartList`, so a record is
-loaded elsewhere while this editor is blank.
+The rail lists `16676 [21538]` under `SmartList`. **Corrected: it is NOT
+highlighted** — plain dark text, measured against `f_000538` where the active record
+is a saturated band with reversed text. Nothing is selected in either create-state,
+which *strengthens* the reading: no record loaded means nothing to highlight.
+
+The rail also **accumulates** across the session — one record at `f_000516`, two at
+`f_000529`, three at `f_000538` — with at most one highlighted. Brief 15 could only
+store the single active record, so this needs a column.
 
 - **Editor pane**: the full toolbar — `B` · undo · `?` · `Insert SmartText` ·
   `Insert SmartList` · a list glyph · scissors with caret · `•••` at the right —
@@ -39,8 +45,10 @@ loaded elsewhere while this editor is blank.
   segmented control rendered** · `☐ Released` unchecked
 - Then `📖 Synonyms`, collapsed — and **`Levels`**, a green-headed collapsed panel
   that **no built screen has**.
-- Footer: `Open` · `Preview` only. No `Create Copy`, no `Save`, no `Accept`, no
-  `Cancel` — brief 15's loaded editors all have those.
+- Footer: `Open` · `Preview` · `✕ Close`. **Corrected — I first wrote "Open ·
+  Preview only" here and "adds ✕ Close" for the other screen; both footers are the
+  same three.** The absences are right: no `Metadata`, `Create Copy`, `Save`,
+  `Accept` or `Cancel`, all of which brief 15's loaded editors have.
 
 **Which record type this creates is not settled.** The rail selection points at
 `SmartList` but the toolbar is the SmartText/SmartPhrase one, and `Levels` appears
@@ -51,7 +59,7 @@ The red `!` is the only red pixel in the frame. What it means is not evidenced.
 
 ## 2. `f_000529` (08:49) — the SmartLink create-state
 
-Rail shows `A [103487]` selected under `SmartPhrases`.
+Rail lists `A [103487]` under `SmartPhrases`, again **not** highlighted.
 
 - **Editor pane**: the balloon empty state, with a **heart/pulse tile** beside it
   and the caption **`Select a SmartLink type.`** The mountain backdrop is the same
@@ -60,7 +68,7 @@ Rail shows `A [103487]` selected under `SmartPhrases`.
   · `SmartLink Type` — **label only, no control** · `Search Availability ⓘ` —
   **label only, no segmented control** · `☐ Released` unchecked
 - Then `📖 Synonyms` and **`Overrides`**, both collapsed.
-- Footer: `Open` · `Preview` · `× Close`.
+- Footer: `Open` · `Preview` · `✕ Close` — identical to the other create-state.
 
 **`Mnemonic` does not exist as a FIELD on brief 15's loaded SmartLink**
 (`smartlink-f_000538`). It does already appear in the repo as a grid *column* in one
@@ -87,6 +95,17 @@ beneath them, where the loaded editors render full segment groups. Brief 13's
 different thing and should not be flattened into it.
 
 ---
+
+## Three things the build added that this brief did not have
+
+- **Neither create-state has a heading.** `f_000518` heads with `System SmartPhrase
+  – A [103487]`; both create-state heading bands are blank. Render no empty `h1`.
+- **`f_000529`'s `Description` has no `Populate from Text` link** where `f_000516`'s
+  does. This brief mentioned it only for the latter, which was right, but the
+  asymmetry deserves to be explicit.
+- **The `•••` toolbar overflow is on brief 15's loaded `System SmartPhrase` too** —
+  the two toolbars are identical button-for-button, and that renderer had omitted
+  it. A brief-15 defect these frames exposed.
 
 ## Acceptance
 
