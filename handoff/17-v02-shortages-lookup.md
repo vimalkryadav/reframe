@@ -85,11 +85,15 @@ shows. Do not dedupe it and do not fill the blanks — whether the bold row is a
 different widths. Transcribe each exactly. A normaliser here would be inventing a
 format the source does not use.
 
-**`Status` is glyph-only.** Five rows carry ⚠ and the rest are blank. There is no
+**`Status` is glyph-only.** **Four** rows carry ⚠ and the rest are blank — the row
+table above is correct and this prose originally said five, twice. Confirmed by an
+amber-pixel scan of the Status column across both frames. There is no
 text and no legend in frame, so what the warning means is not evidenced.
 
-**`FOUNDATION SYSTEM …` is clipped** by the column width on every row that has it.
-Carry it clipped.
+**Two columns clip, not one.** `FOUNDATION SYSTEM …` is cut on every row that has
+it, and **both `SULFAMETHOXAZOLE-TRIMETHOPRIM` medication names are cut too**, with
+a visible ellipsis. The row table carries both, so seeding from the table is right;
+this callout understated it.
 
 ## One cross-video observation, offered as context only
 
@@ -111,7 +115,7 @@ grid, that is exactly the borrowing brief 04's `Identity/ADS` note already refus
 - [ ] The duplicated bold first row is preserved, its blanks left blank, and the
       question of what it is recorded rather than answered
 - [ ] NDC codes keep their inconsistent punctuation; no normaliser
-- [ ] `Status` renders the ⚠ glyph on the five rows that have it and nothing on the
+- [ ] `Status` renders the ⚠ glyph on the four rows that have it and nothing on the
       rest; what it means is recorded as unevidenced
 - [ ] `FOUNDATION SYSTEM …` stays clipped
 - [ ] The other four Shortages lookups stay empty — only `Affected Packages` was

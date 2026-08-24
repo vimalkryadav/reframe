@@ -35,10 +35,12 @@ sample_fps: 1
 #     left null rather than corrected because `known_misread` records a WRONG
 #     read, not an ABSENT one, so naming it here would report a regression on
 #     every run. See DECISIONS.md open questions.
-#   * `Workbench` at 03:36/03:48 and `SmartTools` at 08:36/08:49 are workspace
-#     tab labels rather than screens, on the same evidence that settled
-#     `Pharmacy Admin` — but nobody has opened those particular frames, so they
-#     are NOT corrected here. Do that before trusting them.
+# CHECKED since: `Workbench` at 03:36/03:48 and `SmartTools` at 08:36/08:49 were
+#     all four workspace tab labels, now corrected below. Two are alternate states
+#     of screens already built (Protocol Builder scrolled, Order Group Builder).
+#     TWO ARE NOT BUILT: the blank create-states at 08:36 and 08:49, which carry a
+#     `Levels` panel and a `Mnemonic` field respectively that no built screen has.
+#     Those need a brief.
 
 screens:
   - t: "00:00"
@@ -300,7 +302,11 @@ screens:
     bucket: new
     note: "resembles 'Bed Control' (0.52)"
   - t: "03:36"
-    name: "Workbench"
+    # Corrected. f_000216: "Workbench" is the WORKSPACE TAB. This is Protocol Builder
+    # scrolled down — same heading, toolbar and read-only banner — showing an
+    # Emergency Medications section brief 14 never transcribed.
+    name: "Protocol Builder"
+    known_misread: "Workbench"
     bucket: new
     note: "identified at 0.60 — verify this name; resembles 'Workqueues' (0.53)"
   - t: "03:38"
@@ -329,7 +335,9 @@ screens:
     bucket: new
     note: "identified at 0.77 — verify this name; resembles 'Call Group On-Call Schedule' (0.59)"
   - t: "03:48"
-    name: "Workbench"
+    # Corrected. f_000228: workspace tab again; the pane is titled "Order Group Properties".
+    name: "Order Group Builder"
+    known_misread: "Workbench"
     bucket: new
     note: "identified at 0.57 — verify this name; resembles 'Workqueues' (0.53)"
   - t: "03:50"
@@ -710,7 +718,11 @@ screens:
     bucket: new
     note: "identified at 0.68 — verify this name; resembles 'Family Lookup' (0.63)"
   - t: "08:36"
-    name: "SmartTools"
+    # Corrected. f_000516: workspace tab. A BLANK new-record editor on the SmartTools shell,
+    # with a Levels panel no built screen has. Name is the closest activity; the
+    # record type is not settled by this frame.
+    name: "SmartText"
+    known_misread: "SmartTools"
     module: "Tools"
     bucket: new
   - t: "08:38"
@@ -727,7 +739,10 @@ screens:
     bucket: new
     note: "identified at 0.65 — verify this name"
   - t: "08:49"
-    name: "SmartTools"
+    # Corrected. f_000529: workspace tab. The blank SmartLink CREATE state — "Select a
+    # SmartLink type." plus a Mnemonic field the loaded view does not show.
+    name: "SmartLink"
+    known_misread: "SmartTools"
     module: "Tools"
     bucket: new
     note: "identified at 0.62 — verify this name"

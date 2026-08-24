@@ -339,3 +339,47 @@ Standalone: `Episode Type` (11 tabs + overflow), `ProcDoc Charge Mapping Tester`
 **28 screens, 5 shells, 1 launcher wizard, 2 menus.** Not 45 pages, and not the
 14 I first estimated. 22 of the 28 are specifiable today from frames already in
 hand; 4 need a look; 2 are legitimately empty.
+
+---
+
+# 10. Closing the audit — what the fixture's unaudited entries turned out to be
+
+v02's fixture was recorded with 20 `name: null` entries and four workspace-tab
+labels nobody had opened. Auditing all 24:
+
+| | count | outcome |
+| --- | --- | --- |
+| Launcher/picker states of built screens | 14 | already covered |
+| The hub with a menu open | 4 | already covered |
+| Shortages' populated `Affected Packages` lookup | 2 | **brief 17** |
+| Alternate states of built screens | 2 | Protocol Builder scrolled, Order Group Builder |
+| **Blank create-states, not built** | **2** | **need a brief** |
+
+## The two that still need building
+
+Both are on the SmartTools shell, both are the **new-record** state, and neither is
+a variant of what brief 15 built — brief 15's editors all had a record loaded.
+
+**`f_000516` (08:36)** — a blank editor: empty `Name`, `Description` with a
+`Populate from Text` link, `Text Format` with **no segment selected**, unchecked
+`Released`, then `Synonyms` and a green **`Levels`** panel. No built screen has
+`Levels`. Which record type this creates is not settled by the frame; `SmartText` is
+the closest activity, not a confirmed identity.
+
+**`f_000529` (08:49)** — the blank **SmartLink** create-state: `Select a SmartLink
+type.` centred over the balloon empty state, and a Settings panel carrying `Name`,
+**`Mnemonic`**, `Description`, `SmartLink Type`, `Search Availability ⓘ`, unchecked
+`Released`, `Synonyms`, `Overrides`. Brief 15's loaded SmartLink shows neither
+`Mnemonic` nor a type-selection state.
+
+Both frames are staged in `~/build-evidence/17-v02-shortages-lookup/`'s sibling —
+they are **not** yet shipped anywhere. Ship them before citing them; that mistake
+has now been made twice in this sequence.
+
+## What this closes
+
+Every one of v02's 168 fixture entries has now been either audited against a frame
+or explicitly marked unaudited. 13 carry `known_misread`. The remaining `null`
+entries are launcher states whose parent screens are built, and one — 02:31,
+`Launching Adjust Par Levels` — is a name a human has read that the fixture format
+cannot yet express (DEC-030's open question).
