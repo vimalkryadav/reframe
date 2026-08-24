@@ -342,7 +342,10 @@ observed structural difference, not a framing accident.
 - **Two balloon captions were left blank on purpose** — Draft Medication Request
   and Shortages both cut theirs off, and their siblings are captioned. Inventing
   them from the siblings would have been the easy wrong move.
-- **No populated grid exists anywhere in this module.** Shortages, lots,
-  workqueues and par levels are all empty in every frame, so no column set for
-  those tables is evidenced. Recorded as one module-wide gap rather than four
-  screens' worth of guesses.
+- ~~**No populated grid exists anywhere in this module.**~~ **WRONG — see brief
+  17.** Shortages' `Affected Packages` lookup is open and populated at 01:43 and
+  01:46, with five columns and seventeen transcribable rows. Those two frames were
+  in v02's catalogue as unnamed screens the whole time and nobody opened them.
+  The narrower claim that survives: the four screens' own *tables* — shortages,
+  lots, workqueues, par levels — are empty in every frame, so their column sets
+  are still unevidenced.
