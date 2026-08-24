@@ -87,6 +87,32 @@ which are already maintained as part of normal development:
 | `frontend/components/shell/moduleChrome.ts` → toolbar dropdowns | 22 | Activities reachable only from the activity toolbar, not the ☰ menu. |
 | `frontend/app/**/page.tsx` | 150 | Ground truth on which routes actually exist. |
 
+### The standing rule: if a structure names an activity, the exporter walks it
+
+Three times now a real activity has been invisible to `inventory.json` because the
+file naming it was not read — toolbar dropdown contents (brief 12), the modal-activity
+map (brief 15), and a `moreMenu` field a parallel implementation introduced. Each
+time the symptom was identical: reframe reports `bucket: new` for a screen that was
+built weeks earlier, which is indistinguishable from a screen the target really
+lacks, and that is the one confusion this file exists to remove.
+
+Enumerating sources one at a time has now failed three times, so the rule is the
+general one:
+
+> **Any structure in the consuming project that names an activity is a source, and
+> adding such a structure without teaching the exporter to walk it is an incomplete
+> change.**
+
+A screen's *reachability* and its *menu path* are different facts. The catalogue
+needs the first. Where a screen has no menu path at all, its label belongs in
+`ACTIVITY_OVERRIDES` — which is label→route by design — rather than being derived
+from its route, because un-slugifying a path into a name lets a directory name
+become an activity name.
+
+The corollary for reviewers: a PR that adds a menu, a dropdown, a cascade or a
+route-only screen should be checked against the exporter's output, not just against
+the screen. The entry count moving is the evidence the change is finished.
+
 ### Why `modalActivities.ts` is a label source too
 
 Added for brief 15, and the same failure as the toolbar one. Five activities built
