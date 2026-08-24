@@ -57,6 +57,14 @@ class FixtureScreen(BaseModel):
     module: str | None = None
     # Time-varying: a property of the consuming project at `inventory_commit`.
     bucket: Bucket | None = None
+    # What the pipeline reads here when it is WRONG, and a human has corrected
+    # `name` above. A standing defect, not a regression: it was already wrong when
+    # the fixture was written and it will be wrong on every run until the model or
+    # the prompt changes. Reported as `misread` so the gate stays usable (DEC-030).
+    #
+    # Only ever set this from a frame a human has actually read. Recording a value
+    # here silences a regression, so a guess would silence a real one.
+    known_misread: str | None = None
     note: str | None = None
 
     def t_ms(self) -> int:
@@ -103,7 +111,7 @@ class Fixture(BaseModel):
             raise FixtureError(f"{path} is not a valid fixture:\n{exc}") from exc
 
 
-Status = Literal["regression", "drift", "unfixtured", "gap", "closed"]
+Status = Literal["regression", "misread", "drift", "unfixtured", "gap", "closed"]
 
 
 @dataclass(frozen=True)
@@ -121,6 +129,7 @@ class Finding:
     def render(self) -> str:
         marks: dict[Status, str] = {
             "regression": "[bold red]✗ REGRESSION[/bold red]",
+            "misread": "[magenta]! misread    [/magenta]",
             "drift": "[yellow]~ drift      [/yellow]",
             "unfixtured": "[cyan]? unfixtured [/cyan]",
             "gap": "[yellow]· gap        [/yellow]",
@@ -281,14 +290,33 @@ def _compare_screen(
     actual_name = found.identity.name if found.identity else None
 
     if expected.name and actual_name != expected.name:
-        findings.append(
-            Finding(
-                status="regression",
-                slug=fixture.slug,
-                t_ms=expected.t_ms(),
-                message=f"name changed: {expected.name!r} → {actual_name!r}",
+        # A read the fixture already records as wrong is a standing defect, not a
+        # new one. Reported either way; only an UNEXPECTED name fails the gate.
+        if expected.known_misread is not None and actual_name == expected.known_misread:
+            findings.append(
+                Finding(
+                    status="misread",
+                    slug=fixture.slug,
+                    t_ms=expected.t_ms(),
+                    message=(
+                        f"still misread as {actual_name!r}; truth is {expected.name!r}"
+                    ),
+                )
             )
-        )
+        else:
+            findings.append(
+                Finding(
+                    status="regression",
+                    slug=fixture.slug,
+                    t_ms=expected.t_ms(),
+                    message=f"name changed: {expected.name!r} → {actual_name!r}"
+                    + (
+                        f" (recorded misread was {expected.known_misread!r})"
+                        if expected.known_misread is not None
+                        else ""
+                    ),
+                )
+            )
     if expected.module:
         actual_module = (found.identity.module if found.identity else None) or (
             found.classification.module if found.classification else None

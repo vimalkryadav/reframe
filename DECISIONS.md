@@ -1078,6 +1078,49 @@ move.
 
 ---
 
+## DEC-030 — A read the fixture already corrects is a standing defect, not a regression
+
+Decided 2026-08-24, after it blocked the pre-commit gate on two videos.
+
+A fixture's `name` is ground truth, and a human edits it when the pipeline reads a
+screen wrongly. That correction then makes the pipeline disagree with the fixture on
+**every subsequent run**, because nothing about the model changed — so `verify`
+reported a regression forever, "shows no regressions" could never be satisfied, and
+the checklist item became noise. v01 carried two such corrections; v02 carries
+seven, all of the same kind: the pipeline returns a record-type label or a picker's
+step label where the activity name belongs.
+
+Reporting them as regressions is wrong in the specific way this tool cares about: a
+permanent known defect and a new break look identical, so the signal that should
+mean "something changed today" means nothing.
+
+**Decided:**
+
+- A fixture screen may carry `known_misread` — the value the pipeline produces when
+  it is wrong. When the run returns exactly that, the finding is status `misread`:
+  reported, with both the wrong read and the truth, and **it does not fail the
+  gate**.
+- **It excuses one value, not any wrong value.** A third name at that timestamp is
+  still a regression, and the message names the misread that was expected, so a
+  changed defect cannot hide behind a recorded one.
+- A run that gets it **right** reports nothing at all. A fixed defect should go
+  quiet rather than keep announcing itself.
+- `verify`'s verdict says "no regressions (N standing misread(s))" rather than a
+  bare "no regressions", so a clean gate never reads as a clean catalogue.
+
+**What it does not cover.** `known_misread` records a WRONG read, not an ABSENT
+one. Where the title band is illegible and a human has since read the name off the
+frame at high zoom, there is no way to record the truth without reporting a
+regression on every run. v02 has one such entry — 02:31, `Launching Adjust Par
+Levels` — left `null` with the finding in a comment. Extending the field to cover
+the unread case is an open question below.
+
+**Rejected:** deleting the corrected entry, which throws away the only record of
+what the screen actually is. Also rejected: a per-fixture allowance for N
+regressions, which would mask a genuine break as soon as one landed.
+
+---
+
 ## Open questions
 
 Not yet decided. None block starting.
@@ -1091,8 +1134,15 @@ Not yet decided. None block starting.
 - **Capture resolution.** If the laptop ran at a high resolution, text will be
   physically small in frame and OCR will struggle more. May push `sample.fps` or
   the montage crop. Checkable on the first frame.
-- **How a fixture records a read the model gets wrong every time.** This one is
-  blocking a checklist item, so it needs deciding soon. v01's fixture carries two
+- **How a fixture records a name the pipeline cannot read at all.** DEC-030
+  settled the wrong-read case; the unread case is still open. v02's 02:31 is
+  `Launching Adjust Par Levels`, read off the frame at 4x, and the fixture leaves
+  it `null` because recording the truth would report a regression on every run.
+  Nineteen more entries are `null` and unaudited, so this will recur. Options: a
+  sentinel `known_misread` meaning "reads nothing", a separate `unread: true`, or
+  accepting that a fixture cannot hold what the pipeline cannot express.
+- **(SETTLED by DEC-030) How a fixture records a read the model gets wrong every
+  time.** Kept for the trail. v01's fixture carries two
   hand-corrections — `Package` → `NDC Admin`, `Orderable medication` →
   `Dispensable Mapping`. The model still reads the uncorrected value, and will on
   every future run, so `verify` reports two regressions forever and "shows no

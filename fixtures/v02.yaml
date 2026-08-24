@@ -1,0 +1,779 @@
+# Ground truth for v02, recorded from a validated run.
+#
+# Two kinds of fact live here and verify treats them differently (DEC-019):
+#
+#   name, module, and the presence of a screen at a timestamp are STABLE.
+#     They are properties of the footage and are true forever. If a later run
+#     disagrees, that is a REGRESSION and `reframe verify` fails.
+#
+#   bucket is TIME-VARYING. It is a property of the consuming project at the
+#     commit recorded below. new -> built after you build something is DRIFT,
+#     which is reported and expected, not a failure.
+#
+# Edit freely: correct a name the model misread, delete a screen that is not
+# really there, and add a missed_spans entry for anything the run walked past.
+# A missed span is not a failure — it is a gap you can prove you closed later.
+
+slug: v02
+inventory_commit: 5d0a1233
+sample_fps: 1
+
+# WHAT A HUMAN HAS ACTUALLY CHECKED IN HERE, and what is still just the run's own
+# output. Both are recorded, because a fixture nobody has audited is a snapshot,
+# not ground truth, and the difference has to be visible.
+#
+# CHECKED against frames at 3-14x, during the rl_epic build of briefs 12-16:
+#   * the 7 `known_misread` entries below — each one a frame a human opened
+#   * every screen briefs 13-16 built: their headings, toolbars, tabs, field
+#     labels and control states were transcribed row by row and several of my
+#     first readings were corrected in the process
+#
+# NOT CHECKED, and left exactly as the run wrote it:
+#   * `bucket` on every entry — a property of the project, not the footage
+#   * the 20 entries with `name: null` — the title band was illegible. ONE of
+#     them is known: 02:31 is `Launching Adjust Par Levels`, read at 4x. It is
+#     left null rather than corrected because `known_misread` records a WRONG
+#     read, not an ABSENT one, so naming it here would report a regression on
+#     every run. See DECISIONS.md open questions.
+#   * `Workbench` at 03:36/03:48 and `SmartTools` at 08:36/08:49 are workspace
+#     tab labels rather than screens, on the same evidence that settled
+#     `Pharmacy Admin` — but nobody has opened those particular frames, so they
+#     are NOT corrected here. Do that before trusting them.
+
+screens:
+  - t: "00:00"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "00:03"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "00:05"
+    name: "Update Balances"
+    bucket: new
+    note: "resembles 'Validate Barcodes' (0.62)"
+  - t: "00:17"
+    name: "Inventory Item Selection"
+    bucket: new
+    note: "identified at 0.69 — verify this name; resembles 'Inventory Management Admin' (0.60)"
+  - t: "00:19"
+    name: "Inventory Item Selection"
+    bucket: new
+    note: "identified at 0.66 — verify this name; resembles 'Inventory Management Admin' (0.60)"
+  - t: "00:21"
+    name: null
+    bucket: new
+    note: "identified at 0.74 — verify this name"
+  - t: "00:23"
+    name: "Inventory Item Selection"
+    bucket: new
+    note: "identified at 0.62 — verify this name; resembles 'Inventory Management Admin' (0.60)"
+  - t: "00:25"
+    name: "Update Balances"
+    bucket: new
+    note: "resembles 'Validate Barcodes' (0.62)"
+  - t: "00:27"
+    name: "Update Balances"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Validate Barcodes' (0.62)"
+  - t: "00:30"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "00:33"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "00:36"
+    name: null
+    bucket: new
+    note: "identified at 0.70 — verify this name"
+  - t: "00:42"
+    name: null
+    bucket: new
+    note: "identified at 0.88 — verify this name"
+  - t: "00:44"
+    name: "Inventory: EMC Central Fill"
+    bucket: new
+    note: "resembles 'Chart Central' (0.70)"
+  - t: "00:46"
+    name: "Inventory"
+    bucket: new
+    note: "identified at 0.63 — verify this name; resembles 'Inventory Management Admin' (1.00)"
+  - t: "00:52"
+    name: "Inventory: EMC Central Fill"
+    bucket: new
+    note: "resembles 'Chart Central' (0.70)"
+  - t: "00:54"
+    name: "Draft Medication Request"
+    bucket: new
+    note: "resembles 'Medication Admin' (0.77)"
+  - t: "00:58"
+    name: "Inventory"
+    bucket: new
+    note: "resembles 'Inventory Management Admin' (1.00)"
+  - t: "01:03"
+    name: "Direct Transfer"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Transfer Center' (0.73)"
+  - t: "01:08"
+    name: "Direct Transfer"
+    bucket: new
+    note: "identified at 0.89 — verify this name; resembles 'Transfer Center' (0.73)"
+  - t: "01:10"
+    # Corrected. f_000070: "Pharmacy Admin" is the WORKSPACE TAB. The activity tab and heading
+    # read Direct Transfer; this frame is that screen, badly framed.
+    name: "Direct Transfer"
+    known_misread: "Pharmacy Admin"
+    module: "Willow"
+    bucket: new
+    note: "identified at 1.00 — verify this name"
+  - t: "01:12"
+    name: "Inventory"
+    bucket: new
+    note: "resembles 'Inventory Management Admin' (1.00)"
+  - t: "01:14"
+    name: "Inventory: EMC Central Fill"
+    bucket: new
+    note: "resembles 'Chart Central' (0.70)"
+  - t: "01:16"
+    name: "Inventory: EMC Central Fill"
+    bucket: new
+    note: "resembles 'Chart Central' (0.70)"
+  - t: "01:18"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "01:23"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.71 — verify this name"
+  - t: "01:25"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "01:27"
+    name: "Shortages"
+    bucket: new
+    note: "resembles 'Estimates' (0.56)"
+  - t: "01:37"
+    name: "Inventory Item Selection"
+    bucket: new
+    note: "identified at 0.67 — verify this name; resembles 'Inventory Management Admin' (0.60)"
+  - t: "01:39"
+    name: "Inventory Item Selection"
+    bucket: new
+    note: "identified at 0.67 — verify this name; resembles 'Inventory Management Admin' (0.60)"
+  - t: "01:41"
+    name: "Shortages"
+    bucket: new
+    note: "resembles 'Estimates' (0.56)"
+  - t: "01:43"
+    name: null
+    bucket: new
+    note: "identified at 0.92 — verify this name"
+  - t: "01:46"
+    name: null
+    bucket: new
+    note: "identified at 0.92 — verify this name"
+  - t: "01:48"
+    name: "Shortages"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "resembles 'Estimates' (0.56)"
+  - t: "02:01"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.68 — verify this name"
+  - t: "02:06"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.63 — verify this name"
+  - t: "02:08"
+    name: "Inventory Workqueues"
+    bucket: new
+    note: "resembles 'Workqueues' (1.00)"
+  - t: "02:10"
+    name: "Inventory Workqueues"
+    bucket: new
+    note: "resembles 'Workqueues' (1.00)"
+  - t: "02:12"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.74 — verify this name"
+  - t: "02:16"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.71 — verify this name"
+  - t: "02:20"
+    name: "Lot and Expiration Manager"
+    module: "Pharmacy Admin"
+    bucket: new
+    note: "identified at 0.93 — verify this name; resembles 'Unit Manager' (0.74)"
+  - t: "02:26"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "02:28"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "02:31"
+    name: null
+    bucket: new
+    note: "identified at 0.69 — verify this name"
+  - t: "02:36"
+    name: "Adjust Par Levels"
+    bucket: new
+    note: "identified at 0.67 — verify this name; resembles 'Bed Events Summary' (0.51)"
+  - t: "02:47"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.59 — verify this name"
+  - t: "02:52"
+    name: "Launching Cycle Count"
+    bucket: new
+    note: "identified at 0.52 — verify this name; resembles 'Scheduling Group' (0.49)"
+  - t: "02:56"
+    name: "Cycle Count"
+    bucket: new
+    note: "resembles 'Encounter' (0.60)"
+  - t: "03:06"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.65 — verify this name"
+  - t: "03:08"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.59 — verify this name"
+  - t: "03:11"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.97 — verify this name"
+  - t: "03:13"
+    name: "Launching Protocol Builder"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'ROI Billing Report' (0.55)"
+  - t: "03:19"
+    name: "Protocol"
+    bucket: new
+    note: "identified at 0.52 — verify this name; resembles 'SmartTools' (0.56)"
+  - t: "03:21"
+    # Corrected. f_000201: "Protocol" is the step-1 LABEL of the launcher, not a screen. This
+    # frame is the launcher at step 2, whose grid carries a Contents column.
+    name: "Launching Protocol Builder"
+    known_misread: "Protocol"
+    bucket: new
+    note: "resembles 'SmartTools' (0.56)"
+  - t: "03:23"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "03:25"
+    name: "Protocol Builder"
+    bucket: new
+    note: "resembles 'Bed Control' (0.52)"
+  - t: "03:28"
+    name: "Protocol Builder"
+    bucket: new
+    note: "resembles 'Bed Control' (0.52)"
+  - t: "03:30"
+    name: "Protocol Builder"
+    bucket: new
+    note: "resembles 'Bed Control' (0.52)"
+  - t: "03:34"
+    name: "Protocol Builder"
+    bucket: new
+    note: "resembles 'Bed Control' (0.52)"
+  - t: "03:36"
+    name: "Workbench"
+    bucket: new
+    note: "identified at 0.60 — verify this name; resembles 'Workqueues' (0.53)"
+  - t: "03:38"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.95 — verify this name"
+  - t: "03:40"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "03:42"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.58 — verify this name"
+  - t: "03:44"
+    name: null
+    bucket: new
+    note: "identified at 0.71 — verify this name"
+  - t: "03:46"
+    # Corrected. f_000226: "Order Group Contact" is the step-2 label of the launcher.
+    name: "Launching Order Group Builder"
+    known_misread: "Order Group Contact"
+    bucket: new
+    note: "identified at 0.77 — verify this name; resembles 'Call Group On-Call Schedule' (0.59)"
+  - t: "03:48"
+    name: "Workbench"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'Workqueues' (0.53)"
+  - t: "03:50"
+    name: "Order Group Builder"
+    bucket: new
+    note: "resembles 'Call Group On-Call Schedule' (0.54)"
+  - t: "03:53"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "03:55"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.55 — verify this name"
+  - t: "03:57"
+    name: null
+    bucket: new
+    note: "identified at 0.75 — verify this name"
+  - t: "03:59"
+    # Corrected. f_000239: "Locator" is the step-1 label of the launcher.
+    name: "Launching Treatment Modification Builder"
+    known_misread: "Locator"
+    bucket: new
+    note: "identified at 0.70 — verify this name; resembles 'Chart' (0.50)"
+  - t: "04:01"
+    name: "Locator"
+    bucket: new
+    note: "identified at 0.43 — verify this name; resembles 'Chart' (0.50)"
+  - t: "04:03"
+    # Corrected. f_000243: the heading reads "MODIFICATION ONCBCN RSH TRASTUZUMAB REDUCTION
+    # [2038] - 11/06/2013 [1] - Treatment Modification B…". The pipeline returns
+    # the record name's first word as the activity.
+    name: "Treatment Modification Builder"
+    known_misread: "MODIFICATION"
+    bucket: new
+    note: "identified at 0.98 — verify this name; resembles 'Medication Admin' (0.64)"
+  - t: "04:08"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.95 — verify this name"
+  - t: "04:10"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.55 — verify this name"
+  - t: "04:12"
+    # Corrected. f_000252: this is the PICKER, not Episode Type mid-load. One-step, 13 of 30
+    # rows loaded.
+    name: "Launching Episode Type Admin"
+    known_misread: "Episode Type Admin"
+    bucket: new
+    note: "identified at 0.57 — verify this name; resembles 'NDC Admin' (0.71)"
+  - t: "04:14"
+    name: null
+    bucket: new
+    note: "identified at 0.68 — verify this name"
+  - t: "04:17"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "04:19"
+    name: "Episode Type"
+    bucket: new
+    note: "identified at 0.92 — verify this name; resembles 'Bundled Episodes' (0.50)"
+  - t: "04:21"
+    name: "Episode Type"
+    module: "Admin"
+    bucket: new
+    note: "identified at 0.96 — verify this name; resembles 'Bundled Episodes' (0.50)"
+  - t: "04:23"
+    name: "Episode Type"
+    bucket: new
+    note: "identified at 0.72 — verify this name; resembles 'Bundled Episodes' (0.50)"
+  - t: "04:25"
+    name: "Episode Type"
+    module: "Admin"
+    bucket: new
+    note: "resembles 'Bundled Episodes' (0.50)"
+  - t: "04:27"
+    name: "Episode Type"
+    bucket: new
+    note: "resembles 'Bundled Episodes' (0.50)"
+  - t: "04:29"
+    name: "Episode Type"
+    module: "Admin"
+    bucket: new
+    note: "resembles 'Bundled Episodes' (0.50)"
+  - t: "04:32"
+    name: "Episode Type"
+    bucket: new
+    note: "identified at 0.54 — verify this name; resembles 'Bundled Episodes' (0.50)"
+  - t: "04:39"
+    name: "Episode Type"
+    module: "Admin"
+    bucket: new
+    note: "resembles 'Bundled Episodes' (0.50)"
+  - t: "04:48"
+    name: "Episode Type"
+    bucket: new
+    note: "identified at 0.54 — verify this name; resembles 'Bundled Episodes' (0.50)"
+  - t: "04:51"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "04:56"
+    name: null
+    bucket: new
+    note: "identified at 0.96 — verify this name"
+  - t: "05:02"
+    name: "Launching Episode Type Admin"
+    bucket: new
+    note: "identified at 0.58 — verify this name; resembles 'NDC Admin' (0.71)"
+  - t: "05:04"
+    name: null
+    bucket: new
+    note: "identified at 0.69 — verify this name"
+  - t: "05:06"
+    name: null
+    bucket: new
+    note: "identified at 0.68 — verify this name"
+  - t: "05:08"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:11"
+    name: "Launching Beacon Security"
+    bucket: new
+    note: "identified at 0.54 — verify this name; resembles 'Security' (1.00)"
+  - t: "05:14"
+    name: "Beacon - Security Class Editor"
+    bucket: new
+    note: "resembles 'Security' (1.00)"
+  - t: "05:18"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.68 — verify this name"
+  - t: "05:20"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:22"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:24"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.93 — verify this name"
+  - t: "05:26"
+    name: null
+    bucket: new
+    note: "identified at 0.70 — verify this name"
+  - t: "05:28"
+    # Corrected. f_000328: "Protocol Version" is the step-2 label of the launcher.
+    name: "Launching Therapy Protocol Builder"
+    known_misread: "Protocol Version"
+    bucket: new
+    note: "identified at 0.56 — verify this name; resembles 'Non-Covered' (0.52)"
+  - t: "05:30"
+    name: "Therapy Protocol Builder"
+    bucket: new
+    note: "identified at 0.69 — verify this name; resembles 'Professional Billing Reports' (0.46)"
+  - t: "05:34"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:36"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:40"
+    name: "Launching Therapy Plan Security"
+    bucket: new
+    note: "identified at 0.51 — verify this name; resembles 'Security' (1.00)"
+  - t: "05:42"
+    name: "Therapy Plan - Security Class Editor"
+    bucket: new
+    note: "resembles 'Security' (1.00)"
+  - t: "05:46"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.68 — verify this name"
+  - t: "05:48"
+    name: null
+    bucket: new
+    note: "identified at 0.94 — verify this name"
+  - t: "05:51"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "05:53"
+    name: null
+    bucket: new
+    note: "identified at 0.87 — verify this name"
+  - t: "06:01"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "06:07"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.58 — verify this name"
+  - t: "06:09"
+    name: "ProcDoc Charge Mapping Tester"
+    module: "Willow"
+    bucket: new
+  - t: "06:23"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "06:25"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.74 — verify this name"
+  - t: "06:29"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.96 — verify this name"
+  - t: "06:31"
+    name: null
+    bucket: new
+    note: "identified at 0.93 — verify this name"
+  - t: "06:34"
+    name: "SmartForm Designer"
+    bucket: new
+    note: "resembles 'Container Storage' (0.51)"
+  - t: "06:36"
+    name: "SmartForm Designer"
+    bucket: new
+    note: "resembles 'Container Storage' (0.51)"
+  - t: "06:39"
+    name: "SmartForm Designer - (LEGACY) AUTH APPEAL INFORMATION [330518019] - CRM Forms (Read-Only Mode)"
+    bucket: new
+    note: "resembles 'New CRM' (0.60)"
+  - t: "06:45"
+    name: "SmartForm Designer"
+    bucket: new
+    note: "resembles 'Container Storage' (0.51)"
+  - t: "06:59"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.70 — verify this name"
+  - t: "07:02"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "07:06"
+    name: null
+    bucket: new
+    note: "identified at 0.69 — verify this name"
+  - t: "07:08"
+    name: "Launching Relationship Builder"
+    bucket: new
+    note: "resembles 'ROI Billing Report' (0.54)"
+  - t: "07:11"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "07:13"
+    name: "Relationship Builder"
+    bucket: new
+    note: "resembles 'Deposit Reconciliation' (0.52)"
+  - t: "07:15"
+    name: "Relationship Builder"
+    bucket: new
+    note: "resembles 'Deposit Reconciliation' (0.52)"
+  - t: "07:18"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "07:20"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.74 — verify this name"
+  - t: "07:26"
+    name: "Macro Editor"
+    bucket: new
+    note: "identified at 0.70 — verify this name; resembles 'Text/Template Editor' (0.67)"
+  - t: "07:32"
+    name: "Macro Editor"
+    bucket: new
+    note: "identified at 0.68 — verify this name; resembles 'Text/Template Editor' (0.67)"
+  - t: "07:34"
+    name: "Macro Editor"
+    bucket: new
+    note: "resembles 'Text/Template Editor' (0.67)"
+  - t: "07:36"
+    name: "Macro Editor"
+    bucket: new
+    note: "resembles 'Text/Template Editor' (0.67)"
+  - t: "07:38"
+    name: "Macro Editor"
+    module: "Admin"
+    bucket: new
+    note: "identified at 0.60 — verify this name; resembles 'Text/Template Editor' (0.67)"
+  - t: "07:41"
+    name: "Macro Editor"
+    bucket: new
+    note: "resembles 'Text/Template Editor' (0.67)"
+  - t: "07:44"
+    name: "Macro Editor"
+    bucket: new
+    note: "resembles 'Text/Template Editor' (0.67)"
+  - t: "07:46"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "07:48"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "07:56"
+    name: "SmartText"
+    bucket: new
+    note: "identified at 0.44 — verify this name; resembles 'SmartTools' (0.63)"
+  - t: "07:58"
+    name: null
+    bucket: new
+    note: "identified at 0.66 — verify this name"
+  - t: "08:00"
+    name: "SmartText"
+    bucket: new
+    note: "identified at 0.44 — verify this name; resembles 'SmartTools' (0.63)"
+  - t: "08:02"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "08:04"
+    name: "SmartText - (DEPRECATED) - EHS SBO SERVICE AREA - GUARANTOR BILLING ACCESS ADDED FROM ADDRESS"
+    bucket: new
+    note: "identified at 0.69 — verify this name; resembles 'Guarantor Account' (0.69)"
+  - t: "08:15"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "08:18"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "08:21"
+    name: "SmartList"
+    bucket: new
+    note: "identified at 0.64 — verify this name; resembles 'SmartTools' (0.74)"
+  - t: "08:23"
+    name: "SmartList"
+    bucket: new
+    note: "identified at 0.74 — verify this name; resembles 'SmartTools' (0.74)"
+  - t: "08:25"
+    name: null
+    bucket: new
+    note: "identified at 0.71 — verify this name"
+  - t: "08:27"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "08:29"
+    name: "System SmartList"
+    bucket: new
+    note: "identified at 0.68 — verify this name; resembles 'System Definitions' (0.59)"
+  - t: "08:31"
+    name: "System SmartList"
+    bucket: new
+    note: "identified at 0.73 — verify this name; resembles 'System Definitions' (0.59)"
+  - t: "08:33"
+    name: "SmartPhrase Lookup"
+    bucket: new
+    note: "identified at 0.68 — verify this name; resembles 'Family Lookup' (0.63)"
+  - t: "08:36"
+    name: "SmartTools"
+    module: "Tools"
+    bucket: new
+  - t: "08:38"
+    name: "System SmartPhrase"
+    module: "SmartTools"
+    bucket: new
+    note: "resembles 'Pharmacy System Definitions' (0.53)"
+  - t: "08:45"
+    name: "System SmartPhrase"
+    bucket: new
+    note: "identified at 0.93 — verify this name; resembles 'Pharmacy System Definitions' (0.53)"
+  - t: "08:47"
+    name: null
+    bucket: new
+    note: "identified at 0.65 — verify this name"
+  - t: "08:49"
+    name: "SmartTools"
+    module: "Tools"
+    bucket: new
+    note: "identified at 0.62 — verify this name"
+  - t: "08:51"
+    name: "SmartLink (Type: SmartLink)"
+    bucket: new
+    note: "identified at 0.68 — verify this name; resembles 'Open Chart' (0.50)"
+  - t: "08:58"
+    name: "SmartLink (Type: SmartLink)"
+    bucket: new
+    note: "resembles 'Open Chart' (0.50)"
+  - t: "09:01"
+    name: "System SmartPhrase"
+    bucket: new
+    note: "identified at 0.62 — verify this name; resembles 'Pharmacy System Definitions' (0.53)"
+  - t: "09:05"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "09:08"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+    note: "identified at 0.71 — verify this name"
+  - t: "09:10"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "09:12"
+    name: "Infusion Duration Table"
+    bucket: new
+    note: "resembles 'Home Infusion' (0.76)"
+  - t: "09:20"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "09:25"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+  - t: "09:36"
+    name: "Willow Project Team"
+    module: "Willow"
+    bucket: built
+
+# Spans this run failed to catalogue. Add one per stretch of footage that
+# shows a screen the catalogue above does not contain, e.g.:
+#   - {from: "31:10", to: "33:40", note: "scroll through the order list"}
+missed_spans: []

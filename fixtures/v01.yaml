@@ -523,6 +523,10 @@ screens:
     # Corrected: "Orderable medication:" is the record-type label in the heading.
     # The activity tab reads "Dispensable Mapping".
     name: "Dispensable Mapping"
+    # The pipeline reads the record-type label instead of the activity, every run.
+    # Recorded so this reports as a standing defect rather than a fresh regression
+    # (DEC-030). If the read ever changes to anything else, that IS a regression.
+    known_misread: "Orderable medication"
     bucket: new
     note: "resembles 'Medication Reconciliation' (0.67)"
   - t: "08:50"
@@ -558,6 +562,8 @@ screens:
     # tab reads "NDC Admin", confirmed also by the footer button and an identical
     # sidebar tree.
     name: "NDC Admin"
+    # Same standing defect as 08:48 — the record-type label read as the activity.
+    known_misread: "Package"
     module: "NDC Admin"
     bucket: new
     note: "resembles 'Triage Call' (0.44)"

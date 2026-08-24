@@ -317,11 +317,19 @@ def _print_findings(findings: list[fixtures.Finding], slugs: list[str]) -> None:
         counts[finding.status] = counts.get(finding.status, 0) + 1
     summary = " · ".join(f"{count} {status}" for status, count in sorted(counts.items()))
     regressions = counts.get("regression", 0)
-    verdict = (
-        f"[bold red]{regressions} regression(s)[/bold red]"
-        if regressions
-        else "[green]no regressions[/green]"
-    )
+    # A standing misread is not a failure, but "no regressions" on its own would
+    # read as "nothing is wrong" when the fixture records reads that are still
+    # wrong. Say both (DEC-030).
+    misreads = counts.get("misread", 0)
+    if regressions:
+        verdict = f"[bold red]{regressions} regression(s)[/bold red]"
+    elif misreads:
+        verdict = (
+            f"[green]no regressions[/green]"
+            f" ([magenta]{misreads} standing misread(s)[/magenta])"
+        )
+    else:
+        verdict = "[green]no regressions[/green]"
     console.print(f"\n{len(slugs)} video(s) verified: {summary} — {verdict}")
 
 
